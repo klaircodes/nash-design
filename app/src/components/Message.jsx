@@ -46,9 +46,52 @@ function CodeBlock({ lang, v }) {
   );
 }
 
+function FileCard({ name, meta }) {
+  return (
+    <div className="filecard">
+      <b>{name}</b>
+      <small>{meta}</small>
+    </div>
+  );
+}
+
+/* a titled document the reply produced — collapsible, with its own actions */
+function DocBlock({ title, v }) {
+  const [open, setOpen] = useState(true);
+  return (
+    <div className="doc">
+      <div className="dochead">
+        <span className="t">{title}</span>
+        <button title="Edit" aria-label="Edit"><Icon name="edit" size={15} /></button>
+        <button title="Copy" aria-label="Copy"><Icon name="copy" size={15} /></button>
+        <button title="Download" aria-label="Download"><Icon name="download" size={15} /></button>
+        <motion.button onClick={() => setOpen(o => !o)}
+          aria-label={open ? 'Collapse' : 'Expand'}
+          animate={{ rotate: open ? 0 : -90 }} transition={{ duration: dur.swap, ease }}>
+          <Icon name="chevD" size={15} />
+        </motion.button>
+      </div>
+      <AnimatePresence initial={false}>
+        {open && (
+          <motion.div className="docbody" key="b"
+            initial={{ height:0, opacity:0 }} animate={{ height:'auto', opacity:1 }}
+            exit={{ height:0, opacity:0 }} transition={{ duration: dur.move, ease }}
+            style={{ overflow:'hidden' }}>
+            <div className="docin">
+              {v.map((para, i) => <p key={i}>{para}</p>)}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
 function Blocks({ blocks }) {
   return blocks.map((b, i) => {
     if (b.t === 'code')  return <CodeBlock key={i} lang={b.lang} v={b.v} />;
+    if (b.t === 'file')  return <FileCard key={i} name={b.name} meta={b.meta} />;
+    if (b.t === 'doc')   return <DocBlock key={i} title={b.title} v={b.v} />;
     if (b.t === 'h2')    return <h2 key={i} className="bh2">{b.v}</h2>;
     if (b.t === 'h3')    return <h3 key={i} className="bh3">{b.v}</h3>;
     if (b.t === 'quote') return <blockquote key={i} className="bq">{inline(b.v)}</blockquote>;

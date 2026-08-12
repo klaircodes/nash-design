@@ -14,6 +14,7 @@ export const CHATS = [
   { title:'Creating a PDF summary',       group:'Previous 7 days', pinned:true  },
   { title:'Voice chat',                   group:'Previous 7 days', pinned:false },
   { title:'Why .map() returns a new array', group:'Previous 7 days', pinned:false },
+  { title:'Resume review',                group:'Previous 7 days', pinned:false },
 ];
 
 export const GROUP_ORDER = ['Today','Yesterday','Previous 7 days','Previous 30 days','June'];
@@ -161,6 +162,21 @@ export const CONVERSATIONS = {
         'Scope — sidebar, composer, and the model picker only.',
         'Out of scope — bookmarks and MCP, which ship after.',
         'Open — whether personas keep their own pinned list.',
+      ]},
+    ]},
+  ],
+
+  'Resume review': [
+    { role:'user', blocks:[
+      { t:'file', name:'resume_2026.pdf', meta:'PDF · 2.4 MB' },
+      { t:'p',    v:'Review my resume and suggest improvements.' },
+    ]},
+    { role:'bot', blocks:[
+      { t:'p', v:'Here is a draft cover letter tailored to a product design role:' },
+      { t:'doc', title:'Cover Letter Draft', v:[
+        'Dear Hiring Manager,',
+        'I am writing to express my strong interest in the Senior Product Designer position at your company. With over 6 years of experience in product design and a proven track record of shipping user-centered products at scale, I believe I would be a valuable addition to your team.',
+        'In my current role at…',
       ]},
     ]},
   ],
