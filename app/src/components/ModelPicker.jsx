@@ -97,12 +97,7 @@ export default function ModelPicker({ open, model, pinned, onPick, onPin, onClos
           whileHover={{ color:'var(--t1)' }} whileTap={{ scale: 0.86 }}
           transition={{ duration: dur.hover, ease }}
         >
-          {/* pinned + hovered: the pin tilts loose, reading as “click to unpin” */}
-          <motion.span style={{ display:'flex' }}
-            animate={{ rotate: isPinned && hover ? 90 : 0 }}
-            transition={liquid}>
-            <Icon name="pin" size={15} />
-          </motion.span>
+          <Icon name="pin" size={15} />
         </motion.button>
 
       </div>

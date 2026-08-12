@@ -73,7 +73,8 @@
 .chatrow .rowacts{display:flex;align-items:center;gap:5px;flex:0 0 auto;}
 .chatrow .dots{display:flex;color:var(--t3);overflow:hidden;}
 .chatrow .pin{display:flex;color:var(--t4);flex:0 0 auto;}
-.chatrow .pin.on{color:var(--t3);}
+.chatrow .pin.on{color:var(--t2);}
+.chatrow .pin.on svg path{fill:currentColor;}
 .rule{height:1px;background:var(--border);margin:8px 0;}
 .version{
   padding:8px 9px 2px;text-align:center;font-size:10.5px;color:var(--t4);

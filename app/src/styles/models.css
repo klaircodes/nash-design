@@ -88,7 +88,9 @@
 .tick{color:var(--accent);display:flex;flex:0 0 auto;}
 .rowacts{display:flex;align-items:center;gap:2px;flex:0 0 auto;}
 .pinbtn{color:var(--t3);padding:4px;border-radius:6px;flex:0 0 auto;display:flex;}
+/* pinned reads as a solid pin; unpinned stays an outline */
 .pinbtn.on{color:var(--t1);}
+.pinbtn.on svg path{fill:currentColor;}
 .mrow.first{margin-top:6px;}
 .mempty{padding:34px 12px;text-align:center;}
 .mempty b{display:block;font-size:13.5px;font-weight:500;color:var(--t1);margin-bottom:6px;}
