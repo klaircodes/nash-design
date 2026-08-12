@@ -37,8 +37,8 @@ function ChatRow({ title, pinned, nested }) {
   const [hover, setHover] = useState(false);
 
   /* generous 26px target — the glyph alone was fiddly to hit */
-  const PinBtn = ({ lead }) => (
-    <motion.button className={`pin ${pinned ? 'on' : ''} ${lead ? 'lead' : ''}`}
+  const PinBtn = () => (
+    <motion.button className={`pin ${pinned ? 'on' : ''}`}
       aria-label={pinned ? 'Unpin chat' : 'Pin chat'}
       animate={{ opacity: pinned || hover ? 1 : 0 }}
       whileTap={{ scale: 0.86 }}
@@ -54,11 +54,9 @@ function ChatRow({ title, pinned, nested }) {
                  color: hover ? 'var(--t1)' : 'var(--t2)' }}
       transition={{ duration: dur.hover, ease }}
     >
-      {/* pinned chats wear the pin up front; unpinned ones offer it on hover, right */}
-      {pinned && <PinBtn lead />}
       <span className="title">{title}</span>
       <div className="rowacts">
-        {!pinned && <PinBtn />}
+        <PinBtn />
         <AnimatePresence>
           {hover && (
             <motion.span className="dots" key="d"

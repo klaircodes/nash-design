@@ -50,6 +50,13 @@ export default function ModelPicker({ open, model, pinned, onPick, onPin, onClos
   const rootPinned = useMemo(
     () => sorted(MODELS.filter(m => pinned.includes(m.name) && match(m))),
     [pinned, q, filter, sort]);
+  /* personas carry no date or tags, so they sort and filter separately */
+  const rootPinnedPersonas = useMemo(
+    () => (filter === 'all'
+      ? PERSONAS.filter(p => pinned.includes(p.name) &&
+          (!q || p.name.toLowerCase().includes(q) || p.desc.toLowerCase().includes(q)))
+      : []),
+    [pinned, q, filter]);
   const rootProviders = useMemo(() => PROVIDERS
     .map(p => ({ ...p, count: MODELS.filter(m => m.provider === p.name && match(m)).length }))
     .filter(p => p.count > 0), [q, filter]);
@@ -102,6 +109,32 @@ export default function ModelPicker({ open, model, pinned, onPick, onPin, onClos
 
       </div>
     </motion.div>
+    );
+  };
+
+  const PersonaRow = ({ p, bare }) => {
+    const hover = hoverRow === p.name;
+    const isPinned = pinned.includes(p.name);
+    return (
+      <motion.div className="mrow" onClick={() => onPick(p.name)}
+        onHoverStart={() => setHoverRow(p.name)}
+        onHoverEnd={() => setHoverRow(h => (h === p.name ? null : h))}
+        whileHover={{ backgroundColor:'var(--hover)' }} transition={{ duration: dur.hover, ease }}>
+        <div className="mt">
+          <div className="mn"><span className="name">{p.name}</span></div>
+          {!bare && <div className="mm">{p.desc}</div>}
+        </div>
+        {model === p.name && <span className="tick"><Icon name="check" size={16} /></span>}
+        <div className="rowacts">
+          <motion.button className={`pinbtn ${isPinned ? 'on' : ''}`}
+            onClick={e => { e.stopPropagation(); onPin(p.name); }}
+            aria-label={isPinned ? 'Unpin' : 'Pin'}
+            animate={{ opacity: isPinned || hover ? 1 : 0 }}
+            whileTap={{ scale: 0.86 }} transition={{ duration: dur.hover, ease }}>
+            <Icon name="pin" size={15} />
+          </motion.button>
+        </div>
+      </motion.div>
     );
   };
 
@@ -219,8 +252,9 @@ export default function ModelPicker({ open, model, pinned, onPick, onPin, onClos
                   </motion.button>
                 )}
 
-                {rootPinned.length > 0 && (<>
+                {(rootPinned.length > 0 || rootPinnedPersonas.length > 0) && (<>
                   <div className="mlabel">Pinned</div>
+                  {rootPinnedPersonas.map(p => <PersonaRow key={p.name} p={p} bare />)}
                   {rootPinned.map(m => <Row key={m.name} m={m} bare />)}
                 </>)}
 
@@ -239,7 +273,8 @@ export default function ModelPicker({ open, model, pinned, onPick, onPin, onClos
                   ))}
                 </>)}
 
-                {rootPinned.length === 0 && rootProviders.length === 0 && <Empty what="models" />}
+                {rootPinned.length === 0 && rootPinnedPersonas.length === 0
+                  && rootProviders.length === 0 && <Empty what="models" />}
               </div>
             </>)}
 
@@ -278,16 +313,7 @@ export default function ModelPicker({ open, model, pinned, onPick, onPin, onClos
               </div>
               <Search placeholder="Search personas..." />
               <div className="mscroll">
-                {personas.map(p => (
-                  <motion.button key={p.name} className="mrow" onClick={() => onPick(p.name)}
-                    whileHover={{ backgroundColor:'var(--hover)' }} transition={{ duration: dur.hover, ease }}>
-                    <div className="mt">
-                      <div className="mn"><span className="name">{p.name}</span></div>
-                      <div className="mm">{p.desc}</div>
-                    </div>
-                    {model === p.name && <span className="tick"><Icon name="check" size={16} /></span>}
-                  </motion.button>
-                ))}
+                {personas.map(p => <PersonaRow key={p.name} p={p} />)}
                 {personas.length === 0 && <Empty what="personas" />}
               </div>
             </>)}

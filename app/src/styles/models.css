@@ -86,7 +86,7 @@
 .newtag{font-size:10.5px;font-weight:500;padding:2px 8px;border-radius:6px;
   background:rgba(99,91,255,.18);color:var(--accent);}
 .tick{color:var(--accent);display:flex;flex:0 0 auto;}
-.rowacts{display:flex;align-items:center;gap:2px;flex:0 0 auto;}
+.rowacts{display:flex;align-items:center;gap:6px;flex:0 0 auto;margin-left:4px;}
 .pinbtn{
   color:var(--t3);flex:0 0 auto;border-radius:7px;
   display:flex;align-items:center;justify-content:center;
