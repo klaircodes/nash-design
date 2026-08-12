@@ -124,8 +124,8 @@
 [data-theme="light"] .mpanel.inline{background:transparent;}
 
 @media (max-width: 720px){
-  .pickhost{max-height:52vh;padding:0 4px;}
-  .mpanel.inline{max-height:52vh;}
+  .pickhost{height:52vh;padding:0 4px;}
+  .mpanel.inline{height:100%;max-height:none;}
   .mhead{padding:6px 12px 12px;}
   .mhead h3{font-size:16px;}
   .searchrow{margin:0 12px 12px;}

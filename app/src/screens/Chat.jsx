@@ -55,8 +55,10 @@ export default function Chat({ user, sessionKey, mobile, drawer, onMenu }) {
       <AnimatePresence initial={false}>
         {mobile && picker && (
           <motion.div key="pick" className="pickhost"
+            /* a fixed height, not the content's — three results and thirty
+               should open to the same panel */
             initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
+            animate={{ height: '52vh', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ height: liquid, opacity: { duration: 0.2, ease } }}
             style={{ overflow: 'hidden' }}>
