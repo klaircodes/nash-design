@@ -47,7 +47,18 @@ const I = {
   google:'<path d="M21.35 11.1H12v3.2h5.35a4.6 4.6 0 0 1-2 3l3.2 2.5c1.87-1.73 2.95-4.28 2.95-7.3 0-.6-.05-1.1-.15-1.4z"/><path d="M12 22c2.7 0 4.96-.9 6.55-2.4l-3.2-2.5c-.9.6-2.05.95-3.35.95-2.6 0-4.8-1.75-5.6-4.1l-3.3 2.55A10 10 0 0 0 12 22z"/><path d="M6.4 13.95a6 6 0 0 1 0-3.9L3.1 7.5a10 10 0 0 0 0 9z"/><path d="M12 5.95c1.47 0 2.78.5 3.82 1.5l2.84-2.84A10 10 0 0 0 3.1 7.5l3.3 2.55C7.2 7.7 9.4 5.95 12 5.95z"/>',
   back:'<line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>',
   chevR:'<polyline points="9 18 15 12 9 6"/>',
-  logout:'<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>'
+  logout:'<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>',
+  library:'<line x1="4" y1="21" x2="4" y2="10"/><line x1="9" y1="21" x2="9" y2="3"/><line x1="14" y1="21" x2="14" y2="8"/><line x1="19" y1="21" x2="19" y2="14"/>',
+  memories:'<ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M20 12c0 1.66-3.58 3-8 3s-8-1.34-8-3"/><path d="M4 5v14c0 1.66 3.58 3 8 3s8-1.34 8-3V5"/>',
+  clip:'<path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/>',
+  image:'<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>',
+  temp:'<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
+  servers:'<rect x="2" y="4" width="20" height="7" rx="2"/><rect x="2" y="13" width="20" height="7" rx="2"/><line x1="6" y1="7.5" x2="6.01" y2="7.5"/><line x1="6" y1="16.5" x2="6.01" y2="16.5"/>',
+  wave:'<line x1="4" y1="10" x2="4" y2="14"/><line x1="8" y1="7" x2="8" y2="17"/><line x1="12" y1="4" x2="12" y2="20"/><line x1="16" y1="7" x2="16" y2="17"/><line x1="20" y1="10" x2="20" y2="14"/>',
+  mic:'<path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/>',
+  chevL:'<polyline points="15 18 9 12 15 6"/>',
+  sort:'<line x1="4" y1="6" x2="20" y2="6"/><line x1="7" y1="12" x2="17" y2="12"/><line x1="10" y1="18" x2="14" y2="18"/>',
+  mcp:'<path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/>'
 };
 const ico = (n, s = 16, cls = '') =>
   `<svg class="${cls}" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none"
@@ -56,10 +67,17 @@ window.__ico = ico;
 
 /* ---------- state ---------- */
 const state = {
-  view: 'connectors',
+  view: 'chat',
   theme: (() => { try { return localStorage.getItem('nash.theme') || 'dark'; } catch (e) { return 'dark'; } })(),
   user: { name:'Klair', email:'claire@backboard.io' },
   userMenu: false,
+  moreMenu: null,      // {x, y} when the More flyout is open
+  composerOpen: false,
+  model: 'GPT-4.1',
+  modelPanel: null,    // null | 'root' | provider name
+  modelQuery: '',
+  modelFilter: 'All',
+  pinned: ['Claude Opus 4.8'],
   tab: 'All',
   layout: 'grid',
   query: '',
@@ -175,7 +193,8 @@ function sidebar() {
     <div class="searchfield">${ico('search',14)}<span>Search messages</span></div>
     <div class="spacer"></div>
     ${nav.map(([i,l,v]) => `
-      <div class="navitem ${state.view===v?'active':''}" ${v?`data-go="${v}"`:''}>
+      <div class="navitem ${state.view===v?'active':''} ${l==='More'&&state.moreMenu?'active':''}"
+           ${l==='More' ? 'data-more' : (v?`data-go="${v}"`:'')}>
         ${ico(i,16)}<span>${l}</span></div>`).join('')}
    </div>
 
@@ -223,6 +242,24 @@ function sidebar() {
     </div>
    </div>
   </aside>`;
+}
+
+/* ---------- More flyout ---------- */
+const MORE = [
+  ['library','Library','library'],
+  ['memories','Memories','memories'],
+  ['mcp','MCP Settings','connectors']
+];
+function moreflyout() {
+  if (!state.moreMenu) return '';
+  const { x, y } = state.moreMenu;
+  return `
+  <div class="flyout" style="left:${x}px;top:${y}px">
+    ${MORE.map(([i,l,v]) => `
+      <div class="flyrow ${state.view===v?'on':''}" data-go="${v}">
+        ${ico(i,16)}<span>${l}</span>
+      </div>`).join('')}
+  </div>`;
 }
 
 /* ---------- user / settings menu ---------- */
@@ -409,67 +446,167 @@ function rail() {
 }
 
 /* ---------- chat ---------- */
-function chatView() {
-  const active = state.connectors.filter(c => c.inChat && c.status === 'connected');
+const GREETING = () => {
+  const h = new Date().getHours();
+  return h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
+};
+const firstName = () => (state.user.name || 'there').split(' ')[0];
+
+const TOOLS = [
+  ['temp','Temporary chat'],
+  ['servers','Connectors'],
+  ['wave','Voice mode'],
+  ['gear','Chat settings']
+];
+
+function composer() {
+  const open = state.composerOpen;
   return `
-  <div class="view" style="display:flex;flex-direction:column;height:100%">
-    <div style="flex:1;overflow-y:auto">
-      <div class="thread">
-        <div class="msg user"><div class="bubble">Does .map() mutate the array I call it on?</div></div>
-        <div class="msg ai">
-          <div class="model">Claude Opus 5</div>
-          <div class="body">The <code>.map()</code> method creates a new array by calling a function on every
-            element. It doesn’t modify the original array — it returns a new one, which is why it works well
-            in React render logic.</div>
-        </div>
-        <div class="msg user"><div class="bubble">Any invoices outstanding this month?</div></div>
-        <div class="toolcall">
-          <div class="th">${ico('mail',14)}<b>Gmail</b>
-            <span class="state" style="color:var(--ok)">Done</span></div>
-          <div class="tool">search_messages</div>
-          <div class="res">Found 4 threads matching “invoice” from the last 30 days.</div>
-        </div>
-        <div class="msg ai">
-          <div class="model">Claude Opus 5</div>
-          <div class="body">You have four open invoices. The oldest is from Northwind, dated 14 July, for £2,400.</div>
-        </div>
-      </div>
+  <div class="composer ${open ? 'open' : ''}">
+    <div class="crow">
+      <button class="round" data-composer>${ico(open ? 'minus' : 'plus', 17)}</button>
+      <input placeholder="Ask anything..." id="ask">
+      <button class="modelpick" data-modelopen>
+        <span>${state.model}</span>${ico('chevD',14)}
+      </button>
+      <button class="round">${ico('mic',16)}</button>
+      <button class="round accent">${ico('send',16)}</button>
     </div>
-    <div style="position:relative">
-      ${state.popover ? popover(active) : ''}
-      <div class="composer">
-        <button class="round" data-popover>${state.popover ? ico('minus',17) : ico('plus',17)}</button>
-        <input placeholder="Ask anything...">
-        <span style="font-size:13px;color:var(--t2)">Claude Opus 5</span>
-        <button class="round accent">${ico('send',16)}</button>
-      </div>
+    ${open ? `
+    <div class="trow">
+      <button class="pill">${ico('clip',15)}Add File</button>
+      <button class="pill">${ico('image',15)}Create Image</button>
+      <span class="sp"></span>
+      ${TOOLS.map(([i,t]) => `<button class="round sm" title="${t}"
+        ${i==='servers' ? 'data-popover' : ''}>${ico(i,15)}</button>`).join('')}
+    </div>` : ''}
+  </div>`;
+}
+
+function chatView() {
+  return `
+  <div class="chatwrap">
+    <div class="chathead"><span class="sp"></span>
+      <button class="iconbtn">${ico('dots',18)}</button>
+    </div>
+    <div class="chatbody">
+      <h1 class="greet">${GREETING()}, ${firstName()}</h1>
+    </div>
+    <div class="composerwrap">
+      ${state.popover ? popover() : ''}
+      ${composer()}
     </div>
   </div>`;
 }
-function popover() {
-  const list = state.connectors.filter(c => c.status !== 'available');
-  const on = list.filter(c => c.inChat && c.status === 'connected').length;
+
+/* ---------- model picker ---------- */
+const PINNED_MODELS = [
+  ['Claude Opus 4.8','Mar 18 · Vision'],
+  ['GPT-5','Jun 20 · Vision']
+];
+const PROVIDERS = [
+  ['Open AI',14,'GPT-5, GPT-5 mini, o4'],
+  ['Anthropic',8,'Claude Opus 5, Opus 4.8, Sonnet 5'],
+  ['Google',11,'Gemini 3 Pro, Gemini 3 Flash'],
+  ['Meta',9,'Llama 4, Llama 4 Scout'],
+  ['Mistral',6,'Mistral Large 3, Codestral']
+];
+const PROVIDER_MODELS = {
+  'Anthropic':[
+    ['Claude Opus 5','Jul 29 · Vision',true],
+    ['Claude Opus 4.8','Mar 18 · Vision',false],
+    ['Claude Sonnet 5','Jun 02 · Vision',false],
+    ['Claude Haiku 4.5','Jan 14 · Vision',false]
+  ],
+  'Open AI':[
+    ['GPT-5','Jun 20 · Vision',true],
+    ['GPT-5 mini','Jun 20 · Vision',false],
+    ['o4','Feb 08 · Reasoning',false]
+  ],
+  'Google':[['Gemini 3 Pro','May 11 · Vision',true],['Gemini 3 Flash','May 11 · Vision',false]],
+  'Meta':[['Llama 4','Apr 02 · Open source',false],['Llama 4 Scout','Apr 02 · Open source',false]],
+  'Mistral':[['Mistral Large 3','Mar 30 · Open source',false],['Codestral','Feb 19 · Code',false]]
+};
+const FILTERS = ['All','Open source','Fast','Powerful'];
+
+function modelRow(name, meta, opts = {}) {
+  const isPinned = state.pinned.includes(name);
+  const selected = state.model === name;
   return `
-  <div class="popover" style="bottom:82px;right:0">
-    <div class="phead">
-      <b>Connectors in this chat</b>
-      <span class="chip">${on} on</span>
-      <button class="btn ghost" style="padding:5px 9px" data-go="connectors">${ico('gear',13)}Manage</button>
+  <div class="mrow ${selected?'sel':''}" data-model="${name}">
+    <div class="mt">
+      <div class="mn">${name}${opts.isNew?'<span class="newtag">New</span>':''}</div>
+      <div class="mm">${meta}</div>
     </div>
-    <div class="prule"></div>
-    <div class="plist">
-      ${list.map(c => `
-        <div class="prow">
-          ${ico(c.icon,16)}
-          <div class="tt"><b>${c.name}</b>
-            <small>${c.status==='needs-auth' ? '<span style="color:var(--warn)">Needs auth</span> · ' : ''}${c.tools} tools</small>
-          </div>
-          ${c.status === 'needs-auth'
-            ? `<button class="btn" style="padding:6px 10px;font-size:11.5px" data-reconnect="${c.id}">${ico('refresh',12)}Fix</button>`
-            : `<div class="toggle sm ${c.inChat?'on':''}" data-inchat="${c.id}"><div class="knob"></div></div>`}
-        </div>`).join('')}
-    </div>
+    ${selected ? `<span class="tick">${ico('check',16)}</span>` : ''}
+    <button class="pinbtn ${isPinned?'on':''}" data-pin="${name}">${ico('pin',15)}</button>
   </div>`;
+}
+function filterRow() {
+  return `
+  <div class="filters">
+    <span class="flabel">Filter</span>
+    ${FILTERS.map(f => `<button class="fpill ${state.modelFilter===f?'on':''}" data-mfilter="${f}">${f}</button>`).join('')}
+    <button class="fsort">${ico('sort',15)}</button>
+  </div>`;
+}
+function modelModal() {
+  if (!state.modelPanel) return '';
+  const q = state.modelQuery.trim().toLowerCase();
+  const root = state.modelPanel === 'root';
+  let inner;
+
+  if (root) {
+    const pins = PINNED_MODELS.filter(m => !q || m[0].toLowerCase().includes(q));
+    const provs = PROVIDERS.filter(p => !q || (p[0]+p[2]).toLowerCase().includes(q));
+    inner = `
+      <div class="mhead">
+        <div class="mtitle"><h3>Select Model</h3><small>17,000+ models · 200+ providers</small></div>
+        <button class="iconbtn" data-modelclose>${ico('x',16)}</button>
+      </div>
+      <div class="msearch">${ico('search',15)}
+        <input id="mq" placeholder="Search 17,000+ models..." value="${state.modelQuery}">
+      </div>
+      ${filterRow()}
+      <div class="mscroll">
+        ${pins.length ? `<div class="mlabel">Pinned</div>${pins.map(m=>modelRow(m[0],m[1])).join('')}` : ''}
+        <div class="mrow personas" data-personas>
+          <div class="mt"><div class="mn">Personas</div><div class="mm">12 saved presets</div></div>
+          ${ico('chevR',16)}
+        </div>
+        ${provs.length ? `<div class="mlabel">Providers · most used first</div>
+          ${provs.map(([n,c,sub]) => `
+            <div class="mrow" data-provider="${n}">
+              <div class="mt">
+                <div class="mn">${n}<span class="count">${c}</span></div>
+                <div class="mm">${sub}</div>
+              </div>${ico('chevR',16)}
+            </div>`).join('')}` : ''}
+        ${!pins.length && !provs.length ? `<div class="mempty">No models match “${state.modelQuery}”</div>` : ''}
+      </div>`;
+  } else {
+    const p = state.modelPanel;
+    const list = (PROVIDER_MODELS[p]||[]).filter(m => !q || m[0].toLowerCase().includes(q));
+    const pins = list.filter(m => state.pinned.includes(m[0]));
+    const rest = list.filter(m => !state.pinned.includes(m[0]));
+    inner = `
+      <div class="mhead">
+        <button class="iconbtn" data-modelback>${ico('chevL',16)}</button>
+        <div class="mtitle"><h3>${p}</h3><small>${(PROVIDER_MODELS[p]||[]).length} models · all support vision</small></div>
+        <button class="iconbtn" data-modelclose>${ico('x',16)}</button>
+      </div>
+      <div class="msearch">${ico('search',15)}
+        <input id="mq" placeholder="Search ${p} models..." value="${state.modelQuery}">
+      </div>
+      ${filterRow()}
+      <div class="mscroll">
+        ${pins.length ? `<div class="mlabel">Pinned</div>${pins.map(m=>modelRow(m[0],m[1],{isNew:m[2]})).join('')}` : ''}
+        ${rest.length ? `<div class="mlabel">All models · newest first</div>
+          ${rest.map(m=>modelRow(m[0],m[1],{isNew:m[2]})).join('')}` : ''}
+        ${!list.length ? `<div class="mempty">No ${p} models match “${state.modelQuery}”</div>` : ''}
+      </div>`;
+  }
+  return `<div class="scrim" data-modelscrim><div class="modelpanel">${inner}</div></div>`;
 }
 
 /* ---------- bookmarks ---------- */
@@ -593,29 +730,45 @@ function render() {
   app.innerHTML = `
     <div class="shell">
       ${sidebar()}
+      ${moreflyout()}
       <div class="main">
         <div class="content">${view}</div>
         ${state.view==='connectors' ? rail() : ''}
         ${modal()}
+        ${modelModal()}
         ${toasts()}
       </div>
     </div>`;
-  const q = document.getElementById('q');
-  if (q && document.activeElement !== q && state.query) {
-    q.focus(); q.setSelectionRange(q.value.length, q.value.length);
+  for (const id of ['q','mq']) {
+    const el = document.getElementById(id);
+    const val = id === 'q' ? state.query : state.modelQuery;
+    if (el && document.activeElement !== el && val) {
+      el.focus(); el.setSelectionRange(el.value.length, el.value.length);
+    }
   }
 }
 
 /* ---------- events ---------- */
 function onAppClick(e) {
-  const t = e.target.closest('[data-go],[data-toggle],[data-folder],[data-tab],[data-layout],[data-connect],[data-consent],[data-manage],[data-pause],[data-resume],[data-disconnect],[data-confirmdisconnect],[data-reconnect],[data-closerail],[data-tool],[data-inchat],[data-popover],[data-add],[data-cancel],[data-scrim],[data-themetoggle],[data-clear],[data-toastclose],[data-toastaction],[data-usermenu],[data-signout]');
+  const t = e.target.closest('[data-go],[data-toggle],[data-folder],[data-tab],[data-layout],[data-connect],[data-consent],[data-manage],[data-pause],[data-resume],[data-disconnect],[data-confirmdisconnect],[data-reconnect],[data-closerail],[data-tool],[data-inchat],[data-popover],[data-add],[data-cancel],[data-scrim],[data-themetoggle],[data-clear],[data-toastclose],[data-toastaction],[data-usermenu],[data-signout],[data-more],[data-composer],[data-modelopen],[data-modelclose],[data-modelback],[data-modelscrim],[data-provider],[data-model],[data-pin],[data-mfilter],[data-personas]');
   if (!t) {                                        // click-away closes transient surfaces
-    if (state.userMenu || state.popover) { state.userMenu = false; state.popover = false; render(); }
+    if (state.userMenu || state.popover || state.moreMenu) {
+      state.userMenu = false; state.popover = false; state.moreMenu = null; render();
+    }
     return;
   }
   const d = t.dataset;
   if (d.signout !== undefined) return;             // handled by its own listener
-  if (d.usermenu !== undefined) { state.userMenu = !state.userMenu; render(); return; }
+  if (d.usermenu !== undefined) { state.userMenu = !state.userMenu; state.moreMenu = null; render(); return; }
+  if (d.more !== undefined) {
+    if (state.moreMenu) { state.moreMenu = null; }
+    else {
+      const r = t.getBoundingClientRect();
+      state.moreMenu = { x: Math.round(r.right + 10), y: Math.round(r.top - 6) };
+    }
+    state.userMenu = false; render(); return;
+  }
+  state.moreMenu = null;
   if (d.themetoggle === undefined && d.usermenu === undefined) state.userMenu = false;
 
   if (d.scrim && e.target !== t) return;               // only the backdrop closes
@@ -626,6 +779,20 @@ function onAppClick(e) {
   if (d.tab)       state.tab = d.tab;
   if (d.layout)    state.layout = d.layout;
   if (d.clear !== undefined) state.query = '';
+  if (d.composer !== undefined) { state.composerOpen = !state.composerOpen; render(); return; }
+  if (d.modelopen !== undefined) { state.modelPanel='root'; state.modelQuery=''; state.modelFilter='All'; render(); return; }
+  if (d.modelclose !== undefined || (d.modelscrim !== undefined && e.target === t)) {
+    state.modelPanel = null; render(); return; }
+  if (d.modelback !== undefined) { state.modelPanel='root'; state.modelQuery=''; render(); return; }
+  if (d.provider) { state.modelPanel = d.provider; state.modelQuery=''; render(); return; }
+  if (d.pin) {
+    state.pinned = state.pinned.includes(d.pin)
+      ? state.pinned.filter(x => x !== d.pin) : state.pinned.concat(d.pin);
+    render(); return;
+  }
+  if (d.model) { state.model = d.model; state.modelPanel = null; render(); return; }
+  if (d.mfilter) { state.modelFilter = d.mfilter; render(); return; }
+  if (d.personas !== undefined) { render(); return; }
   if (d.themetoggle !== undefined) {
     state.theme = state.theme === 'dark' ? 'light' : 'dark';
     document.documentElement.dataset.theme = state.theme;
@@ -701,10 +868,13 @@ function onAppClick(e) {
 
 document.addEventListener('input', e => {
   if (e.target.id === 'q') { state.query = e.target.value; render(); }
+  if (e.target.id === 'mq') { state.modelQuery = e.target.value; render(); }
 });
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
-    if (state.modal) state.modal = null;
+    if (state.modelPanel) state.modelPanel = null;
+    else if (state.modal) state.modal = null;
+    else if (state.moreMenu) state.moreMenu = null;
     else if (state.popover) state.popover = false;
     else if (state.rail) state.rail = null;
     else return;
