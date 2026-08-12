@@ -297,6 +297,7 @@ export default function ModelPicker({ open, model, pinned, onPick, onPin, onClos
                 <motion.button className="iconbtn" onClick={onClose}
                   whileHover={{ backgroundColor:'var(--hover)', color:'var(--t1)' }}><Icon name="x" size={16} /></motion.button>
               </div>
+              <div className="mbody">
               <Search placeholder="Search 17,000+ models..." />
               <Filters />
               <div className="mscroll">
@@ -331,6 +332,7 @@ export default function ModelPicker({ open, model, pinned, onPick, onPin, onClos
 
                 {rootPinned.length === 0 && rootProviders.length === 0 && <Empty what="models" />}
               </div>
+              </div>
             </>)}
 
             {view.kind === 'provider' && (<>
@@ -344,6 +346,7 @@ export default function ModelPicker({ open, model, pinned, onPick, onPin, onClos
                 <motion.button className="iconbtn" onClick={onClose}
                   whileHover={{ backgroundColor:'var(--hover)', color:'var(--t1)' }}><Icon name="x" size={16} /></motion.button>
               </div>
+              <div className="mbody">
               <Search placeholder={`Search ${view.name} models...`} withSort />
               <div className="mscroll">
                 {provPinned.length > 0 && (<>
@@ -356,6 +359,7 @@ export default function ModelPicker({ open, model, pinned, onPick, onPin, onClos
                 </>)}
                 {provModels.length === 0 && <Empty what={`${view.name} models`} />}
               </div>
+              </div>
             </>)}
 
             {view.kind === 'personas' && (<>
@@ -366,6 +370,7 @@ export default function ModelPicker({ open, model, pinned, onPick, onPin, onClos
                 <motion.button className="iconbtn" onClick={onClose}
                   whileHover={{ backgroundColor:'var(--hover)', color:'var(--t1)' }}><Icon name="x" size={16} /></motion.button>
               </div>
+              <div className="mbody">
               <Search placeholder="Search personas..." />
               <div className="mscroll">
                 {pinnedPersonas.length > 0 && (<>
@@ -375,6 +380,7 @@ export default function ModelPicker({ open, model, pinned, onPick, onPin, onClos
                 </>)}
                 {personas.map(p => <PersonaRow key={p.name} p={p} />)}
                 {personas.length === 0 && pinnedPersonas.length === 0 && <Empty what="personas" />}
+              </div>
               </div>
             </>)}
 

@@ -137,11 +137,21 @@
   .searchrow{margin:0 0 12px;}
   .filterbar{padding:0 0 10px;}
   .sortmenu{right:0;}
-  /* the list gets its own card, same as Add to Chat's groups, so the panel
-     reads as a surface over the chat instead of dissolving into it */
-  .mpanel.inline .mscroll{
-    background:var(--surface);border-radius:14px;padding:4px 0 6px;
+  /* search, filters and the list share one card — same language as Add to
+     Chat's groups — so the panel reads as a surface over the chat */
+  .mpanel.inline .mbody{
+    flex:1;min-height:0;display:flex;flex-direction:column;
+    background:var(--surface);border-radius:14px;padding:10px 0 6px;
   }
+  /* controls need to lift off that card, not match it */
+  .mpanel.inline .msearch,
+  .mpanel.inline .fpill,
+  .mpanel.inline .sortmenu{background:var(--elevated);}
+  .mpanel.inline .fpill.on{background:var(--accent);}
+  .mpanel.inline .searchrow{margin:0 10px 10px;}
+  .mpanel.inline .filterbar{padding:0 10px 10px;}
+  .mpanel.inline .mscroll{padding:0 2px 4px;}
+  .mpanel.inline .mhead small{display:none;}
   .mrow{padding:11px 12px;}
   .mlabel{padding:12px 12px 8px;}
 }
