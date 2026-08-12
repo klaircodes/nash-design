@@ -23,7 +23,7 @@
 
 /* rows never compress */
 .brand,.org,.searchfield,.navitem,.sechead,.folderrow,
-.folderchat,.datemark,.chatrow,.gap,.rule,.userrow{flex:0 0 auto;}
+.datemark,.chatrow,.gap,.rule,.userrow{flex:0 0 auto;}
 
 .brand{height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 8px;}
 .brand b{font-size:17px;font-weight:600;letter-spacing:-.2px;}
@@ -49,12 +49,8 @@
   border-radius:var(--r-sm);font-size:12.5px;color:var(--t2);text-align:left;
 }
 .folderrow .chev{margin-left:auto;display:flex;}
-/* nested chats match loose chat rows exactly — only the indent differs */
-.folderchat{
-  height:32px;display:flex;align-items:center;padding:0 9px 0 31px;
-  border-radius:var(--r-sm);font-size:12.5px;color:var(--t2);
-  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
-}
+/* nested chats are the same row, only indented */
+.chatrow.nested{padding-left:31px;}
 .datemark{
   height:30px;display:flex;align-items:center;padding:0 9px;
   font-size:11px;font-weight:500;color:var(--t3);margin-top:14px;

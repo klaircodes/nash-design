@@ -34,11 +34,11 @@ function Chevron({ open }) {
   );
 }
 
-function ChatRow({ title, pinned }) {
+function ChatRow({ title, pinned, nested }) {
   const [hover, setHover] = useState(false);
   return (
     <motion.div
-      className="chatrow"
+      className={`chatrow ${nested ? 'nested' : ''}`}
       onHoverStart={() => setHover(true)}
       onHoverEnd={() => setHover(false)}
       animate={{ backgroundColor: hover ? 'var(--hover)' : 'rgba(0,0,0,0)',
@@ -124,7 +124,7 @@ export default function Sidebar({ user, onNewChat }) {
                   <Chevron open={open[f.key]} />
                 </motion.button>
                 <Collapse open={open[f.key]}>
-                  {f.chats.map(c => <div className="folderchat" key={c}>{c}</div>)}
+                  {f.chats.map(c => <ChatRow key={c} title={c} nested />)}
                 </Collapse>
               </div>
             ))}
