@@ -78,7 +78,7 @@ export default function Sidebar({ user, onNewChat, collapsed, onToggle }) {
     <motion.aside
       className="sidebar"
       animate={{
-        width: collapsed ? 112 : 280,
+        width: collapsed ? 148 : 280,
         backgroundColor: collapsed ? 'rgba(0,0,0,0)' : 'var(--sunken)',
         borderRightColor: collapsed ? 'rgba(0,0,0,0)' : 'var(--border)',
       }}
