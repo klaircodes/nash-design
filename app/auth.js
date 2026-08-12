@@ -76,7 +76,6 @@ function render() {
     <div class="hero">
       <div class="hero-top">
         <span class="mark">Nash</span>
-        <span class="back">${ic('back',16)}Back to Nash</span>
       </div>
       <div class="hero-copy">
         <h2>Every AI model.<br>One workspace. Zero lock-in.</h2>

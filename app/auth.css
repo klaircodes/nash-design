@@ -16,7 +16,7 @@
   display:flex;flex-direction:column;padding:24px 40px 40px;
 }
 .hero::before{                       /* backdrop blobs */
-  content:'';position:absolute;inset:0;
+  content:'';position:absolute;inset:0;z-index:0;
   background:
     radial-gradient(58% 44% at 32% 30%, rgba(99,91,255,.30), transparent 70%),
     radial-gradient(46% 34% at 72% 18%, rgba(99,91,255,.17), transparent 70%),
@@ -28,21 +28,16 @@
   from{transform:translate3d(0,0,0) scale(1);}
   to{transform:translate3d(-22px,18px,0) scale(1.05);}
 }
-.hero::after{                        /* sheen + vignette */
-  content:'';position:absolute;inset:0;pointer-events:none;
+.hero::after{                        /* sheen + vignette — stays behind the copy */
+  content:'';position:absolute;inset:0;z-index:1;pointer-events:none;
   background:
     linear-gradient(102deg, transparent 0%, rgba(99,91,255,.10) 42%, rgba(99,91,255,.16) 50%,
                     rgba(99,91,255,.10) 58%, transparent 100%),
     radial-gradient(120% 92% at 50% 46%, transparent 0%, rgba(10,12,16,.50) 62%, #0a0c10 100%);
 }
-.hero-top{position:relative;display:flex;align-items:center;justify-content:space-between;}
+.hero-top{position:relative;z-index:2;display:flex;align-items:center;}
 .hero-top .mark{font-size:18px;font-weight:500;color:#f6f6f7;letter-spacing:-.2px;}
-.hero-top .back{
-  display:flex;align-items:center;gap:6px;font-size:12.5px;color:#a8abb1;
-  transition:color .16s var(--ease);
-}
-.hero-top .back:hover{color:#f6f6f7;}
-.hero-copy{position:relative;margin-top:auto;display:flex;flex-direction:column;gap:14px;max-width:500px;}
+.hero-copy{position:relative;z-index:2;margin-top:auto;display:flex;flex-direction:column;gap:14px;max-width:500px;}
 .hero-copy h2{
   margin:0;font-size:30px;line-height:1.14;font-weight:500;color:#f6f6f7;letter-spacing:-.5px;
 }
