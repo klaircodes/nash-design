@@ -165,7 +165,9 @@
   .scrim:has(.memdialog){place-items:center;padding:24px 16px;}
   .memdialog{width:100%;max-width:none;border-radius:16px;
     max-height:calc(100vh - 48px);}
-  .memform{overflow-y:auto;}
+  .memdialog .mhead{padding:16px 16px 12px;}
+  .memdialog .mhead h3{font-size:16px;}
+  .memform{overflow-y:auto;padding:0 16px 2px;}
   /* scope pills wrap rather than running off the sheet */
   .memform .filters{flex-wrap:wrap;}
   .memform textarea{resize:none;min-height:120px;}

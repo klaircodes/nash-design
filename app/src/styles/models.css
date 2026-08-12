@@ -131,12 +131,12 @@
   .mpanel.inline{height:100%;max-height:none;}
   /* matches Add to Chat: same top offset, same 14px to the content below,
      and the close sits on the title's line rather than centred on the block */
-  .mhead{padding:4px 0 14px;align-items:flex-start;}
-  .mhead h3{font-size:16px;}
-  .mhead .iconbtn{width:30px;height:30px;margin-top:-4px;}
-  .searchrow{margin:0 0 12px;}
-  .filterbar{padding:0 0 10px;}
-  .sortmenu{right:0;}
+  .mpanel.inline .mhead{padding:4px 0 14px;align-items:flex-start;}
+  .mpanel.inline .mhead h3{font-size:16px;}
+  .mpanel.inline .mhead .iconbtn{width:30px;height:30px;margin-top:-4px;}
+  .mpanel.inline .searchrow{margin:0 0 12px;}
+  .mpanel.inline .filterbar{padding:0 0 10px;}
+  .mpanel.inline .sortmenu{right:0;}
   /* search, filters and the list share one card — same language as Add to
      Chat's groups — so the panel reads as a surface over the chat */
   .mpanel.inline .mbody{
