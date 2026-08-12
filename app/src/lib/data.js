@@ -87,7 +87,28 @@ export const fmtDate = iso => {
   return d.toLocaleDateString('en-GB', { month:'short', day:'2-digit' });
 };
 
-export const ORGS = ['Mo', 'NashTest', 'Test'];
+/* one org is already signed in; the others still need it */
+export const ORGS = [
+  { name:'Mo',       signedIn:false },
+  { name:'NashTest', signedIn:true  },
+  { name:'Test',     signedIn:false },
+];
+
+/* switching workspace swaps the content, never the behaviour */
+export const WORKSPACES = {
+  Personal: { chats: CHATS, folders: FOLDERS },
+  NashTest: {
+    chats: [
+      { title:'Design system audit',   group:'Today',           pinned:true  },
+      { title:'Onboarding copy pass',  group:'Today',           pinned:false },
+      { title:'Sprint 12 retro',       group:'Previous 7 days', pinned:false },
+    ],
+    folders: [
+      { key:'ws-design',  label:'Design',  chats:['Token migration'] },
+      { key:'ws-eng',     label:'Engineering', chats:['Release checklist'] },
+    ],
+  },
+};
 
 /* Canned threads. Frontend only — no model is called; the reply is fixed.
    Each chat gets its own content; chats without an entry open empty. */
@@ -254,3 +275,43 @@ export const CONVERSATIONS = {
     { role:'bot',  text:REPLY },
   ],
 };
+
+Object.assign(CONVERSATIONS, {
+  'Design system audit': [
+    { role:'user', text:'Where is the design system drifting from what is actually shipped?' },
+    { role:'bot', blocks:[
+      { t:'p',  v:'Three places, in order of how much they cost to leave alone:' },
+      { t:'ol', v:[
+        ['Colour', 'six greys in the code, four in the library. The two extras came from screenshots.'],
+        ['Spacing', 'the 4px scale is respected everywhere except the composer, which uses 13 and 22.'],
+        ['Icons', 'two sets in play — the outline set and whatever shipped with the picker.'],
+      ]},
+    ]},
+  ],
+  'Onboarding copy pass': [
+    { role:'user', text:'Tighten the empty-state copy. It reads like a manual.' },
+    { role:'bot',  text:REPLY },
+  ],
+  'Sprint 12 retro': [
+    { role:'user', text:'Summarise what went wrong in sprint 12 without naming anyone.' },
+    { role:'bot', blocks:[
+      { t:'p',     v:'Two themes: work started before the shape was agreed, and review happened after merge rather than before.' },
+      { t:'quote', v:'Nothing was late. Things were just decided twice.' },
+    ]},
+  ],
+  'Token migration': [
+    { role:'user', text:'What is left in the hex-to-token migration?' },
+    { role:'bot',  text:REPLY },
+  ],
+  'Release checklist': [
+    { role:'user', text:'Draft the pre-release checklist for the next tag.' },
+    { role:'bot', blocks:[
+      { t:'p',  v:'Keep it to what would actually block a release:' },
+      { t:'ul', v:[
+        'Dark and light both pass a visual sweep.',
+        'Composer keyboard behaviour verified on a phone.',
+        'No console errors on a cold load.',
+      ]},
+    ]},
+  ],
+});

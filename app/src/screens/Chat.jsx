@@ -21,7 +21,7 @@ export default function Chat({ user, sessionKey, openChat, mobile, drawer, onMen
   useEffect(() => { setThread([]); }, [sessionKey]);
   useEffect(() => {
     /* no shared fallback — a chat without its own thread opens empty */
-    if (openChat) setThread(CONVERSATIONS[openChat.title] || []);
+    setThread(openChat ? (CONVERSATIONS[openChat.title] || []) : []);
   }, [openChat]);
 
   /* stay pinned to the newest message */

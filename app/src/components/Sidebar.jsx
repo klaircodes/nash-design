@@ -2,7 +2,21 @@ import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import Icon from './Icon.jsx';
 import { ease, dur, liquid, liquidWide } from '../lib/motion.js';
-import { FOLDERS, CHATS, GROUP_ORDER, ORGS } from '../lib/data.js';
+import { GROUP_ORDER, ORGS, WORKSPACES, CONVERSATIONS } from '../lib/data.js';
+
+/* a chat matches on its title or on anything said inside it */
+const haystack = title => {
+  const said = (CONVERSATIONS[title] || []).flatMap(m => [
+    m.text || '',
+    ...(m.blocks || []).flatMap(b => [
+      b.title || '', b.name || '', b.meta || '', b.lang || '',
+      typeof b.v === 'string' ? b.v : '',
+      Array.isArray(b.v) ? b.v.flat(2).join(' ') : '',
+      ...(b.head || []), ...(b.rows || []).flat(),
+    ]),
+  ]);
+  return `${title} ${said.join(' ')}`.toLowerCase();
+};
 
 /* Every collapse in the app uses this — height springs to the
    content's own size and eases closed the same way. */
@@ -171,7 +185,7 @@ function MoreMenu({ collapsed, mobile }) {
   );
 }
 
-function OrgSwitcher({ collapsed }) {
+function OrgSwitcher({ collapsed, org, onPick }) {
   const { open, setOpen, at, ref, toggle } = useFlyout(collapsed);
 
   return (
@@ -179,8 +193,8 @@ function OrgSwitcher({ collapsed }) {
       <motion.button ref={ref} className={`org ${open ? 'open' : ''}`} onClick={toggle}
         whileHover={{ backgroundColor:'var(--hover)', color:'var(--t1)' }}
         transition={{ duration: dur.hover, ease }}>
-        <Icon name="user" size={15} />
-        <span style={{ flex:1, textAlign:'left' }}>Personal</span>
+        <Icon name={org === 'Personal' ? 'user' : 'building'} size={15} />
+        <span style={{ flex:1, textAlign:'left' }}>{org}</span>
         <motion.span style={{ display:'flex' }}
           animate={{ rotate: open ? 180 : 0 }} transition={{ duration: dur.swap, ease }}>
           <Icon name="chevD" size={14} />
@@ -195,17 +209,23 @@ function OrgSwitcher({ collapsed }) {
             animate={{ opacity:1, x:0, y:0, scale:1 }}
             exit={{ opacity:0, x: at.drop ? 0 : -8, y: at.drop ? -6 : 0, scale:.98 }}
             transition={liquid}>
-            <motion.button className="orgrow" onClick={() => setOpen(false)}
+            <motion.button className="orgrow"
+              onClick={() => { onPick('Personal'); setOpen(false); }}
               whileHover={{ backgroundColor:'var(--hover)' }} transition={{ duration: dur.hover, ease }}>
               <Icon name="user" size={16} />
               <div className="ot"><b>Personal</b></div>
-              <span className="tick"><Icon name="check" size={15} /></span>
+              {org === 'Personal' && <span className="tick"><Icon name="check" size={15} /></span>}
             </motion.button>
             {ORGS.map(o => (
-              <motion.button key={o} className="orgrow" onClick={() => setOpen(false)}
+              <motion.button key={o.name} className="orgrow"
+                onClick={() => { if (o.signedIn) onPick(o.name); setOpen(false); }}
                 whileHover={{ backgroundColor:'var(--hover)' }} transition={{ duration: dur.hover, ease }}>
                 <Icon name="building" size={16} />
-                <div className="ot"><b>{o}</b><small>Sign in to this organization</small></div>
+                <div className="ot">
+                  <b>{o.name}</b>
+                  {!o.signedIn && <small>Sign in to this organization</small>}
+                </div>
+                {org === o.name && <span className="tick"><Icon name="check" size={15} /></span>}
               </motion.button>
             ))}
           </motion.div>
@@ -229,17 +249,35 @@ export default function Sidebar({ user, onNewChat, collapsed, onToggle, mobile, 
 
   /* pin state is live: loose chats move between the Pinned group and their date
      group, while a folder's chats pin to the top of that folder and stay in it */
-  const [chats, setChats] = useState(
-    () => CHATS.map((c, i) => ({ ...c, id:`c${i}` })));
-  const [folders, setFolders] = useState(
-    () => FOLDERS.map(f => ({
-      ...f,
-      chats: f.chats.map((title, i) => ({ title, pinned:false, id:`${f.key}${i}` })),
-    })));
+  const [org, setOrg] = useState('Personal');
+  const load = key => {
+    const ws = WORKSPACES[key] || WORKSPACES.Personal;
+    return {
+      chats: ws.chats.map((c, i) => ({ ...c, id:`${key}-c${i}` })),
+      folders: ws.folders.map(f => ({
+        ...f,
+        chats: f.chats.map((title, i) => ({ title, pinned:false, id:`${key}-${f.key}${i}` })),
+      })),
+    };
+  };
+  const [chats, setChats]     = useState(() => load('Personal').chats);
+  const [folders, setFolders] = useState(() => load('Personal').folders);
+
+  /* the workspace swaps the content; every interaction stays exactly as it was */
+  const switchOrg = key => {
+    if (key === org) return;
+    const next = load(key);
+    setOrg(key);
+    setChats(next.chats);
+    setFolders(next.folders);
+    setQuery('');
+    onOpenChat?.(null);
+  };
 
   const [drag, setDrag]     = useState(null);   // the chat being dragged
   const [over, setOver]     = useState(null);   // folder it is hovering
   const [adding, setAdding] = useState(false);
+  const [query, setQuery]   = useState('');
 
   /* one global listener clears the highlight however the drag ends */
   useEffect(() => {
@@ -337,10 +375,18 @@ export default function Sidebar({ user, onNewChat, collapsed, onToggle, mobile, 
       chats: f.chats.map(c => (c.id === id ? { ...c, pinned: !c.pinned } : c)),
     })));
 
-  const pinned = chats.filter(c => c.pinned);
+  const q = query.trim().toLowerCase();
+  const hit = c => !q || haystack(c.title).includes(q);
+
+  const pinned = chats.filter(c => c.pinned && hit(c));
   const groups = GROUP_ORDER
-    .map(g => [g, chats.filter(c => c.group === g && !c.pinned)])
+    .map(g => [g, chats.filter(c => c.group === g && !c.pinned && hit(c))])
     .filter(([, rows]) => rows.length);
+  /* while searching, a folder with nothing in it is just noise */
+  const shownFolders = q
+    ? folders.map(f => ({ ...f, chats: f.chats.filter(hit) })).filter(f => f.chats.length)
+    : folders;
+  const nothing = q && !pinned.length && !groups.length && !shownFolders.length;
 
   return (
     <motion.aside
@@ -374,9 +420,19 @@ export default function Sidebar({ user, onNewChat, collapsed, onToggle, mobile, 
       >
             <div className="sb-scroll">
               <div className="gap" />
-              <OrgSwitcher collapsed={collapsed} />
+              <OrgSwitcher collapsed={collapsed} org={org} onPick={switchOrg} />
               <div className="gap" />
-              <div className="searchfield"><Icon name="search" size={14} /><span>Search messages</span></div>
+              <div className="searchfield">
+                <Icon name="search" size={14} />
+                <input value={query} placeholder="Search messages"
+                       onChange={e => setQuery(e.target.value)}
+                       onKeyDown={e => e.key === 'Escape' && setQuery('')} />
+                {query && (
+                  <button className="clear" onClick={() => setQuery('')} aria-label="Clear search">
+                    <Icon name="x" size={13} />
+                  </button>
+                )}
+              </div>
               <div className="gap" />
               {NAV.map(n => (
                 <motion.button key={n.label}
@@ -430,7 +486,7 @@ export default function Sidebar({ user, onNewChat, collapsed, onToggle, mobile, 
                     )}
                   </AnimatePresence>
 
-                  {folders.map(f => (
+                  {shownFolders.map(f => (
                     <div key={f.key}
                       onDragEnter={() => setOver(f.key)}
                       onDragOver={e => { e.preventDefault(); setOver(f.key); }}
@@ -452,7 +508,7 @@ export default function Sidebar({ user, onNewChat, collapsed, onToggle, mobile, 
                         <Icon name="folder" size={16} /><span>{f.label}</span>
                         <Chevron open={open[f.key]} />
                       </motion.button>
-                      <Collapse open={open[f.key]}>
+                      <Collapse open={q ? true : open[f.key]}>
                         {f.chats.filter(c => c.pinned).map(c => (
                           <ChatRow key={c.id} title={c.title} pinned nested mobile={mobile}
                                    onDragStart={() => setDrag({ kind:'chat', id:c.id, title:c.title, from:f.key })}
@@ -493,6 +549,8 @@ export default function Sidebar({ user, onNewChat, collapsed, onToggle, mobile, 
                     ))}
                   </>
                 )}
+                {nothing && <div className="noresults">No chats match “{query.trim()}”</div>}
+
                 {groups.map(([label, rows]) => (
                   <div key={label}>
                     <div className="datemark">{label}</div>

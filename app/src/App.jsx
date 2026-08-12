@@ -47,7 +47,10 @@ export default function App() {
           <Sidebar user={user}
                    onNewChat={() => { setSession(s => s + 1); setOpenChat(null); setDrawer(false); }}
                    openChat={openChat}
-                   onOpenChat={c => { setOpenChat({ ...c, at: Date.now() }); setDrawer(false); }}
+                   onOpenChat={c => {
+                     setOpenChat(c ? { ...c, at: Date.now() } : null);
+                     if (c) setDrawer(false);
+                   }}
                    mobile={mobile} drawer={drawer}
                    collapsed={mobile ? false : collapsed}
                    onToggle={() => mobile ? setDrawer(false) : setCollapsed(v => !v)} />
