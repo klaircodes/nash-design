@@ -27,9 +27,16 @@
 .msearch input::placeholder{color:var(--t4);}
 .msearch .clear{display:flex;color:var(--t3);}
 
-.filters{
+/* the bar does not clip, only the pill strip inside it scrolls */
+.filterbar{
   display:flex;align-items:center;gap:8px;padding:0 18px 12px;flex:0 0 auto;
-  overflow-x:auto;scrollbar-width:none;position:relative;
+  position:relative;
+}
+.filters{
+  display:flex;align-items:center;gap:8px;flex:1;min-width:0;
+  overflow-x:auto;scrollbar-width:none;
+  -webkit-mask-image:linear-gradient(90deg,#000 0,#000 calc(100% - 16px),transparent 100%);
+          mask-image:linear-gradient(90deg,#000 0,#000 calc(100% - 16px),transparent 100%);
 }
 .filters::-webkit-scrollbar{display:none;}
 .flabel{font-size:12.5px;color:var(--t3);flex:0 0 auto;}
@@ -45,7 +52,7 @@
 .fsort.on{background:var(--surface);color:var(--t1);}
 
 .sortmenu{
-  position:absolute;right:18px;top:40px;z-index:5;width:168px;padding:6px;
+  position:absolute;right:18px;top:38px;z-index:20;width:172px;padding:6px;
   border-radius:12px;background:var(--elevated);box-shadow:var(--shadow);
 }
 [data-theme="light"] .sortmenu{background:var(--app);box-shadow:0 10px 28px rgba(16,18,24,.14),inset 0 0 0 1px var(--border);}

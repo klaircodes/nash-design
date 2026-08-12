@@ -101,18 +101,26 @@ export default function ModelPicker({ open, model, pinned, onPick, onPin, onClos
   );
 
   const Filters = () => (
-    <div className="filters">
-      <span className="flabel">Filter</span>
-      {FILTERS.map(f => (
-        <motion.button key={f.key} className={`fpill ${filter === f.key ? 'on' : ''}`}
-          onClick={() => setFilter(f.key)}
-          whileHover={filter === f.key ? {} : { backgroundColor:'var(--border)' }}
-          whileTap={{ scale: 0.97 }} transition={{ duration: dur.hover, ease }}>
-          {f.label}
-        </motion.button>
-      ))}
-      <button className={`fsort ${sortOpen ? 'on' : ''}`} onClick={() => setSortOpen(v => !v)}
-        aria-label="Sort"><Icon name="sort" size={15} /></button>
+    <div className="filterbar">
+      <div className="filters">
+        <span className="flabel">Filter</span>
+        {FILTERS.map(f => (
+          <motion.button key={f.key} className={`fpill ${filter === f.key ? 'on' : ''}`}
+            onClick={() => setFilter(f.key)}
+            whileHover={filter === f.key ? {} : { backgroundColor:'var(--border)' }}
+            whileTap={{ scale: 0.97 }} transition={{ duration: dur.hover, ease }}>
+            {f.label}
+          </motion.button>
+        ))}
+      </div>
+
+      {/* outside the scrolling strip, so the menu is never clipped */}
+      <motion.button className={`fsort ${sortOpen ? 'on' : ''}`}
+        onClick={() => setSortOpen(v => !v)} aria-label="Sort"
+        whileHover={{ backgroundColor:'var(--surface)', color:'var(--t1)' }}
+        whileTap={{ scale: 0.94 }} transition={{ duration: dur.hover, ease }}>
+        <Icon name="sort" size={15} />
+      </motion.button>
 
       <AnimatePresence>
         {sortOpen && (
