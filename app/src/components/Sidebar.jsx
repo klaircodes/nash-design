@@ -90,8 +90,14 @@ function OrgSwitcher({ collapsed }) {
   useEffect(() => {
     if (!open) return;
     const key = e => e.key === 'Escape' && setOpen(false);
+    const scrolled = () => setOpen(false);
     window.addEventListener('keydown', key);
-    return () => window.removeEventListener('keydown', key);
+    ref.current?.closest('.sb-scroll')?.addEventListener('scroll', scrolled);
+    const host = ref.current?.closest('.sb-scroll');
+    return () => {
+      window.removeEventListener('keydown', key);
+      host?.removeEventListener('scroll', scrolled);
+    };
   }, [open]);
 
   return (
@@ -180,7 +186,7 @@ export default function Sidebar({ user, onNewChat, collapsed, onToggle }) {
         style={{ pointerEvents: collapsed ? 'none' : 'auto' }}
         transition={liquidWide}
       >
-            <div className="sb-head">
+            <div className="sb-scroll">
               <div className="gap" />
               <OrgSwitcher collapsed={collapsed} />
               <div className="gap" />
@@ -195,9 +201,6 @@ export default function Sidebar({ user, onNewChat, collapsed, onToggle }) {
                   <Icon name={n.icon} size={16} /><span>{n.label}</span>
                 </motion.button>
               ))}
-            </div>
-
-            <div className="sb-scroll">
               <div className="gap" style={{ height: 8 }} />
               <button className="sechead" onClick={() => setChatsOpen(v => !v)}>
                 <span>Chats</span><Chevron open={chatsOpen} />
