@@ -143,23 +143,36 @@ export default function Memories({ mobile, drawer, onMenu, use, onUse }) {
      if the whole list fits there is nothing to page through. */
   const host = useRef(null);
   const listTop = useRef(null);
+  const toastRef = useRef(null);
   const [perPage, setPerPage] = useState(4);
 
   useLayoutEffect(() => {
     const el = host.current;
     if (!el) return;
+    /* `.page` is the offset parent, so offsetTop is a layout position and does
+       not drift with scroll — measuring off getBoundingClientRect would grow
+       the estimate every time the list was scrolled. */
     const measure = () => {
       const anchor = listTop.current;
       if (!anchor) return;
-      const room = el.clientHeight - (anchor.offsetTop - el.scrollTop) - 84;
+      /* on a phone the reminder lies across the full width, so the list gives
+         up a row for it and takes it back when the toast goes. Driven off the
+         intended state, not the DOM — an exiting toast still has height. */
+      const toast = mobile && !use && !hideOff
+        ? (toastRef.current?.offsetHeight || 64)
+        : 0;
+      const room = el.clientHeight - anchor.offsetTop - 76 - (toast ? toast + 12 : 0);
       const row = anchor.querySelector('.memrow')?.offsetHeight || 92;
       setPerPage(Math.max(1, Math.floor(room / (row + 12))));
     };
     measure();
+    const raf = requestAnimationFrame(measure);
+    const settle = setTimeout(measure, 420);
     const ro = new ResizeObserver(measure);
     ro.observe(el);
-    return () => ro.disconnect();
-  }, [use, filter, query]);
+    if (listTop.current) ro.observe(listTop.current);
+    return () => { cancelAnimationFrame(raf); clearTimeout(settle); ro.disconnect(); };
+  }, [use, filter, query, loading, hideOff, mobile]);
 
   const q = query.trim().toLowerCase();
   const shown = useMemo(() => list.filter(m =>
@@ -332,7 +345,7 @@ export default function Memories({ mobile, drawer, onMenu, use, onUse }) {
       <div className="toasts">
         <AnimatePresence initial={false}>
           {!use && !hideOff && (
-            <motion.div className="toast warn" key="off"
+            <motion.div className="toast warn" key="off" ref={toastRef}
               initial={{ opacity:0, y:14 }} animate={{ opacity:1, y:0 }}
               exit={{ opacity:0, y:10 }} transition={liquid}>
               <Icon name="memoff" size={17} />
