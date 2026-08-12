@@ -1,22 +1,18 @@
 /* Placeholder content. Nothing here navigates yet. */
 export const FOLDERS = [
-  { key:'work',     label:'Work',     chats:['Q3 roadmap','Pricing research','Launch checklist'] },
-  { key:'research', label:'Research', chats:['Competitor teardown','User interviews'] },
+  { key:'work',     label:'Work',     chats:['Pricing research','Launch checklist'] },
+  { key:'research', label:'Research', chats:['Competitor teardown'] },
   { key:'personal', label:'Personal', chats:['Reading list'] },
 ];
 
+/* every chat here has its own thread in CONVERSATIONS — nothing repeats */
 export const CHATS = [
-  { title:'Connector permissions review', group:'Today',            pinned:false },
-  { title:'Invoice chase — Northwind',    group:'Today',            pinned:false },
-  { title:'Q3 roadmap draft',             group:'Yesterday',        pinned:true  },
-  { title:'Bug triage — render loop',     group:'Yesterday',        pinned:false },
-  { title:'Voice chat',                   group:'Previous 7 days',  pinned:false },
-  { title:'Fork: Testing — What’s Next?', group:'Previous 7 days',  pinned:false },
-  { title:'Friendly Chat Beginnings',     group:'Previous 30 days', pinned:false },
-  { title:'Creating a PDF summary',       group:'Previous 30 days', pinned:true  },
-  { title:'Whimsical Tales Unfold',       group:'Previous 30 days', pinned:false },
-  { title:'Testing the Waters',           group:'June',             pinned:false },
-  { title:'Voice chat',                   group:'June',             pinned:false },
+  { title:'Connector permissions review', group:'Today',           pinned:false },
+  { title:'Invoice chase — Northwind',    group:'Today',           pinned:false },
+  { title:'Q3 roadmap draft',             group:'Yesterday',       pinned:true  },
+  { title:'Bug triage — render loop',     group:'Yesterday',       pinned:false },
+  { title:'Creating a PDF summary',       group:'Previous 7 days', pinned:true  },
+  { title:'Voice chat',                   group:'Previous 7 days', pinned:false },
 ];
 
 export const GROUP_ORDER = ['Today','Yesterday','Previous 7 days','Previous 30 days','June'];
@@ -153,6 +149,53 @@ export const CONVERSATIONS = {
 
   'Invoice chase — Northwind': [
     { role:'user', text:'Draft a short follow-up on the Northwind invoice. Firm, not rude.' },
+    { role:'bot',  text:REPLY },
+  ],
+
+  'Creating a PDF summary': [
+    { role:'user', text:'Summarise the attached spec into one page a PM can skim.' },
+    { role:'bot', blocks:[
+      { t:'p',  v:'One page, four sections: what changes, what does not, what it costs, and what has to be decided this week.' },
+      { t:'ul', v:[
+        'Scope — sidebar, composer, and the model picker only.',
+        'Out of scope — bookmarks and MCP, which ship after.',
+        'Open — whether personas keep their own pinned list.',
+      ]},
+    ]},
+  ],
+
+  'Voice chat': [
+    { role:'user', text:'Can we start a voice session from the composer directly?' },
+    { role:'bot',  text:REPLY },
+  ],
+
+  'Pricing research': [
+    { role:'user', text:'What do the three competitors charge for a seat, and what is bundled?' },
+    { role:'bot', blocks:[
+      { t:'p',  v:'All three anchor on a per-seat price and then gate model access rather than usage.' },
+      { t:'ol', v:[
+        ['Entry', 'one model family, no connectors, capped history.'],
+        ['Team',  'all families plus shared personas — this is where they make margin.'],
+        ['Enterprise', 'priced on request, which in practice means seat count times a multiplier.'],
+      ]},
+    ]},
+  ],
+
+  'Launch checklist': [
+    { role:'user', text:'What is left before we can call this launchable?' },
+    { role:'bot',  text:REPLY },
+  ],
+
+  'Competitor teardown': [
+    { role:'user', text:'Pull apart their onboarding — where does it lose people?' },
+    { role:'bot', blocks:[
+      { t:'p',    v:'Two drop-offs. The first is a workspace step before anyone has seen the product; the second is model selection presented as a decision rather than a default.' },
+      { t:'quote', v:'Nobody wants to choose a model before they have asked a question.' },
+    ]},
+  ],
+
+  'Reading list': [
+    { role:'user', text:'Add the token piece to the list and tell me what is still unread.' },
     { role:'bot',  text:REPLY },
   ],
 
