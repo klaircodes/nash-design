@@ -231,12 +231,12 @@
   .group{margin-top:12px;border-radius:13px;background:var(--elevated);overflow:hidden;}
   .grow{
     position:relative;width:100%;height:50px;display:flex;align-items:center;gap:13px;
-    padding:0 15px;color:var(--t1);font-size:13.5px;text-align:left;
+    padding:0 12px;color:var(--t1);font-size:13.5px;text-align:left;
   }
   .grow span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
   .grow > :last-child{color:var(--t3);}
   .grow + .grow::before{
-    content:'';position:absolute;left:15px;right:15px;top:0;height:1px;background:var(--border);
+    content:'';position:absolute;left:12px;right:12px;top:0;height:1px;background:var(--border);
   }
   .disclaim{display:block;}
   .topbar .menu{width:32px;height:32px;display:grid;place-items:center;}

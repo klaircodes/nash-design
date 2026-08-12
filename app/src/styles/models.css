@@ -124,12 +124,17 @@
 [data-theme="light"] .mpanel.inline{background:transparent;}
 
 @media (max-width: 720px){
-  .pickhost{height:52vh;padding:0 4px;}
+  /* One gutter for both panels above the composer: the 12px the composer
+     itself sits at, with row text a further 12px in — level with the
+     composer's placeholder and with Add to Chat's list rows. */
+  .pickhost{height:52vh;padding:0 12px;}
   .mpanel.inline{height:100%;max-height:none;}
-  .mhead{padding:6px 12px 12px;}
+  .mhead{padding:6px 0 12px;}
   .mhead h3{font-size:16px;}
-  .searchrow{margin:0 12px 12px;}
-  .filterbar{padding:0 12px 10px;}
-  .sortmenu{right:12px;}
-  .mscroll{padding:0 6px 6px;}
+  .searchrow{margin:0 0 12px;}
+  .filterbar{padding:0 0 10px;}
+  .sortmenu{right:0;}
+  .mscroll{padding:0 0 6px;}
+  .mrow{padding:11px 12px;}
+  .mlabel{padding:12px 12px 8px;}
 }
