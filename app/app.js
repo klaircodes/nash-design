@@ -79,7 +79,7 @@ const state = {
   modelFilter: 'All',
   pinned: ['Claude Opus 4.8'],
   chats: null,          // filled on mount from CHATS
-  activeChat: 'Connector permissions review',
+  activeChat: null,
   tab: 'All',
   layout: 'grid',
   query: '',
