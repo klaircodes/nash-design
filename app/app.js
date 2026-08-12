@@ -236,7 +236,7 @@ function usermenu() {
       <div class="prow" style="gap:10px;align-items:center">
         <span style="color:var(--t3)">${ico(state.theme==='dark'?'moon':'sun',15)}</span>
         <div class="tt"><b>Appearance</b><small>${state.theme==='dark'?'Dark':'Light'}</small></div>
-        <div class="toggle sm ${state.theme==='light'?'on':''}" data-theme><div class="knob"></div></div>
+        <div class="toggle sm ${state.theme==='light'?'on':''}" data-themetoggle><div class="knob"></div></div>
       </div>
 
       <div style="height:1px;background:var(--border);margin:6px 4px"></div>
@@ -608,7 +608,7 @@ function render() {
 
 /* ---------- events ---------- */
 function onAppClick(e) {
-  const t = e.target.closest('[data-go],[data-toggle],[data-folder],[data-tab],[data-layout],[data-connect],[data-consent],[data-manage],[data-pause],[data-resume],[data-disconnect],[data-confirmdisconnect],[data-reconnect],[data-closerail],[data-tool],[data-inchat],[data-popover],[data-add],[data-cancel],[data-scrim],[data-theme],[data-clear],[data-toastclose],[data-toastaction],[data-usermenu],[data-signout]');
+  const t = e.target.closest('[data-go],[data-toggle],[data-folder],[data-tab],[data-layout],[data-connect],[data-consent],[data-manage],[data-pause],[data-resume],[data-disconnect],[data-confirmdisconnect],[data-reconnect],[data-closerail],[data-tool],[data-inchat],[data-popover],[data-add],[data-cancel],[data-scrim],[data-themetoggle],[data-clear],[data-toastclose],[data-toastaction],[data-usermenu],[data-signout]');
   if (!t) {                                        // click-away closes transient surfaces
     if (state.userMenu || state.popover) { state.userMenu = false; state.popover = false; render(); }
     return;
@@ -616,7 +616,7 @@ function onAppClick(e) {
   const d = t.dataset;
   if (d.signout !== undefined) return;             // handled by its own listener
   if (d.usermenu !== undefined) { state.userMenu = !state.userMenu; render(); return; }
-  if (!d.theme && !d.usermenu) state.userMenu = false;
+  if (d.themetoggle === undefined && d.usermenu === undefined) state.userMenu = false;
 
   if (d.scrim && e.target !== t) return;               // only the backdrop closes
   if (d.go)        { state.view = d.go; state.popover = false; state.rail = null; }
@@ -626,7 +626,7 @@ function onAppClick(e) {
   if (d.tab)       state.tab = d.tab;
   if (d.layout)    state.layout = d.layout;
   if (d.clear !== undefined) state.query = '';
-  if (d.theme !== undefined) {
+  if (d.themetoggle !== undefined) {
     state.theme = state.theme === 'dark' ? 'light' : 'dark';
     document.documentElement.dataset.theme = state.theme;
     try { localStorage.setItem('nash.theme', state.theme); } catch (x) {}
