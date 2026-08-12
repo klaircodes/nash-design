@@ -1,32 +1,44 @@
 # Nash — design
 
-Design system reference and a working prototype for **Nash**, an AI chat product.
-
-## Contents
+Design system reference and an interactive prototype for **Nash**.
 
 | Path | What it is |
 |---|---|
 | `DESIGN.md` | The design system — tokens, spacing, components, behaviour, motion |
-| `app/` | Interactive prototype. No build step, no dependencies |
+| `app/` | React + Vite + Motion prototype |
 
-## Running the prototype
+## Running
 
 ```bash
-open app/index.html
+cd app
+npm install
+npm run dev
 ```
 
-That's it — it's plain HTML, CSS and JavaScript.
+Then open the printed URL (default `http://localhost:5173`).
 
-## What works
+## Stack
 
-Real state, not a click-through:
+- **React 19** — component state, no global mutation
+- **Motion** (`motion/react`) — every transition, including enter and exit
+- **Vite 8** — dev server and build
+- Plain CSS with custom properties for tokens; no utility framework
 
-- **Connectors** — search, filter tabs, grid/list toggle
-- **Connect flow** — consent → connecting (spinner + progress) → connected, with a toast
-- **Detail rail** — permissions and per-tool switches that actually toggle
-- **Pause / resume / disconnect** — with confirmation on destructive actions and undo in the toast
-- **Chat** — connector picker with live toggles, inline tool-call results
-- **Sidebar** — three-level collapse (Chats → Folders → each folder), date grouping
-- **Theme** — dark and light, switchable
+## Structure
 
-Press `Esc` to close any modal, popover or rail.
+```
+src/
+  App.jsx              routing between auth and the app shell
+  lib/motion.js        one motion vocabulary — durations, easing, variants
+  styles/tokens.css    colour tokens for both themes
+  styles/base.css      resets and reduced-motion
+  components/          shared primitives
+  screens/             one file per screen
+```
+
+## Progress
+
+- [x] Auth — log in and sign up, 1:1 with Figma
+- [ ] App shell and sidebar
+- [ ] Chat — empty, filled, streaming
+- [ ] Connectors, Bookmarks, Memories, Library

@@ -1,0 +1,18 @@
+*,*::before,*::after{box-sizing:border-box;}
+html,body,#root{height:100%;}
+body{
+  margin:0;
+  font-family:Poppins,-apple-system,system-ui,sans-serif;
+  background:var(--app);color:var(--t1);
+  -webkit-font-smoothing:antialiased;
+}
+button{font:inherit;border:0;background:none;color:inherit;cursor:pointer;padding:0;}
+input{font:inherit;border:0;outline:0;background:none;color:inherit;}
+h1,h2,h3,p{margin:0;}
+::selection{background:var(--accent);color:#fff;}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{
+    animation-duration:.001ms !important;transition-duration:.001ms !important;
+  }
+}
