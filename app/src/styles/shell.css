@@ -92,7 +92,7 @@
 /* ---- folders: drop target + new folder ---- */
 .sechead.row{display:flex;align-items:center;gap:2px;}
 .sechead.row .lbl{flex:1;text-align:left;height:100%;
-  color:inherit;font:inherit;letter-spacing:inherit;}
+  color:inherit;font:inherit;letter-spacing:inherit;text-transform:uppercase;}
 .addfolder,.chevbtn{width:22px;height:22px;border-radius:6px;
   display:grid;place-items:center;color:var(--t3);flex:0 0 auto;}
 .chevbtn .chev{display:flex;}
