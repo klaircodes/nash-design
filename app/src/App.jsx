@@ -25,8 +25,7 @@ export default function App() {
           transition={{ duration: 0.28, ease }}>
           <Sidebar user={user} onNewChat={() => setSession(s => s + 1)}
                    collapsed={collapsed} onToggle={() => setCollapsed(v => !v)} />
-          <Chat user={user} sessionKey={session}
-                collapsed={collapsed} onToggle={() => setCollapsed(v => !v)} />
+          <Chat user={user} sessionKey={session} />
         </motion.div>
       )}
     </AnimatePresence>

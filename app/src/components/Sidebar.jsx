@@ -77,23 +77,30 @@ export default function Sidebar({ user, onNewChat, collapsed, onToggle }) {
   return (
     <motion.aside
       className="sidebar"
-      animate={{ width: collapsed ? 0 : 280 }}
+      animate={{
+        width: collapsed ? 112 : 280,
+        backgroundColor: collapsed ? 'rgba(0,0,0,0)' : 'var(--sunken)',
+        borderRightColor: collapsed ? 'rgba(0,0,0,0)' : 'var(--border)',
+      }}
       transition={liquidWide}
     >
+      {/* the brand row never moves and never resizes */}
+      <div className="brand">
+        <b>nash:</b>
+        <motion.button className="panel" onClick={onToggle}
+          aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          whileHover={{ color: 'var(--t1)' }} whileTap={{ scale: 0.92 }}
+          transition={{ duration: dur.hover, ease }}>
+          <Icon name="panel" size={18} />
+        </motion.button>
+      </div>
+
       <motion.div className="sb-body"
         animate={{ opacity: collapsed ? 0 : 1 }}
-        transition={{ duration: collapsed ? 0.12 : 0.2, ease, delay: collapsed ? 0 : 0.06 }}
+        style={{ pointerEvents: collapsed ? 'none' : 'auto' }}
+        transition={{ duration: collapsed ? 0.14 : 0.22, ease, delay: collapsed ? 0 : 0.08 }}
       >
             <div className="sb-head">
-              <div className="brand">
-                <b>nash:</b>
-                <motion.button className="panel" onClick={onToggle}
-                  aria-label="Collapse sidebar"
-                  whileHover={{ color: 'var(--t1)' }} whileTap={{ scale: 0.92 }}
-                  transition={{ duration: dur.hover, ease }}>
-                  <Icon name="panel" size={18} />
-                </motion.button>
-              </div>
               <div className="gap" />
               <div className="org"><Icon name="user" size={15} />
                 <span style={{flex:1}}>Personal</span><Icon name="chevD" size={14} /></div>

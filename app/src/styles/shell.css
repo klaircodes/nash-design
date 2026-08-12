@@ -7,8 +7,10 @@
 .sidebar{
   flex:0 0 auto;display:flex;flex-direction:column;
   padding:14px 12px 12px;background:var(--sunken);
-  border-right:1px solid var(--border);overflow:hidden;
+  border-right:1px solid var(--border);border-right-style:solid;overflow:hidden;
 }
+/* the mark row keeps its exact size and position in both states */
+.sidebar .brand{width:256px;flex:0 0 auto;}
 /* the body keeps its width while the aside narrows, so nothing squashes */
 .sb-body{
   flex:1 1 auto;min-height:0;display:flex;flex-direction:column;
@@ -86,10 +88,6 @@
   height:56px;flex:0 0 auto;display:flex;align-items:center;
   padding:0 22px;gap:12px;
 }
-.topbar .left{display:flex;align-items:center;gap:12px;}
-/* same size as the sidebar mark — it does not shrink when it moves */
-.topbar b{font-size:17px;font-weight:600;letter-spacing:-.2px;color:var(--t1);}
-.topbar .panel{color:var(--t3);display:flex;}
 .topbar .more{margin-left:auto;color:var(--t3);display:flex;}
 .chatbody{flex:1;min-height:0;display:grid;place-items:center;padding:24px;}
 .greet{font-size:30px;font-weight:600;letter-spacing:-.5px;color:var(--t1);}
