@@ -492,7 +492,9 @@ function composer() {
   return `
   <div class="composer ${open ? 'open' : ''}">
     <div class="crow">
-      <button class="round" data-composer>${ico(open ? 'minus' : 'plus', 17)}</button>
+      <button class="round" data-composer aria-label="${open?'Collapse':'Expand'} tools">
+        <span class="morph"><i class="h"></i><i class="v"></i></span>
+      </button>
       <input placeholder="Ask anything..." id="ask">
       <button class="modelpick" data-modelopen>
         <span>${state.model}</span>${ico('chevD',14)}
@@ -500,14 +502,15 @@ function composer() {
       <button class="round">${ico('mic',16)}</button>
       <button class="round accent">${ico('send',16)}</button>
     </div>
-    ${open ? `
-    <div class="trow">
-      <button class="pill">${ico('clip',15)}Add File</button>
-      <button class="pill">${ico('image',15)}Create Image</button>
-      <span class="sp"></span>
-      ${TOOLS.map(([i,t]) => `<button class="round sm" title="${t}"
-        ${i==='servers' ? 'data-popover' : ''}>${ico(i,15)}</button>`).join('')}
-    </div>` : ''}
+    <div class="tgrid"><div class="tclip">
+      <div class="trow">
+        <button class="pill">${ico('clip',15)}Add File</button>
+        <button class="pill">${ico('image',15)}Create Image</button>
+        <span class="sp"></span>
+        ${TOOLS.map(([i,t]) => `<button class="round sm" title="${t}"
+          ${i==='servers' ? 'data-popover' : ''}>${ico(i,15)}</button>`).join('')}
+      </div>
+    </div></div>
   </div>`;
 }
 

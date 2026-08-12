@@ -494,24 +494,51 @@ input{font-family:inherit;border:0;outline:0;background:none;color:inherit;}
 }
 .composer{
   border-radius:22px;background:var(--surface);
-  transition:border-radius .24s var(--ease),background .18s var(--ease);
+  transition:border-radius .38s var(--ease),background .18s var(--ease);
 }
 .composer.open{border-radius:20px;}
-.composer.open .crow{padding-bottom:10px;}
-.crow{display:flex;align-items:center;gap:12px;padding:14px;}
+.crow{
+  display:flex;align-items:center;gap:12px;padding:14px;
+  transition:padding-bottom .38s var(--ease);
+}
+.composer.open .crow{padding-bottom:16px;}
 .crow input{flex:1;min-width:0;font-size:15px;color:var(--t1);}
 .crow input::placeholder{color:var(--t4);}
-.modelpick{
-  display:flex;align-items:center;gap:6px;padding:6px 8px;border-radius:8px;
-  font-size:13px;color:var(--t2);flex:0 0 auto;
-  transition:background .16s var(--ease),color .16s var(--ease);
+
+/* liquid + → −  : the vertical bar collapses into the horizontal one */
+.morph{position:relative;width:17px;height:17px;display:block;}
+.morph i{position:absolute;background:currentColor;border-radius:1.5px;}
+.morph i.h{left:0;right:0;top:50%;height:1.9px;margin-top:-.95px;
+  transform:scaleX(1);transition:transform .38s var(--ease);}
+.morph i.v{top:0;bottom:0;left:50%;width:1.9px;margin-left:-.95px;
+  transform:scaleY(1);transition:transform .38s var(--ease);}
+.composer.open .morph i.v{transform:scaleY(0);}
+.composer.open .morph i.h{transform:scaleX(.82);}
+
+/* the row grows and shrinks from its own height — no jump either way */
+.tgrid{
+  display:grid;grid-template-rows:0fr;
+  transition:grid-template-rows .38s var(--ease);
 }
-.modelpick:hover{background:var(--hover);color:var(--t1);}
+.composer.open .tgrid{grid-template-rows:1fr;}
+.tclip{overflow:hidden;min-height:0;}
 .trow{
-  display:flex;align-items:center;gap:10px;padding:18px 14px 14px;
-  animation:trowIn .22s var(--ease) both;
+  display:flex;align-items:center;gap:10px;padding:20px 14px 14px;
+  opacity:0;transform:translateY(-6px);
+  transition:opacity .26s var(--ease),transform .38s var(--ease);
 }
-@keyframes trowIn{from{opacity:0;transform:translateY(-4px);}to{opacity:1;transform:none;}}
+.composer.open .trow{opacity:1;transform:none;}
+.trow > *{
+  opacity:0;transform:translateY(4px);
+  transition:opacity .3s var(--ease),transform .3s var(--ease);
+}
+.composer.open .trow > *{opacity:1;transform:none;}
+.composer.open .trow > *:nth-child(1){transition-delay:.06s;}
+.composer.open .trow > *:nth-child(2){transition-delay:.09s;}
+.composer.open .trow > *:nth-child(4){transition-delay:.12s;}
+.composer.open .trow > *:nth-child(5){transition-delay:.14s;}
+.composer.open .trow > *:nth-child(6){transition-delay:.16s;}
+.composer.open .trow > *:nth-child(7){transition-delay:.18s;}
 .pill{
   height:34px;border-radius:17px;padding:0 14px 0 12px;display:flex;align-items:center;gap:8px;
   background:var(--elevated);font-size:13px;color:var(--t2);flex:0 0 auto;
