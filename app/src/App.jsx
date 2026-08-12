@@ -9,6 +9,7 @@ import './styles/shell.css';
 export default function App() {
   const [user, setUser] = useState(null);
   const [session, setSession] = useState(0);   // bumping this starts a fresh chat
+  const [collapsed, setCollapsed] = useState(false);
 
   return (
     <AnimatePresence mode="wait">
@@ -22,8 +23,10 @@ export default function App() {
         <motion.div key="app" className="shell"
           initial={{ opacity: 0 }} animate={{ opacity: 1 }}
           transition={{ duration: 0.28, ease }}>
-          <Sidebar user={user} onNewChat={() => setSession(s => s + 1)} />
-          <Chat user={user} sessionKey={session} />
+          <Sidebar user={user} onNewChat={() => setSession(s => s + 1)}
+                   collapsed={collapsed} onToggle={() => setCollapsed(v => !v)} />
+          <Chat user={user} sessionKey={session}
+                collapsed={collapsed} onToggle={() => setCollapsed(v => !v)} />
         </motion.div>
       )}
     </AnimatePresence>

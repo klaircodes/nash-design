@@ -64,8 +64,7 @@ const NAV = [
   { icon:'dots',     label:'More' },
 ];
 
-export default function Sidebar({ user, onNewChat }) {
-  const [rail, setRail] = useState(false);          // collapsed to a rail
+export default function Sidebar({ user, onNewChat, collapsed, onToggle }) {
   const [chatsOpen, setChatsOpen] = useState(true);
   const [foldersOpen, setFoldersOpen] = useState(true);
   const [open, setOpen] = useState({ work:true, research:false, personal:false });
@@ -77,48 +76,24 @@ export default function Sidebar({ user, onNewChat }) {
 
   return (
     <motion.aside
-      className={`sidebar ${rail ? 'rail' : ''}`}
-      animate={{ width: rail ? 78 : 280 }}
+      className="sidebar"
+      animate={{ width: collapsed ? 0 : 280 }}
       transition={liquidWide}
     >
-      <div className="sb-head">
-        <div className="brand">
-          <AnimatePresence initial={false}>
-            {!rail && (
-              <motion.b key="mark"
-                initial={{ opacity: 0, x: -6 }} animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -6 }} transition={{ duration: 0.18, ease }}>
-                nash:
-              </motion.b>
-            )}
-          </AnimatePresence>
-          <motion.button className="panel" onClick={() => setRail(v => !v)}
-            aria-label={rail ? 'Expand sidebar' : 'Collapse sidebar'}
-            whileHover={{ color: 'var(--t1)' }} whileTap={{ scale: 0.92 }}
-            transition={{ duration: dur.hover, ease }}>
-            <Icon name="panel" size={18} />
-          </motion.button>
-        </div>
-
-        <AnimatePresence initial={false}>
-          {rail && (
-            <motion.b className="railmark" key="railmark"
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              transition={{ duration: 0.18, ease, delay: rail ? 0.08 : 0 }}>
-              nash:
-            </motion.b>
-          )}
-        </AnimatePresence>
-      </div>
-
-      {/* everything except the mark and the toggle collapses away */}
-      <AnimatePresence initial={false}>
-        {!rail && (
-          <motion.div key="body" className="sb-body"
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            transition={{ duration: 0.16, ease }}
-          >
+      <motion.div className="sb-body"
+        animate={{ opacity: collapsed ? 0 : 1 }}
+        transition={{ duration: collapsed ? 0.12 : 0.2, ease, delay: collapsed ? 0 : 0.06 }}
+      >
             <div className="sb-head">
+              <div className="brand">
+                <b>nash:</b>
+                <motion.button className="panel" onClick={onToggle}
+                  aria-label="Collapse sidebar"
+                  whileHover={{ color: 'var(--t1)' }} whileTap={{ scale: 0.92 }}
+                  transition={{ duration: dur.hover, ease }}>
+                  <Icon name="panel" size={18} />
+                </motion.button>
+              </div>
               <div className="gap" />
               <div className="org"><Icon name="user" size={15} />
                 <span style={{flex:1}}>Personal</span><Icon name="chevD" size={14} /></div>
@@ -188,9 +163,7 @@ export default function Sidebar({ user, onNewChat }) {
               </div>
               <div className="version">Nash v1.0.0</div>
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      </motion.div>
     </motion.aside>
   );
 }

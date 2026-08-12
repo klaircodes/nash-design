@@ -9,16 +9,10 @@
   padding:14px 12px 12px;background:var(--sunken);
   border-right:1px solid var(--border);overflow:hidden;
 }
-.sidebar.rail{align-items:center;padding-left:8px;padding-right:8px;}
-.sidebar.rail .brand{justify-content:center;padding:0;}
-.railmark{
-  font-size:13px;font-weight:600;letter-spacing:-.2px;color:var(--t1);
-  margin-top:10px;white-space:nowrap;
-}
-/* the collapsing body must not squash while width animates */
+/* the body keeps its width while the aside narrows, so nothing squashes */
 .sb-body{
   flex:1 1 auto;min-height:0;display:flex;flex-direction:column;
-  width:256px;overflow:hidden;
+  width:256px;flex-shrink:0;
 }
 .sb-head,.sb-foot{flex:0 0 auto;display:flex;flex-direction:column;gap:2px;}
 .sb-foot{padding-top:8px;}
@@ -88,6 +82,15 @@
 
 /* ---------- main ---------- */
 .main{flex:1;min-width:0;display:flex;flex-direction:column;}
+.topbar{
+  height:56px;flex:0 0 auto;display:flex;align-items:center;
+  padding:0 22px;gap:12px;
+}
+.topbar .left{display:flex;align-items:center;gap:12px;}
+/* same size as the sidebar mark — it does not shrink when it moves */
+.topbar b{font-size:17px;font-weight:600;letter-spacing:-.2px;color:var(--t1);}
+.topbar .panel{color:var(--t3);display:flex;}
+.topbar .more{margin-left:auto;color:var(--t3);display:flex;}
 .chatbody{flex:1;min-height:0;display:grid;place-items:center;padding:24px;}
 .greet{font-size:30px;font-weight:600;letter-spacing:-.5px;color:var(--t1);}
 
