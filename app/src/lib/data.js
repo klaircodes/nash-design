@@ -94,53 +94,75 @@ export const fmtDate = iso => {
 
 export const ORGS = ['Mo', 'NashTest', 'Test'];
 
-/* Canned threads. Frontend only — no model is called; the reply is fixed. */
+/* Canned threads. Frontend only — no model is called; the reply is fixed.
+   Each chat gets its own content; chats without an entry open empty. */
 export const REPLY = 'this is a test thanks for using';
-
-const LONG_USER =
-  'Can you take the connector permissions review from last week and turn it into ' +
-  'something I can actually hand to the security team? I want the scopes we ask ' +
-  'for laid out per connector, a note on which ones are read-only versus write, ' +
-  'and a short paragraph on what happens to a token when someone leaves the ' +
-  'workspace. If a connector needs a scope we cannot justify, flag it rather than ' +
-  'quietly listing it. Keep the tone plain — no marketing language, no hedging. ' +
-  'It should read like something an engineer wrote for another engineer, and it ' +
-  'needs to survive being pasted into a ticket without losing its structure.';
-
-const LONG_REPLY =
-  'Here is the shape I would use. Each connector gets its own block with the ' +
-  'scopes it requests, the reason it needs them, and whether the access is read ' +
-  'or write. Anything that cannot be justified in one sentence goes in a separate ' +
-  'list at the end so it is impossible to miss. Token handling is its own short ' +
-  'section because it is the part security will actually read first: tokens are ' +
-  'revoked on seat removal, refresh tokens are not reissued, and any cached ' +
-  'artefacts are dropped on the next sweep. Nothing else in the document depends ' +
-  'on that section, so it can be lifted out wholesale if they want it separately.';
 
 export const CONVERSATIONS = {
   'Connector permissions review': [
-    { role:'user', text:LONG_USER },
-    { role:'bot',  text:LONG_REPLY },
+    { role:'user', text:
+      'Can you take the connector permissions review from last week and turn it into ' +
+      'something I can actually hand to the security team? I want the scopes we ask ' +
+      'for laid out per connector, a note on which ones are read-only versus write, ' +
+      'and a short paragraph on what happens to a token when someone leaves the ' +
+      'workspace. If a connector needs a scope we cannot justify, flag it rather than ' +
+      'quietly listing it. Keep the tone plain — no marketing language, no hedging. ' +
+      'It should read like something an engineer wrote for another engineer, and it ' +
+      'needs to survive being pasted into a ticket without losing its structure.' },
+    { role:'bot', blocks:[
+      { t:'h2', v:'Connector scopes — security review' },
+      { t:'p',  v:'Each connector gets its own block: the scopes it requests, why it needs them, and whether the access is read or write. Anything that cannot be justified in one sentence moves to a flagged list at the end.' },
+      { t:'h3', v:'Token handling' },
+      { t:'p',  v:'Tokens are revoked on seat removal, refresh tokens are not reissued, and cached artefacts are dropped on the next sweep. Nothing else depends on this section, so it can be lifted out wholesale.' },
+      { t:'ol', v:[
+        ['Read-only', 'calendar, contacts, and file listing. Safe to grant by default.'],
+        ['Write', 'drive upload and issue creation. Needs an owner on record.'],
+        ['Flagged', '`admin.directory.user` — we never call it. Drop from the manifest.'],
+      ]},
+      { t:'quote', v:'If a scope has no caller in the codebase, it does not belong in the manifest.' },
+    ]},
     { role:'user', text:'Good. Which one is the risky scope?' },
-    { role:'bot',  text:REPLY },
+    { role:'bot', text:REPLY },
   ],
+
+  'Q3 roadmap draft': [
+    { role:'user', blocks:[
+      { t:'p',  v:'Write me a blog post about:' },
+      { t:'ul', v:[
+        'The benefits of design tokens',
+        'How to migrate from hex to tokens',
+        'Real-world examples from Stripe and Linear',
+      ]},
+      { t:'p',  v:'Make it casual but informative.' },
+    ]},
+    { role:'bot', blocks:[
+      { t:'h2', v:'Design Tokens: The Foundation of Scalable UI' },
+      { t:'p',  v:'If you have ever changed a brand colour and had to update 47 files manually, you already know the problem design tokens solve. They are the single source of truth for every visual decision in your product.' },
+      { t:'h3', v:'Why tokens matter' },
+      { t:'ol', v:[
+        ['Consistency', 'one change propagates everywhere. No more “which grey is this?”'],
+        ['Theming', 'dark mode, brand variants, and white-labeling become trivial.'],
+        ['Handoff', 'designers and engineers share the same vocabulary.'],
+      ]},
+      { t:'h3', v:'Real-world examples' },
+      { t:'p',  v:'Stripe uses a token layer called “Sail” that maps semantic names to raw values. Their entire component library references tokens like color.background.primary rather than hex codes. Linear takes a similar approach — their design system ships with a complete token set that powers both light and dark themes from a single source.' },
+      { t:'p',  v:'In practice, you would reference `color.text.primary` instead of `#E4E5E8`.' },
+      { t:'quote', v:'The best design system is one where you never have to think about colours, spacing, or typography — the tokens handle it.' },
+    ]},
+  ],
+
   'Invoice chase — Northwind': [
     { role:'user', text:'Draft a short follow-up on the Northwind invoice. Firm, not rude.' },
     { role:'bot',  text:REPLY },
   ],
-  'Q3 roadmap draft': [
-    { role:'user', text:'What is still unresolved in the Q3 draft?' },
-    { role:'bot',  text:LONG_REPLY },
-    { role:'user', text:'Cut it to three bullets.' },
-    { role:'bot',  text:REPLY },
-  ],
+
   'Bug triage — render loop': [
     { role:'user', text:'The sidebar re-renders on every hover. Where would you look first?' },
+    { role:'bot', blocks:[
+      { t:'p',  v:'Start with component identity. A component declared inside another component is a new type on every render, so React unmounts and remounts its whole subtree instead of updating it.' },
+      { t:'p',  v:'Move the row component to module scope and give it local state — the hover no longer travels through the parent at all.' },
+    ]},
+    { role:'user', text:'That was exactly it.' },
     { role:'bot',  text:REPLY },
   ],
 };
-
-export const FALLBACK_THREAD = [
-  { role:'user', text:'Picking this back up — where did we leave it?' },
-  { role:'bot',  text:REPLY },
-];

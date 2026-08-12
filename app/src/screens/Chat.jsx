@@ -4,7 +4,7 @@ import Icon from '../components/Icon.jsx';
 import Composer from '../components/Composer.jsx';
 import ModelPicker from '../components/ModelPicker.jsx';
 import Message from '../components/Message.jsx';
-import { CONVERSATIONS, FALLBACK_THREAD, REPLY } from '../lib/data.js';
+import { CONVERSATIONS, REPLY } from '../lib/data.js';
 import { ease, liquid, liquidWide } from '../lib/motion.js';
 
 function greeting() {
@@ -20,7 +20,8 @@ export default function Chat({ user, sessionKey, openChat, mobile, drawer, onMen
   /* New Chat empties the thread; opening one from the sidebar loads its own. */
   useEffect(() => { setThread([]); }, [sessionKey]);
   useEffect(() => {
-    if (openChat) setThread(CONVERSATIONS[openChat.title] || FALLBACK_THREAD);
+    /* no shared fallback — a chat without its own thread opens empty */
+    if (openChat) setThread(CONVERSATIONS[openChat.title] || []);
   }, [openChat]);
 
   /* stay pinned to the newest message */
@@ -30,7 +31,7 @@ export default function Chat({ user, sessionKey, openChat, mobile, drawer, onMen
   }, [thread]);
 
   const send = text =>
-    setThread(t => [...t, { role:'user', text }, { role:'bot', text: REPLY }]);
+    setThread(t => [...t, { role:'user', text }, { role:'bot', text: REPLY, model }]);
   const [picker, setPicker] = useState(false);
   const [tools, setTools]   = useState(false);
 
@@ -78,7 +79,10 @@ export default function Chat({ user, sessionKey, openChat, mobile, drawer, onMen
       ) : (
         <div className="thread" ref={scroller}>
           <div className="threadin">
-            {thread.map((m, i) => <Message key={i} role={m.role} text={m.text} />)}
+            {thread.map((m, i) => (
+              <Message key={i} role={m.role} text={m.text} blocks={m.blocks}
+                       model={m.model || model} mobile={mobile} />
+            ))}
           </div>
         </div>
       )}
