@@ -33,7 +33,8 @@ function Chevron({ open }) {
   );
 }
 
-function ChatRow({ title, pinned, nested, mobile, onPin, onOpen, active, onDragStart }) {
+function ChatRow({ title, pinned, nested, mobile, onPin, onOpen, active,
+                  onDragStart, onDropHere, over }) {
   const [hover, setHover] = useState(false);
 
   /* generous 26px target — the glyph alone was fiddly to hit */
@@ -50,9 +51,11 @@ function ChatRow({ title, pinned, nested, mobile, onPin, onOpen, active, onDragS
   );
 
   return (
-    <motion.div className={`chatrow ${nested ? 'nested' : ''} ${active ? 'active' : ''}`}
+    <motion.div className={`chatrow ${nested ? 'nested' : ''} ${active ? 'active' : ''} ${over ? 'over' : ''}`}
       onClick={onOpen}
       draggable={Boolean(onDragStart)} onDragStart={onDragStart}
+      onDragOver={onDropHere ? (e => { e.preventDefault(); onDropHere.mark(); }) : undefined}
+      onDrop={onDropHere ? (e => { e.preventDefault(); onDropHere.drop(); }) : undefined}
       onHoverStart={() => setHover(true)} onHoverEnd={() => setHover(false)}
       animate={{ backgroundColor: active || hover ? 'var(--hover)' : 'rgba(0,0,0,0)',
                  color: active || hover ? 'var(--t1)' : 'var(--t2)' }}
@@ -237,11 +240,30 @@ export default function Sidebar({ user, onNewChat, collapsed, onToggle, mobile, 
   const [drag, setDrag]     = useState(null);   // the chat being dragged
   const [over, setOver]     = useState(null);   // folder it is hovering
   const [adding, setAdding] = useState(false);
+
+  /* one global listener clears the highlight however the drag ends */
+  useEffect(() => {
+    const end = () => { setOver(null); setDrag(null); };
+    window.addEventListener('dragend', end);
+    window.addEventListener('drop', end);
+    return () => {
+      window.removeEventListener('dragend', end);
+      window.removeEventListener('drop', end);
+    };
+  }, []);
   const [draft, setDraft]   = useState('');
 
-  /* a chat lives in exactly one place: loose, or inside one folder */
+  /* pull a chat out of wherever it currently lives */
+  const detach = () => {
+    if (drag.from === 'loose') setChats(list => list.filter(c => c.id !== drag.id));
+    else setFolders(list => list.map(f => (f.key !== drag.from ? f : {
+      ...f, chats: f.chats.filter(c => c.id !== drag.id),
+    })));
+  };
+
+  /* dropping onto a folder header files the chat in that folder */
   const moveToFolder = key => {
-    if (!drag || drag.from === key) return;
+    if (!drag || drag.kind !== 'chat' || drag.from === key) return;
     if (drag.from === 'loose') setChats(list => list.filter(c => c.id !== drag.id));
     setFolders(list => list.map(f => {
       let rows = f.chats;
@@ -255,11 +277,53 @@ export default function Sidebar({ user, onNewChat, collapsed, onToggle, mobile, 
     setOpen(o => ({ ...o, [key]: true }));
   };
 
+  /* dropping onto another folder puts the dragged folder in its place */
+  const reorderFolder = key => {
+    if (!drag || drag.kind !== 'folder' || drag.key === key) return;
+    setFolders(list => {
+      const from = list.findIndex(f => f.key === drag.key);
+      const to   = list.findIndex(f => f.key === key);
+      if (from < 0 || to < 0) return list;
+      const next = [...list];
+      next.splice(to, 0, next.splice(from, 1)[0]);
+      return next;
+    });
+    setDrag(null);
+    setOver(null);
+  };
+
+  /* dropping onto a chat drops it into that slot — inside a folder, or in the
+     loose list, where it also adopts the target's date group */
+  const dropOnChat = (target, where) => {
+    if (!drag || drag.kind !== 'chat' || drag.id === target.id) return;
+    detach();
+    const moving = { id: drag.id, title: drag.title, pinned: false };
+    if (where === 'loose') {
+      setChats(list => {
+        const rest = list.filter(c => c.id !== drag.id);
+        const at = rest.findIndex(c => c.id === target.id);
+        rest.splice(at < 0 ? rest.length : at, 0, { ...moving, group: target.group });
+        return rest;
+      });
+    } else {
+      setFolders(list => list.map(f => {
+        if (f.key !== where) return f;
+        const rest = f.chats.filter(c => c.id !== drag.id);
+        const at = rest.findIndex(c => c.id === target.id);
+        rest.splice(at < 0 ? rest.length : at, 0, moving);
+        return { ...f, chats: rest };
+      }));
+      setOpen(o => ({ ...o, [where]: true }));
+    }
+    setDrag(null);
+    setOver(null);
+  };
+
   const addFolder = () => {
     const label = draft.trim();
     if (!label) { setAdding(false); setDraft(''); return; }
     const key = `f${Date.now()}`;
-    setFolders(list => [...list, { key, label, chats: [] }]);
+    setFolders(list => [{ key, label, chats: [] }, ...list]);
     setOpen(o => ({ ...o, [key]: true }));
     setDraft('');
     setAdding(false);
@@ -368,10 +432,16 @@ export default function Sidebar({ user, onNewChat, collapsed, onToggle, mobile, 
 
                   {folders.map(f => (
                     <div key={f.key}
+                      onDragEnter={() => setOver(f.key)}
                       onDragOver={e => { e.preventDefault(); setOver(f.key); }}
-                      onDragLeave={() => setOver(o => (o === f.key ? null : o))}
-                      onDrop={e => { e.preventDefault(); moveToFolder(f.key); }}>
+                      onDrop={e => {
+                        e.preventDefault();
+                        if (drag?.kind === 'folder') reorderFolder(f.key);
+                        else moveToFolder(f.key);
+                      }}>
                       <motion.button className={`folderrow ${over === f.key ? 'over' : ''}`}
+                        draggable
+                        onDragStart={() => setDrag({ kind:'folder', key:f.key })}
                         onClick={() => setOpen(o => ({ ...o, [f.key]: !o[f.key] }))}
                         whileHover={{ backgroundColor:'var(--hover)', color:'var(--t1)' }}
                         transition={{ duration: dur.hover, ease }}>
@@ -381,14 +451,20 @@ export default function Sidebar({ user, onNewChat, collapsed, onToggle, mobile, 
                       <Collapse open={open[f.key]}>
                         {f.chats.filter(c => c.pinned).map(c => (
                           <ChatRow key={c.id} title={c.title} pinned nested mobile={mobile}
-                                   onDragStart={() => setDrag({ id:c.id, title:c.title, from:f.key })}
+                                   onDragStart={() => setDrag({ kind:'chat', id:c.id, title:c.title, from:f.key })}
+                                   over={over === c.id}
+                                   onDropHere={{ mark:() => setOver(c.id),
+                                                 drop:() => dropOnChat(c, f.key) }}
                                    active={openChat?.id === c.id}
                                    onOpen={() => onOpenChat?.({ id:c.id, title:c.title })}
                                    onPin={() => pinInFolder(f.key, c.id)} />
                         ))}
                         {f.chats.filter(c => !c.pinned).map(c => (
                           <ChatRow key={c.id} title={c.title} nested mobile={mobile}
-                                   onDragStart={() => setDrag({ id:c.id, title:c.title, from:f.key })}
+                                   onDragStart={() => setDrag({ kind:'chat', id:c.id, title:c.title, from:f.key })}
+                                   over={over === c.id}
+                                   onDropHere={{ mark:() => setOver(c.id),
+                                                 drop:() => dropOnChat(c, f.key) }}
                                    active={openChat?.id === c.id}
                                    onOpen={() => onOpenChat?.({ id:c.id, title:c.title })}
                                    onPin={() => pinInFolder(f.key, c.id)} />
@@ -403,7 +479,10 @@ export default function Sidebar({ user, onNewChat, collapsed, onToggle, mobile, 
                     <div className="datemark first">Pinned</div>
                     {pinned.map(c => (
                       <ChatRow key={c.id} {...c} mobile={mobile}
-                               onDragStart={() => setDrag({ id:c.id, title:c.title, from:'loose' })}
+                               onDragStart={() => setDrag({ kind:'chat', id:c.id, title:c.title, from:'loose' })}
+                               over={over === c.id}
+                               onDropHere={{ mark:() => setOver(c.id),
+                                             drop:() => dropOnChat(c, 'loose') }}
                                active={openChat?.id === c.id}
                                onOpen={() => onOpenChat?.({ id:c.id, title:c.title })}
                                onPin={() => pinChat(c.id)} />
@@ -415,7 +494,10 @@ export default function Sidebar({ user, onNewChat, collapsed, onToggle, mobile, 
                     <div className="datemark">{label}</div>
                     {rows.map(c => (
                       <ChatRow key={c.id} {...c} mobile={mobile}
-                               onDragStart={() => setDrag({ id:c.id, title:c.title, from:'loose' })}
+                               onDragStart={() => setDrag({ kind:'chat', id:c.id, title:c.title, from:'loose' })}
+                               over={over === c.id}
+                               onDropHere={{ mark:() => setOver(c.id),
+                                             drop:() => dropOnChat(c, 'loose') }}
                                active={openChat?.id === c.id}
                                onOpen={() => onOpenChat?.({ id:c.id, title:c.title })}
                                onPin={() => pinChat(c.id)} />

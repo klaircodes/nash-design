@@ -90,14 +90,16 @@
 .rule{height:1px;background:var(--border);margin:8px 0;}
 
 /* ---- folders: drop target + new folder ---- */
-.sechead.row{display:flex;align-items:center;gap:2px;}
+.sechead.row{display:flex;align-items:center;gap:6px;}
 .sechead.row .lbl{flex:1;text-align:left;height:100%;
   color:inherit;font:inherit;letter-spacing:inherit;text-transform:uppercase;}
-.addfolder,.chevbtn{width:22px;height:22px;border-radius:6px;
+.addfolder{width:22px;height:22px;border-radius:6px;
   display:grid;place-items:center;color:var(--t3);flex:0 0 auto;}
+.chevbtn{width:14px;height:22px;display:grid;place-items:center;
+  color:var(--t3);flex:0 0 auto;}
 .chevbtn .chev{display:flex;}
-.folderrow.over{background:var(--hover);color:var(--t1);}
-.chatrow[draggable="true"]{cursor:grab;}
+.folderrow.over,.chatrow.over{background:var(--hover);color:var(--t1);}
+.folderrow[draggable="true"],.chatrow[draggable="true"]{cursor:grab;}
 .newfolder{display:flex;align-items:center;gap:11px;height:34px;padding:0 9px;
   border-radius:var(--r-sm);color:var(--t2);overflow:hidden;}
 .newfolder input{flex:1;min-width:0;font-size:12.5px;color:var(--t1);
