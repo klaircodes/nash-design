@@ -48,7 +48,11 @@ function ChatRow({ title, pinned, nested }) {
         <motion.span className={`pin ${pinned ? 'on' : ''}`}
           animate={{ opacity: pinned || hover ? 1 : 0 }}
           transition={{ duration: dur.hover, ease }}>
-          <Icon name={pinned && hover ? 'pinOff' : 'pin'} size={13} />
+          <motion.span style={{ display:'flex' }}
+            animate={{ rotate: pinned && hover ? 90 : 0 }}
+            transition={liquid}>
+            <Icon name="pin" size={13} />
+          </motion.span>
         </motion.span>
         <AnimatePresence>
           {hover && (
