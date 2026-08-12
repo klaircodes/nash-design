@@ -35,6 +35,18 @@ function Chevron({ open }) {
 
 function ChatRow({ title, pinned, nested }) {
   const [hover, setHover] = useState(false);
+
+  /* generous 26px target — the glyph alone was fiddly to hit */
+  const PinBtn = ({ lead }) => (
+    <motion.button className={`pin ${pinned ? 'on' : ''} ${lead ? 'lead' : ''}`}
+      aria-label={pinned ? 'Unpin chat' : 'Pin chat'}
+      animate={{ opacity: pinned || hover ? 1 : 0 }}
+      whileTap={{ scale: 0.86 }}
+      transition={{ duration: dur.hover, ease }}>
+      <Icon name="pin" size={15} />
+    </motion.button>
+  );
+
   return (
     <motion.div className={`chatrow ${nested ? 'nested' : ''}`}
       onHoverStart={() => setHover(true)} onHoverEnd={() => setHover(false)}
@@ -42,20 +54,17 @@ function ChatRow({ title, pinned, nested }) {
                  color: hover ? 'var(--t1)' : 'var(--t2)' }}
       transition={{ duration: dur.hover, ease }}
     >
+      {/* pinned chats wear the pin up front; unpinned ones offer it on hover, right */}
+      {pinned && <PinBtn lead />}
       <span className="title">{title}</span>
       <div className="rowacts">
-        {/* pinned rows keep the pin on screen; hovering flips it to “unpin” */}
-        <motion.span className={`pin ${pinned ? 'on' : ''}`}
-          animate={{ opacity: pinned || hover ? 1 : 0 }}
-          transition={{ duration: dur.hover, ease }}>
-          <Icon name="pin" size={13} />
-        </motion.span>
+        {!pinned && <PinBtn />}
         <AnimatePresence>
           {hover && (
             <motion.span className="dots" key="d"
-              initial={{ opacity: 0, width: 0 }} animate={{ opacity: 1, width: 14 }}
+              initial={{ opacity: 0, width: 0 }} animate={{ opacity: 1, width: 16 }}
               exit={{ opacity: 0, width: 0 }} transition={{ duration: dur.hover, ease }}>
-              <Icon name="dots" size={14} />
+              <Icon name="dotsH" size={15} />
             </motion.span>
           )}
         </AnimatePresence>
