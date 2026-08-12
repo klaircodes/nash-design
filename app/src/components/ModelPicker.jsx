@@ -13,6 +13,7 @@ export default function ModelPicker({ open, model, pinned, onPick, onPin, onClos
   const [filter, setFilter] = useState('all');
   const [sort, setSort]     = useState('newest');
   const [sortOpen, setSortOpen] = useState(false);
+  const [hoverRow, setHoverRow] = useState(null);
 
   /* a fresh open always starts at the root */
   useEffect(() => {
@@ -70,8 +71,13 @@ export default function ModelPicker({ open, model, pinned, onPick, onPin, onClos
   const go = next => { setView(next); setQuery(''); setSortOpen(false); };
   const filterLabel = FILTERS.find(f => f.key === filter)?.label;
 
-  const Row = ({ m, bare }) => (
+  const Row = ({ m, bare }) => {
+    const hover = hoverRow === m.name;
+    const isPinned = pinned.includes(m.name);
+    return (
     <motion.div className="mrow" onClick={() => onPick(m.name)}
+      onHoverStart={() => setHoverRow(m.name)}
+      onHoverEnd={() => setHoverRow(h => (h === m.name ? null : h))}
       whileHover={{ backgroundColor:'var(--hover)' }} transition={{ duration: dur.hover, ease }}>
       <div className="mt">
         <div className="mn">
@@ -81,18 +87,36 @@ export default function ModelPicker({ open, model, pinned, onPick, onPin, onClos
         {!bare && <div className="mm">{meta(m)}</div>}
       </div>
       {model === m.name && <span className="tick"><Icon name="check" size={16} /></span>}
-      <motion.button
-        className={`pinbtn ${pinned.includes(m.name) ? 'on' : ''}`}
-        onClick={e => { e.stopPropagation(); onPin(m.name); }}
-        aria-label={pinned.includes(m.name) ? 'Unpin' : 'Pin'}
-        animate={{ opacity: pinned.includes(m.name) ? 1 : 0.45 }}
-        whileHover={{ opacity: 1, color:'var(--t1)' }} whileTap={{ scale: 0.86 }}
-        transition={{ duration: dur.hover, ease }}
-      >
-        <Icon name="pin" size={15} />
-      </motion.button>
+
+      <div className="rowacts">
+        <motion.button
+          className={`pinbtn ${isPinned ? 'on' : ''}`}
+          onClick={e => { e.stopPropagation(); onPin(m.name); }}
+          aria-label={isPinned ? 'Unpin' : 'Pin'}
+          animate={{ opacity: isPinned || hover ? 1 : 0 }}
+          whileHover={{ color:'var(--t1)' }} whileTap={{ scale: 0.86 }}
+          transition={{ duration: dur.hover, ease }}
+        >
+          {/* already pinned + hovered reads as “click to unpin” */}
+          <Icon name={isPinned && hover ? 'pinOff' : 'pin'} size={15} />
+        </motion.button>
+
+        <AnimatePresence>
+          {hover && (
+            <motion.button className="rowmore" key="more"
+              onClick={e => e.stopPropagation()} aria-label="More"
+              initial={{ opacity:0, width:0 }} animate={{ opacity:1, width:18 }}
+              exit={{ opacity:0, width:0 }}
+              whileHover={{ color:'var(--t1)' }} whileTap={{ scale: 0.86 }}
+              transition={{ duration: dur.hover, ease }}>
+              <Icon name="dots" size={15} />
+            </motion.button>
+          )}
+        </AnimatePresence>
+      </div>
     </motion.div>
-  );
+    );
+  };
 
   const Empty = ({ what }) => (
     <div className="mempty">

@@ -43,16 +43,23 @@ function ChatRow({ title, pinned, nested }) {
       transition={{ duration: dur.hover, ease }}
     >
       <span className="title">{title}</span>
-      <AnimatePresence>
-        {hover && (
-          <motion.span className="dots" key="d"
-            initial={{ opacity: 0, width: 0 }} animate={{ opacity: 1, width: 14 }}
-            exit={{ opacity: 0, width: 0 }} transition={{ duration: dur.hover, ease }}>
-            <Icon name="dots" size={14} />
-          </motion.span>
-        )}
-      </AnimatePresence>
-      {pinned && <span className="pin"><Icon name="pin" size={13} /></span>}
+      <div className="rowacts">
+        {/* pinned rows keep the pin on screen; hovering flips it to “unpin” */}
+        <motion.span className={`pin ${pinned ? 'on' : ''}`}
+          animate={{ opacity: pinned || hover ? 1 : 0 }}
+          transition={{ duration: dur.hover, ease }}>
+          <Icon name={pinned && hover ? 'pinOff' : 'pin'} size={13} />
+        </motion.span>
+        <AnimatePresence>
+          {hover && (
+            <motion.span className="dots" key="d"
+              initial={{ opacity: 0, width: 0 }} animate={{ opacity: 1, width: 14 }}
+              exit={{ opacity: 0, width: 0 }} transition={{ duration: dur.hover, ease }}>
+              <Icon name="dots" size={14} />
+            </motion.span>
+          )}
+        </AnimatePresence>
+      </div>
     </motion.div>
   );
 }

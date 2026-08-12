@@ -86,8 +86,11 @@
 .newtag{font-size:10.5px;font-weight:500;padding:2px 8px;border-radius:6px;
   background:rgba(99,91,255,.18);color:var(--accent);}
 .tick{color:var(--accent);display:flex;flex:0 0 auto;}
+.rowacts{display:flex;align-items:center;gap:2px;flex:0 0 auto;}
 .pinbtn{color:var(--t3);padding:4px;border-radius:6px;flex:0 0 auto;display:flex;}
 .pinbtn.on{color:var(--t1);}
+.rowmore{color:var(--t3);border-radius:6px;flex:0 0 auto;
+  display:flex;align-items:center;justify-content:center;overflow:hidden;}
 .mrow.first{margin-top:6px;}
 .mempty{padding:34px 12px;text-align:center;}
 .mempty b{display:block;font-size:13.5px;font-weight:500;color:var(--t1);margin-bottom:6px;}
