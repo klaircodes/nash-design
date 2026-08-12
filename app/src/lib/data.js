@@ -15,6 +15,7 @@ export const CHATS = [
   { title:'Voice chat',                   group:'Previous 7 days', pinned:false },
   { title:'Why .map() returns a new array', group:'Previous 7 days', pinned:false },
   { title:'Resume review',                group:'Previous 7 days', pinned:false },
+  { title:'Naming a design pattern',      group:'Previous 30 days', pinned:false },
 ];
 
 export const GROUP_ORDER = ['Today','Yesterday','Previous 7 days','Previous 30 days','June'];
@@ -163,6 +164,17 @@ export const CONVERSATIONS = {
         'Out of scope — bookmarks and MCP, which ship after.',
         'Open — whether personas keep their own pinned list.',
       ]},
+    ]},
+  ],
+
+  'Naming a design pattern': [
+    { role:'user', blocks:[
+      { t:'img', ratio:'3 / 2' },
+      { t:'p',   v:'What is this design pattern called?' },
+    ]},
+    { role:'bot', model:'Open AI/DALL·E 3', blocks:[
+      { t:'p',   v:'Here is the generated image based on your description:' },
+      { t:'img', ratio:'1.57 / 1' },
     ]},
   ],
 

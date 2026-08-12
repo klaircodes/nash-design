@@ -87,10 +87,17 @@ function DocBlock({ title, v }) {
   );
 }
 
+/* no real asset — the frontend never loads one, so this is the frame it would
+   arrive in, holding its aspect ratio at any width */
+function ImageBlock({ ratio = '3 / 2' }) {
+  return <div className="imgblock" style={{ aspectRatio: ratio }} />;
+}
+
 function Blocks({ blocks }) {
   return blocks.map((b, i) => {
     if (b.t === 'code')  return <CodeBlock key={i} lang={b.lang} v={b.v} />;
     if (b.t === 'file')  return <FileCard key={i} name={b.name} meta={b.meta} />;
+    if (b.t === 'img')   return <ImageBlock key={i} ratio={b.ratio} />;
     if (b.t === 'doc')   return <DocBlock key={i} title={b.title} v={b.v} />;
     if (b.t === 'h2')    return <h2 key={i} className="bh2">{b.v}</h2>;
     if (b.t === 'h3')    return <h3 key={i} className="bh3">{b.v}</h3>;

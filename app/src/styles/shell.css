@@ -151,6 +151,10 @@
 .bol li b,.bp b{font-weight:600;}
 .bq{border-left:2px solid var(--accent);padding-left:14px;font-size:14.5px;
   line-height:1.6;color:var(--t2);}
+.imgblock{background:var(--elevated);border-radius:12px;align-self:stretch;
+  width:100%;max-width:420px;}
+.msg.user .imgblock{max-width:none;}
+
 /* attachment chip inside your own bubble */
 .filecard{background:var(--elevated);border-radius:11px;padding:11px 15px;
   display:flex;flex-direction:column;gap:3px;align-self:stretch;}
@@ -304,6 +308,7 @@
   .bp,.bul li,.bol li,.bq{font-size:14px;}
   .bh2{font-size:16px;}
   .bh3{font-size:14px;}
+  .imgblock{max-width:none;}
   .greet{font-size:20px;text-align:center;letter-spacing:-.3px;}
 
   /* input claims its own line; the controls sit beneath it */
