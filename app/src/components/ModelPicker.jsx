@@ -186,19 +186,19 @@ export default function ModelPicker({ open, model, pinned, onPick, onPin, onClos
               <Search placeholder="Search 17,000+ models..." />
               <Filters />
               <div className="mscroll">
-                {rootPinned.length > 0 && (<>
-                  <div className="mlabel">Pinned</div>
-                  {rootPinned.map(m => <Row key={m.name} m={m} />)}
-                </>)}
-
                 {!q && filter === 'all' && (
-                  <motion.button className="mrow" onClick={() => setView({ kind:'personas' })}
+                  <motion.button className="mrow first" onClick={() => setView({ kind:'personas' })}
                     whileHover={{ backgroundColor:'var(--hover)' }} transition={{ duration: dur.hover, ease }}>
                     <div className="mt"><div className="mn"><span className="name">Personas</span></div>
                       <div className="mm">{PERSONAS.length} saved presets</div></div>
                     <Icon name="chevR" size={16} />
                   </motion.button>
                 )}
+
+                {rootPinned.length > 0 && (<>
+                  <div className="mlabel">Pinned</div>
+                  {rootPinned.map(m => <Row key={m.name} m={m} />)}
+                </>)}
 
                 {rootProviders.length > 0 && (<>
                   <div className="mlabel">Providers · most used first</div>
