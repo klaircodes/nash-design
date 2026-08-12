@@ -71,16 +71,15 @@ function ChatRow({ title, pinned, nested }) {
   );
 }
 
-function OrgSwitcher({ collapsed }) {
+/* The sidebar clips its own overflow for the collapse animation, so flyouts are
+   measured against the trigger and drawn fixed, clear of the panel's right edge. */
+function useFlyout(collapsed) {
   const [open, setOpen] = useState(false);
   const [at, setAt]     = useState({ top: 0, left: 0 });
   const ref = useRef(null);
 
-  /* the sidebar clips its own overflow for the collapse animation, so the
-     menu is measured against the trigger and drawn fixed, outside the panel */
   const toggle = () => {
     const r = ref.current?.getBoundingClientRect();
-    /* clear the whole panel, not just the trigger, or the menu lands on top of it */
     const panel = ref.current?.closest('.sidebar')?.getBoundingClientRect();
     if (r) setAt({ top: r.top - 4, left: (panel?.right ?? r.right) + 12 });
     setOpen(v => !v);
@@ -91,14 +90,58 @@ function OrgSwitcher({ collapsed }) {
     if (!open) return;
     const key = e => e.key === 'Escape' && setOpen(false);
     const scrolled = () => setOpen(false);
-    window.addEventListener('keydown', key);
-    ref.current?.closest('.sb-scroll')?.addEventListener('scroll', scrolled);
     const host = ref.current?.closest('.sb-scroll');
+    window.addEventListener('keydown', key);
+    host?.addEventListener('scroll', scrolled);
     return () => {
       window.removeEventListener('keydown', key);
       host?.removeEventListener('scroll', scrolled);
     };
   }, [open]);
+
+  return { open, setOpen, at, ref, toggle };
+}
+
+const MORE = [
+  { icon:'books',   label:'Library' },
+  { icon:'memory',  label:'Memories' },
+  { icon:'clip',    label:'MCP Settings' },
+];
+
+function MoreMenu({ collapsed }) {
+  const { open, setOpen, at, ref, toggle } = useFlyout(collapsed);
+  return (
+    <>
+      <motion.button ref={ref} className={`navitem ${open ? 'on' : ''}`} onClick={toggle}
+        whileHover={{ backgroundColor:'var(--hover)', color:'var(--t1)' }}
+        whileTap={{ scale: 0.99 }} transition={{ duration: dur.hover, ease }}>
+        <Icon name="dotsH" size={16} /><span>More</span>
+      </motion.button>
+
+      <AnimatePresence>
+        {open && (<>
+          <div className="orgveil" onClick={() => setOpen(false)} />
+          <motion.div className="orgmenu compact" style={{ top: at.top, left: at.left }}
+            initial={{ opacity:0, x:-10, scale:.98 }}
+            animate={{ opacity:1, x:0, scale:1 }}
+            exit={{ opacity:0, x:-8, scale:.98 }}
+            transition={liquid}>
+            {MORE.map(m => (
+              <motion.button key={m.label} className="orgrow" onClick={() => setOpen(false)}
+                whileHover={{ backgroundColor:'var(--hover)' }} transition={{ duration: dur.hover, ease }}>
+                <Icon name={m.icon} size={16} />
+                <div className="ot"><b>{m.label}</b></div>
+              </motion.button>
+            ))}
+          </motion.div>
+        </>)}
+      </AnimatePresence>
+    </>
+  );
+}
+
+function OrgSwitcher({ collapsed }) {
+  const { open, setOpen, at, ref, toggle } = useFlyout(collapsed);
 
   return (
     <>
@@ -145,7 +188,6 @@ const NAV = [
   { icon:'plus',     label:'New Chat' },
   { icon:'bookmark', label:'Bookmarks' },
   { icon:'users',    label:'Persona Marketplace' },
-  { icon:'dots',     label:'More' },
 ];
 
 export default function Sidebar({ user, onNewChat, collapsed, onToggle }) {
@@ -201,6 +243,7 @@ export default function Sidebar({ user, onNewChat, collapsed, onToggle }) {
                   <Icon name={n.icon} size={16} /><span>{n.label}</span>
                 </motion.button>
               ))}
+              <MoreMenu collapsed={collapsed} />
               <div className="gap" style={{ height: 8 }} />
               <button className="sechead" onClick={() => setChatsOpen(v => !v)}>
                 <span>Chats</span><Chevron open={chatsOpen} />

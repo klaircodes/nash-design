@@ -30,6 +30,11 @@
 .sb-scroll::-webkit-scrollbar-thumb{background:transparent;border-radius:3px;}
 .sidebar:hover .sb-scroll::-webkit-scrollbar-thumb{background:var(--border);}
 
+/* Every direct child holds its height. The <Collapse> wrapper around the chat
+   list is a flex item with overflow:hidden, so without this it squashed to fit
+   and hid the excess instead of letting the container scroll. */
+.sb-scroll > *{flex:0 0 auto;}
+
 /* rows never compress */
 .brand,.org,.searchfield,.navitem,.sechead,.folderrow,
 .datemark,.chatrow,.gap,.rule,.userrow{flex:0 0 auto;}
@@ -137,6 +142,9 @@
 
 /* ---- organisation switcher ---- */
 .orgveil{position:fixed;inset:0;z-index:60;}
+.orgmenu.compact{width:206px;}
+.orgmenu.compact .orgrow{padding:9px 10px;}
+.orgmenu.compact .ot b{font-weight:400;color:var(--t2);}
 .orgmenu{
   position:fixed;z-index:61;width:272px;padding:8px;
   border-radius:14px;background:var(--elevated);box-shadow:var(--shadow);
