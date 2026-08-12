@@ -210,20 +210,20 @@ function sidebar() {
 
    <div class="sb-scroll">
     <div class="spacer" style="height:8px"></div>
-    <div class="sechead ${state.chatsOpen?'':'collapsed'}" data-toggle="chats">
+    <div class="sechead ${state.chatsOpen?'':'collapsed'}" id="hd-chats" data-toggle="chats">
       <span>Chats</span>${ico('chevD',14,'chev')}
     </div>
-    <div class="collapsible ${state.chatsOpen?'':'closed'}"><div class="inner">
+    <div class="collapsible ${state.chatsOpen?'':'closed'}" id="col-chats"><div class="inner">
 
-      <div class="sechead ${state.foldersOpen?'':'collapsed'}" data-toggle="folders">
+      <div class="sechead ${state.foldersOpen?'':'collapsed'}" id="hd-folders" data-toggle="folders">
         <span>Folders</span>${ico('chevD',14,'chev')}
       </div>
-      <div class="collapsible ${state.foldersOpen?'':'closed'}"><div class="inner">
+      <div class="collapsible ${state.foldersOpen?'':'closed'}" id="col-folders"><div class="inner">
         ${FOLDERS.map(([k,label,chats]) => `
-          <div class="folderrow ${state.folders[k]?'':'collapsed'}" data-folder="${k}">
+          <div class="folderrow ${state.folders[k]?'':'collapsed'}" id="hd-f-${k}" data-folder="${k}">
             ${ico('folder',16)}<span>${label}</span>${ico('chevD',14,'chev')}
           </div>
-          <div class="collapsible ${state.folders[k]?'':'closed'}"><div class="inner">
+          <div class="collapsible ${state.folders[k]?'':'closed'}" id="col-f-${k}"><div class="inner">
             ${chats.map(c => `<div class="folderchat">${c}</div>`).join('')}
           </div></div>`).join('')}
       </div></div>
@@ -245,6 +245,14 @@ function sidebar() {
     </div>
    </div>
   </aside>`;
+}
+
+/* ---------- in-place collapse, so CSS can actually transition ---------- */
+function collapse(key, open) {
+  const head = document.getElementById('hd-' + key);
+  const body = document.getElementById('col-' + key);
+  if (head) head.classList.toggle('collapsed', !open);
+  if (body) body.classList.toggle('closed', !open);
 }
 
 /* ---------- sidebar chat rows ---------- */
@@ -804,9 +812,20 @@ function onAppClick(e) {
 
   if (d.scrim && e.target !== t) return;               // only the backdrop closes
   if (d.go)        { state.view = d.go; state.popover = false; state.rail = null; }
-  if (d.toggle === 'chats')   state.chatsOpen = !state.chatsOpen;
-  if (d.toggle === 'folders') state.foldersOpen = !state.foldersOpen;
-  if (d.folder)    state.folders[d.folder] = !state.folders[d.folder];
+  /* These are visual-only. Re-rendering would rebuild the node and
+     kill the transition, so flip the classes on the live element. */
+  if (d.toggle === 'chats') {
+    state.chatsOpen = !state.chatsOpen;
+    collapse('chats', state.chatsOpen); return;
+  }
+  if (d.toggle === 'folders') {
+    state.foldersOpen = !state.foldersOpen;
+    collapse('folders', state.foldersOpen); return;
+  }
+  if (d.folder) {
+    state.folders[d.folder] = !state.folders[d.folder];
+    collapse('f-' + d.folder, state.folders[d.folder]); return;
+  }
   if (d.tab)       state.tab = d.tab;
   if (d.layout)    state.layout = d.layout;
   if (d.clear !== undefined) state.query = '';
@@ -821,7 +840,13 @@ function onAppClick(e) {
     render(); return;
   }
   if (d.chat) { state.activeChat = d.chat; state.view = 'chat'; render(); return; }
-  if (d.composer !== undefined) { state.composerOpen = !state.composerOpen; render(); return; }
+  if (d.composer !== undefined) {
+    state.composerOpen = !state.composerOpen;
+    const el = document.querySelector('.composer');
+    if (el) el.classList.toggle('open', state.composerOpen);   // animates; render() would not
+    else render();
+    return;
+  }
   if (d.modelopen !== undefined) { state.modelPanel='root'; state.modelQuery=''; state.modelFilter='All'; render(); return; }
   if (d.modelclose !== undefined || (d.modelscrim !== undefined && e.target === t)) {
     state.modelPanel = null; render(); return; }
