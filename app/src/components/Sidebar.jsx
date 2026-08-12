@@ -118,8 +118,22 @@ const MORE = [
   { icon:'clip',    label:'MCP Settings' },
 ];
 
-function MoreMenu({ collapsed }) {
+function MoreMenu({ collapsed, mobile }) {
   const { open, setOpen, at, ref, toggle } = useFlyout(collapsed);
+
+  /* a flyout needs somewhere to fly to; on a phone the drawer owns the screen,
+     so the destinations are listed outright instead */
+  if (mobile) return (
+    <>
+      {MORE.map(m => (
+        <motion.button key={m.label} className="navitem"
+          whileTap={{ scale: 0.99 }} transition={{ duration: dur.hover, ease }}>
+          <Icon name={m.icon} size={16} /><span>{m.label}</span>
+        </motion.button>
+      ))}
+    </>
+  );
+
   return (
     <>
       <motion.button ref={ref} className={`navitem ${open ? 'on' : ''}`} onClick={toggle}
@@ -255,7 +269,7 @@ export default function Sidebar({ user, onNewChat, collapsed, onToggle, mobile, 
                   <Icon name={n.icon} size={16} /><span>{n.label}</span>
                 </motion.button>
               ))}
-              <MoreMenu collapsed={collapsed} />
+              <MoreMenu collapsed={collapsed} mobile={mobile} />
               <div className="gap" style={{ height: 8 }} />
               <button className="sechead" onClick={() => setChatsOpen(v => !v)}>
                 <span>Chats</span><Chevron open={chatsOpen} />

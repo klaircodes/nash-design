@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import Icon from './Icon.jsx';
 import { ease, dur, liquid } from '../lib/motion.js';
@@ -48,7 +48,18 @@ const ADDLIST = [
 
 export default function Composer({ model, onOpenPicker }) {
   const [open, setOpen] = useState(false);
+  const [text, setText] = useState('');
+  const ta = useRef(null);
   const mobile = useIsMobile();
+
+  /* grow with the content, then stop and scroll. Reset to auto first or the
+     box can only ever get taller — scrollHeight includes the height we set. */
+  useEffect(() => {
+    const el = ta.current;
+    if (!el) return;
+    el.style.height = 'auto';
+    el.style.height = `${el.scrollHeight}px`;
+  }, [text, mobile]);
 
   const AddToChat = () => (
     <div className="addto">
@@ -65,7 +76,7 @@ export default function Composer({ model, onOpenPicker }) {
           <Icon name="clip" size={21} /><span>Add File</span>
         </motion.button>
         <motion.button className="tile" variants={item}>
-          <Icon name="image" size={21} /><span>Image</span>
+          <Icon name="image" size={21} /><span>Create Image</span>
         </motion.button>
       </motion.div>
 
@@ -116,7 +127,8 @@ export default function Composer({ model, onOpenPicker }) {
             <Morph open={open} />
           </motion.button>
 
-          <input placeholder="Ask anything..." />
+          <textarea ref={ta} rows={1} placeholder="Ask anything..."
+            value={text} onChange={e => setText(e.target.value)} />
 
           <motion.button className="modelpick" onClick={onOpenPicker}
             whileHover={{ backgroundColor: 'var(--hover)', color: 'var(--t1)' }}

@@ -113,8 +113,15 @@
 .composerwrap{width:100%;max-width:768px;margin:0 auto;padding:0 24px 28px;flex:0 0 auto;}
 .composer{background:var(--surface);overflow:hidden;}
 .crow{display:flex;align-items:center;gap:12px;padding:14px;}
-.crow input{flex:1;min-width:0;font-size:15px;color:var(--t1);}
-.crow input::placeholder{color:var(--t4);}
+.crow textarea{
+  flex:1;min-width:0;font-size:15px;line-height:1.45;color:var(--t1);
+  resize:none;border:0;outline:none;background:none;font:inherit;font-size:15px;
+  max-height:168px;overflow-y:auto;padding:0;
+  scrollbar-width:thin;scrollbar-color:var(--border) transparent;
+}
+.crow textarea::placeholder{color:var(--t4);}
+.crow textarea::-webkit-scrollbar{width:5px;}
+.crow textarea::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
 .modelpick{display:flex;align-items:center;gap:6px;padding:6px 8px;border-radius:8px;
   font-size:13px;color:var(--t2);max-width:190px;flex:0 0 auto;}
 .modelpick .mname{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
@@ -199,7 +206,7 @@
   /* input claims its own line; the controls sit beneath it */
   .composerwrap{max-width:none;padding:0 12px 14px;}
   .crow{flex-wrap:wrap;gap:10px;padding:12px;}
-  .crow input{order:-1;flex:1 0 100%;font-size:14px;}
+  .crow textarea{order:-1;flex:1 0 100%;font-size:14px;max-height:132px;}
   .crow .modelpick{margin-left:auto;max-width:150px;font-size:12.5px;}
   .round{width:30px;height:30px;}
   .round.sm{width:30px;height:30px;}
