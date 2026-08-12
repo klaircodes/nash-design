@@ -148,7 +148,7 @@ export default function Memories({ mobile, drawer, onMenu, use, onUse }) {
 
   useLayoutEffect(() => {
     const el = host.current;
-    if (!el) return;
+    if (!el || mobile) return;
     /* `.page` is the offset parent, so offsetTop is a layout position and does
        not drift with scroll — measuring off getBoundingClientRect would grow
        the estimate every time the list was scrolled. */
@@ -180,12 +180,14 @@ export default function Memories({ mobile, drawer, onMenu, use, onUse }) {
     (!q || m.text.toLowerCase().includes(q) || m.from.toLowerCase().includes(q))
   ), [list, filter, q]);
 
-  const pages = Math.max(1, Math.ceil(shown.length / perPage));
+  /* a phone scrolls; only the desktop pages, where the list has a fixed frame */
+  const paged = !mobile;
+  const pages = paged ? Math.max(1, Math.ceil(shown.length / perPage)) : 1;
   /* deleting the last row on the last page must not strand you on an empty one */
   useEffect(() => { if (page > pages) setPage(pages); }, [pages, page]);
   useEffect(() => { setPage(1); }, [q, filter]);
 
-  const slice = shown.slice((page - 1) * perPage, page * perPage);
+  const slice = paged ? shown.slice((page - 1) * perPage, page * perPage) : shown;
 
   const save = data => {
     if (dialog && dialog.id) {
@@ -234,7 +236,7 @@ export default function Memories({ mobile, drawer, onMenu, use, onUse }) {
         </div>
       )}
 
-      <div className="page" ref={host}>
+      <div className={`page ${mobile && !use && !hideOff ? 'toastroom' : ''}`} ref={host}>
         <div className="pagehead deskonly">
           <div className="pt">
             <h1>Memories</h1>
@@ -288,7 +290,7 @@ export default function Memories({ mobile, drawer, onMenu, use, onUse }) {
 
         <div className={`memlist ${use ? '' : 'muted'}`} ref={listTop}>
           {loading
-            ? Array.from({ length: Math.min(perPage, 3) }).map((_, i) => (
+            ? Array.from({ length: 3 }).map((_, i) => (
                 <div className="memrow skel" key={`s${i}`} aria-hidden="true">
                   <div className="sk-meta">
                     <i style={{ width: 62 }} /><i style={{ width: 74 }} /><i style={{ width: 48 }} />

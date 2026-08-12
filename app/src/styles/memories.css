@@ -142,6 +142,8 @@
 /* ---------- mobile ---------- */
 @media (max-width: 720px){
   .page{padding:6px 16px 44px;}
+  /* the reminder lies over the foot of the list, so make room to scroll past it */
+  .page.toastroom{padding-bottom:110px;}
   .pagehead.deskonly{display:none;}
   .topbar.pagebar .wordmark{
     position:absolute;left:50%;transform:translateX(-50%);
