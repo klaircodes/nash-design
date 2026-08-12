@@ -31,8 +31,24 @@ function inline(str) {
   });
 }
 
+function CodeBlock({ lang, v }) {
+  return (
+    <div className="codeblock">
+      {lang && (
+        <div className="cbhead">
+          <span className="lang">{lang}</span>
+          <button title="Copy" aria-label="Copy code"><Icon name="copy" size={15} /></button>
+          <button title="Download" aria-label="Download code"><Icon name="download" size={15} /></button>
+        </div>
+      )}
+      <pre><code>{v}</code></pre>
+    </div>
+  );
+}
+
 function Blocks({ blocks }) {
   return blocks.map((b, i) => {
+    if (b.t === 'code')  return <CodeBlock key={i} lang={b.lang} v={b.v} />;
     if (b.t === 'h2')    return <h2 key={i} className="bh2">{b.v}</h2>;
     if (b.t === 'h3')    return <h3 key={i} className="bh3">{b.v}</h3>;
     if (b.t === 'quote') return <blockquote key={i} className="bq">{inline(b.v)}</blockquote>;

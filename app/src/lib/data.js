@@ -13,6 +13,7 @@ export const CHATS = [
   { title:'Bug triage — render loop',     group:'Yesterday',       pinned:false },
   { title:'Creating a PDF summary',       group:'Previous 7 days', pinned:true  },
   { title:'Voice chat',                   group:'Previous 7 days', pinned:false },
+  { title:'Why .map() returns a new array', group:'Previous 7 days', pinned:false },
 ];
 
 export const GROUP_ORDER = ['Today','Yesterday','Previous 7 days','Previous 30 days','June'];
@@ -161,6 +162,19 @@ export const CONVERSATIONS = {
         'Out of scope — bookmarks and MCP, which ship after.',
         'Open — whether personas keep their own pinned list.',
       ]},
+    ]},
+  ],
+
+  'Why .map() returns a new array': [
+    { role:'user', blocks:[
+      { t:'code', v:'const x = [1, 2, 3];\nx.map(n => n * 2);' },
+      { t:'p',    v:'Why does this return a new array?' },
+    ]},
+    { role:'bot', blocks:[
+      { t:'p', v:'`.map()` builds a new array from the return value of the callback for every element. It never touches the original — that is what makes it safe to chain.' },
+      { t:'p', v:'Here is how you can implement that:' },
+      { t:'code', lang:'javascript', v:
+'function greet(name) {\n  return `Hello, ${name}!`;\n}\n\nconsole.log(greet("Claire"));' },
     ]},
   ],
 

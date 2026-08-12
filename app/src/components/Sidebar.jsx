@@ -57,8 +57,8 @@ function ChatRow({ title, pinned, nested, mobile, onPin, onOpen, active,
       onDragOver={onDropHere ? (e => { e.preventDefault(); onDropHere.mark(); }) : undefined}
       onDrop={onDropHere ? (e => { e.preventDefault(); onDropHere.drop(); }) : undefined}
       onHoverStart={() => setHover(true)} onHoverEnd={() => setHover(false)}
-      animate={{ backgroundColor: active || hover ? 'var(--hover)' : 'rgba(0,0,0,0)',
-                 color: active || hover ? 'var(--t1)' : 'var(--t2)' }}
+      animate={{ backgroundColor: active || hover || over ? 'var(--hover)' : 'rgba(0,0,0,0)',
+                 color: active || hover || over ? 'var(--t1)' : 'var(--t2)' }}
       transition={{ duration: dur.hover, ease }}
     >
       <span className="title">{title}</span>
@@ -439,10 +439,14 @@ export default function Sidebar({ user, onNewChat, collapsed, onToggle, mobile, 
                         if (drag?.kind === 'folder') reorderFolder(f.key);
                         else moveToFolder(f.key);
                       }}>
-                      <motion.button className={`folderrow ${over === f.key ? 'over' : ''}`}
+                      <motion.button className="folderrow"
                         draggable
                         onDragStart={() => setDrag({ kind:'folder', key:f.key })}
                         onClick={() => setOpen(o => ({ ...o, [f.key]: !o[f.key] }))}
+                        animate={{
+                          backgroundColor: over === f.key ? 'var(--hover)' : 'rgba(0,0,0,0)',
+                          color: over === f.key ? 'var(--t1)' : 'var(--t2)',
+                        }}
                         whileHover={{ backgroundColor:'var(--hover)', color:'var(--t1)' }}
                         transition={{ duration: dur.hover, ease }}>
                         <Icon name="folder" size={16} /><span>{f.label}</span>
