@@ -61,7 +61,8 @@ export default function ModelPicker({ open, model, pinned, onPick, onPin, onClos
   const provPinned = provModels.filter(m => pinned.includes(m.name));
   const provRest   = provModels.filter(m => !pinned.includes(m.name));
 
-  const personas = PERSONAS.filter(p => !q || p.toLowerCase().includes(q));
+  const personas = PERSONAS.filter(p =>
+    !q || p.name.toLowerCase().includes(q) || p.desc.toLowerCase().includes(q));
 
   const clearAll = () => { setQuery(''); setFilter('all'); setSortOpen(false); };
   const filterLabel = FILTERS.find(f => f.key === filter)?.label;
@@ -256,11 +257,13 @@ export default function ModelPicker({ open, model, pinned, onPick, onPin, onClos
               <Search placeholder="Search personas..." />
               <div className="mscroll">
                 {personas.map(p => (
-                  <motion.button key={p} className="mrow" onClick={() => onPick(p)}
+                  <motion.button key={p.name} className="mrow" onClick={() => onPick(p.name)}
                     whileHover={{ backgroundColor:'var(--hover)' }} transition={{ duration: dur.hover, ease }}>
-                    <div className="mt"><div className="mn"><span className="name">{p}</span></div>
-                      <div className="mm">Persona</div></div>
-                    {model === p && <span className="tick"><Icon name="check" size={16} /></span>}
+                    <div className="mt">
+                      <div className="mn"><span className="name">{p.name}</span></div>
+                      <div className="mm">{p.desc}</div>
+                    </div>
+                    {model === p.name && <span className="tick"><Icon name="check" size={16} /></span>}
                   </motion.button>
                 ))}
                 {personas.length === 0 && <Empty what="personas" />}

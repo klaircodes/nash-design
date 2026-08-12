@@ -73,9 +73,18 @@ export const SORTS = [
 ];
 
 export const PERSONAS = [
-  'Product Strategist','Code Reviewer','Bug Hunter','Frontend Engineer',
-  'Product Designer','Test Writer','Refactor Partner','Documentation Writer',
-  'Data Analyst','Copy Editor','Interview Coach','Meeting Summariser',
+  { name:'Product Strategist',    desc:'Turns rough product ideas into structured plans, competitive analysis and go-to-market strategy.' },
+  { name:'Code Reviewer',         desc:'Reviews changes for logic issues, edge cases and consistency with the existing codebase.' },
+  { name:'Bug Hunter',            desc:'Traces broken behaviour across files, state and user flows to narrow down the cause.' },
+  { name:'Frontend Engineer',     desc:'Builds, debugs and refines interface code with attention to layout and interaction states.' },
+  { name:'Product Designer',      desc:'Turns rough ideas into structured user flows, screen layouts and interaction patterns.' },
+  { name:'Test Writer',           desc:'Creates focused tests for existing behaviour, edge cases and recent changes.' },
+  { name:'Refactor Partner',      desc:'Simplifies messy code while preserving behaviour. Reduces duplication and improves structure.' },
+  { name:'Documentation Writer',  desc:'Turns technical decisions, APIs and workflows into clear documentation.' },
+  { name:'Data Analyst',          desc:'Writes queries, checks assumptions and explains what the numbers actually support.' },
+  { name:'Copy Editor',           desc:'Tightens wording, fixes tone drift and cuts anything that is not earning its place.' },
+  { name:'Interview Coach',       desc:'Runs practice questions, pushes back on vague answers and suggests sharper framing.' },
+  { name:'Meeting Summariser',    desc:'Condenses notes into decisions, owners and open questions — nothing else.' },
 ];
 
 export const fmtDate = iso => {
