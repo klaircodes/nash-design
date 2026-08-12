@@ -16,7 +16,7 @@ export default function ModelPicker({ open, model, pinned, onPick, onPin, onClos
 
   /* a fresh open always starts at the root */
   useEffect(() => {
-    if (open) { setView({ kind:'root' }); setQuery(''); setFilter('all'); setSortOpen(false); }
+    if (open) { go({ kind:'root' }); setQuery(''); setFilter('all'); setSortOpen(false); }
   }, [open]);
 
   useEffect(() => {
@@ -24,7 +24,7 @@ export default function ModelPicker({ open, model, pinned, onPick, onPin, onClos
     const onKey = e => {
       if (e.key !== 'Escape') return;
       if (sortOpen) setSortOpen(false);
-      else if (view.kind !== 'root') setView({ kind:'root' });
+      else if (view.kind !== 'root') go({ kind:'root' });
       else onClose();
     };
     window.addEventListener('keydown', onKey);
@@ -65,6 +65,9 @@ export default function ModelPicker({ open, model, pinned, onPick, onPin, onClos
     !q || p.name.toLowerCase().includes(q) || p.desc.toLowerCase().includes(q));
 
   const clearAll = () => { setQuery(''); setFilter('all'); setSortOpen(false); };
+
+  /* moving between panels always starts from a clean search */
+  const go = next => { setView(next); setQuery(''); setSortOpen(false); };
   const filterLabel = FILTERS.find(f => f.key === filter)?.label;
 
   const Row = ({ m }) => (
@@ -116,6 +119,12 @@ export default function ModelPicker({ open, model, pinned, onPick, onPin, onClos
       </div>
 
       {/* outside the scrolling strip, so the menu is never clipped */}
+      <SortButton />
+    </div>
+  );
+
+  const SortButton = () => (
+    <>
       <motion.button className={`fsort ${sortOpen ? 'on' : ''}`}
         onClick={() => setSortOpen(v => !v)} aria-label="Sort"
         whileHover={{ backgroundColor:'var(--surface)', color:'var(--t1)' }}
@@ -128,31 +137,34 @@ export default function ModelPicker({ open, model, pinned, onPick, onPin, onClos
           <motion.div className="sortmenu"
             initial={{ opacity:0, y:-6, scale:.98 }} animate={{ opacity:1, y:0, scale:1 }}
             exit={{ opacity:0, y:-6, scale:.98 }} transition={{ duration:0.18, ease }}>
-            {SORTS.map(s => (
-              <motion.button key={s.key} className="sortrow"
-                onClick={() => { setSort(s.key); setSortOpen(false); }}
+            {SORTS.map(so => (
+              <motion.button key={so.key} className="sortrow"
+                onClick={() => { setSort(so.key); setSortOpen(false); }}
                 whileHover={{ backgroundColor:'var(--hover)', color:'var(--t1)' }}
                 transition={{ duration: dur.hover, ease }}>
-                {s.label}
-                {sort === s.key && <span className="tick"><Icon name="check" size={14} /></span>}
+                {so.label}
+                {sort === so.key && <span className="tick"><Icon name="check" size={14} /></span>}
               </motion.button>
             ))}
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
+    </>
   );
 
-  const Search = ({ placeholder }) => (
-    <div className="msearch">
-      <Icon name="search" size={15} />
-      <input autoFocus value={query} placeholder={placeholder}
-             onChange={e => { setQuery(e.target.value); setSortOpen(false); }} />
-      {query && (
-        <button className="clear" onClick={() => setQuery('')} aria-label="Clear search">
-          <Icon name="x" size={14} />
-        </button>
-      )}
+  const Search = ({ placeholder, withSort }) => (
+    <div className={`searchrow ${withSort ? 'withsort' : ''}`}>
+      <div className="msearch">
+        <Icon name="search" size={15} />
+        <input autoFocus value={query} placeholder={placeholder}
+               onChange={e => { setQuery(e.target.value); setSortOpen(false); }} />
+        {query && (
+          <button className="clear" onClick={() => setQuery('')} aria-label="Clear search">
+            <Icon name="x" size={14} />
+          </button>
+        )}
+      </div>
+      {withSort && <SortButton />}
     </div>
   );
 
@@ -188,7 +200,7 @@ export default function ModelPicker({ open, model, pinned, onPick, onPin, onClos
               <Filters />
               <div className="mscroll">
                 {!q && filter === 'all' && (
-                  <motion.button className="mrow first" onClick={() => setView({ kind:'personas' })}
+                  <motion.button className="mrow first" onClick={() => go({ kind:'personas' })}
                     whileHover={{ backgroundColor:'var(--hover)' }} transition={{ duration: dur.hover, ease }}>
                     <div className="mt"><div className="mn"><span className="name">Personas</span></div>
                       <div className="mm">{PERSONAS.length} saved presets</div></div>
@@ -205,7 +217,7 @@ export default function ModelPicker({ open, model, pinned, onPick, onPin, onClos
                   <div className="mlabel">Providers · most used first</div>
                   {rootProviders.map(p => (
                     <motion.button key={p.name} className="mrow"
-                      onClick={() => setView({ kind:'provider', name:p.name })}
+                      onClick={() => go({ kind:'provider', name:p.name })}
                       whileHover={{ backgroundColor:'var(--hover)' }} transition={{ duration: dur.hover, ease }}>
                       <div className="mt">
                         <div className="mn"><span className="name">{p.name}</span></div>
@@ -222,7 +234,7 @@ export default function ModelPicker({ open, model, pinned, onPick, onPin, onClos
 
             {view.kind === 'provider' && (<>
               <div className="mhead">
-                <motion.button className="iconbtn" onClick={() => setView({ kind:'root' })}
+                <motion.button className="iconbtn" onClick={() => go({ kind:'root' })}
                   whileHover={{ backgroundColor:'var(--hover)', color:'var(--t1)' }}><Icon name="chevL" size={16} /></motion.button>
                 <div className="tt"><h3>{view.name}</h3>
                   <small>{MODELS.filter(m => m.provider === view.name).length} models · {
@@ -231,8 +243,7 @@ export default function ModelPicker({ open, model, pinned, onPick, onPin, onClos
                 <motion.button className="iconbtn" onClick={onClose}
                   whileHover={{ backgroundColor:'var(--hover)', color:'var(--t1)' }}><Icon name="x" size={16} /></motion.button>
               </div>
-              <Search placeholder={`Search ${view.name} models...`} />
-              <Filters />
+              <Search placeholder={`Search ${view.name} models...`} withSort />
               <div className="mscroll">
                 {provPinned.length > 0 && (<>
                   <div className="mlabel">Pinned</div>
@@ -248,7 +259,7 @@ export default function ModelPicker({ open, model, pinned, onPick, onPin, onClos
 
             {view.kind === 'personas' && (<>
               <div className="mhead">
-                <motion.button className="iconbtn" onClick={() => setView({ kind:'root' })}
+                <motion.button className="iconbtn" onClick={() => go({ kind:'root' })}
                   whileHover={{ backgroundColor:'var(--hover)', color:'var(--t1)' }}><Icon name="chevL" size={16} /></motion.button>
                 <div className="tt"><h3>Personas</h3><small>{PERSONAS.length} saved presets</small></div>
                 <motion.button className="iconbtn" onClick={onClose}

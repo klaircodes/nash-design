@@ -19,10 +19,15 @@
   width:32px;height:32px;flex:0 0 auto;border-radius:var(--r-sm);
   display:grid;place-items:center;color:var(--t3);
 }
+.searchrow{
+  margin:0 18px 14px;display:flex;align-items:center;gap:10px;flex:0 0 auto;position:relative;
+}
 .msearch{
-  margin:0 18px 14px;height:42px;flex:0 0 auto;border-radius:10px;background:var(--surface);
+  flex:1;min-width:0;height:42px;border-radius:10px;background:var(--surface);
   display:flex;align-items:center;gap:10px;padding:0 13px;color:var(--t3);
 }
+.searchrow.withsort .fsort{width:42px;height:42px;border-radius:10px;background:var(--surface);}
+.searchrow .sortmenu{top:48px;right:0;}
 .msearch input{flex:1;min-width:0;font-size:13.5px;color:var(--t1);}
 .msearch input::placeholder{color:var(--t4);}
 .msearch .clear{display:flex;color:var(--t3);}
