@@ -141,7 +141,7 @@
 
 /* ---------- mobile ---------- */
 @media (max-width: 720px){
-  .page{padding:28px 16px 48px;}
+  .page{padding:40px 16px 48px;}
   /* the reminder lies over the foot of the list, so make room to scroll past it */
   .page.toastroom{padding-bottom:120px;}
   .pagehead.deskonly{display:none;}
