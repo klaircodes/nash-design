@@ -84,10 +84,15 @@
 .memtext{margin-top:9px;font-size:14px;line-height:1.6;color:var(--t1);}
 
 /* ---- empty ---- */
-.memempty{padding:44px 12px;text-align:center;}
-.memempty b{display:block;font-size:14px;font-weight:600;color:var(--t1);margin-bottom:7px;}
-.memempty p{font-size:13px;line-height:1.6;color:var(--t3);max-width:380px;margin:0 auto;}
-.memempty button{margin-top:16px;font-size:13px;font-weight:500;color:var(--accent);}
+.memempty{padding:52px 12px 56px;text-align:center;
+  display:flex;flex-direction:column;align-items:center;}
+.memempty .ic{width:46px;height:46px;border-radius:14px;margin-bottom:18px;
+  display:grid;place-items:center;background:var(--surface);color:var(--t3);}
+.memempty b{display:block;font-size:15px;font-weight:600;color:var(--t1);margin-bottom:9px;}
+.memempty p{font-size:13px;line-height:1.65;color:var(--t3);max-width:340px;}
+.memempty p b{display:inline;font-size:inherit;margin:0;color:var(--t2);}
+.memempty .primary.sm,.memempty .ghost{margin-top:20px;}
+.ghost.outlined{box-shadow:inset 0 0 0 1px var(--border);}
 
 /* ---- pagination ---- */
 .pager{display:flex;align-items:center;gap:14px;margin-top:20px;}

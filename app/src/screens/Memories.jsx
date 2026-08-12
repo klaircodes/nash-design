@@ -291,16 +291,24 @@ export default function Memories({ mobile, drawer, onMenu, use, onUse }) {
 
           {!loading && shown.length === 0 && (
             <div className="memempty">
+              <span className="ic">
+                <Icon name={list.length === 0 ? 'memory' : 'search'} size={20} />
+              </span>
               {list.length === 0 ? (<>
                 <b>No memories yet</b>
-                <p>Nash saves things worth remembering as you chat, or you can add one yourself.</p>
-                <button onClick={() => setDialog({})}>Add your first memory</button>
+                <p>Nash saves useful details from your chats so it can recall them later.
+                   Add one manually to get started.</p>
+                <motion.button className="primary sm" onClick={() => setDialog({})}
+                  whileTap={{ scale: 0.98 }} transition={{ duration: dur.press, ease }}>
+                  <Icon name="plus" size={15} /> Add memory
+                </motion.button>
               </>) : (<>
                 <b>Nothing matches{q ? ` “${query.trim()}”` : ''}</b>
                 <p>{filter !== 'All'
-                  ? <>The <b>{filter}</b> filter is narrowing this down.</>
+                  ? <>The <b>{filter}</b> filter is narrowing this down. Try a broader scope
+                      or a shorter search.</>
                   : 'Try a shorter search.'}</p>
-                <button onClick={clearAll}>Clear search and filters</button>
+                <button className="ghost outlined" onClick={clearAll}>Clear search and filters</button>
               </>)}
             </div>
           )}
