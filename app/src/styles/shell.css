@@ -126,14 +126,14 @@
   padding:0 22px;gap:12px;
 }
 .topbar .more{margin-left:auto;color:var(--t3);display:flex;}
-.chatbody{flex:1;min-height:0;display:grid;place-items:center;padding:48px 24px 24px;}
+.chatbody{flex:1;min-height:0;display:grid;place-items:center;padding:24px;}
 
 /* ---------- conversation ---------- */
 .thread{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;
   scrollbar-width:thin;scrollbar-color:var(--border) transparent;}
 .thread::-webkit-scrollbar{width:8px;}
 .thread::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
-.threadin{width:100%;max-width:768px;margin:0 auto;padding:36px 24px 20px;
+.threadin{width:100%;max-width:768px;margin:0 auto;padding:8px 24px 20px;
   display:flex;flex-direction:column;gap:18px;}
 .msg{display:flex;flex-direction:column;align-items:flex-start;}
 .msg.user{align-items:flex-end;}
@@ -320,7 +320,7 @@
 .drawerscrim{position:fixed;inset:0;z-index:79;background:var(--app);}
 /* a fixed 16px off the drawer's edge — not centred in whatever space is left */
 .drawerclose{
-  position:absolute;top:0;left:calc(var(--drawerw) + 16px);width:32px;height:56px;
+  position:absolute;top:24px;left:calc(var(--drawerw) + 16px);width:32px;height:56px;
   display:grid;place-items:center;color:var(--t2);
 }
 .disclaim{display:none;text-align:center;font-size:10.5px;color:var(--t4);
@@ -340,15 +340,15 @@
     border-radius:0 16px 0 16px;
     /* brand row drops to the top bar's own line, so `nash:` and the collapse
        mark sit level and the mark never travels vertically */
-    padding-top:6px;
+    padding-top:30px;
   }
   .sidebar.drawer .sb-body{width:auto;min-width:0;}
 
-  .topbar{position:relative;height:56px;padding:0 14px;gap:10px;}
+  .topbar{position:relative;height:80px;padding:24px 14px 0;gap:10px;}
   .topbar .menu{color:var(--t2);display:flex;align-items:center;}
 
-  .chatbody{padding:64px 16px 16px;}
-  .threadin{padding:56px 12px 16px;gap:16px;}
+  .chatbody{padding:22px 16px 16px;}
+  .threadin{padding:14px 12px 16px;gap:16px;}
   .msg .bubble{max-width:92%;}
   .msg.user .bubble{max-width:84%;}
   .mtext{font-size:14px;}
