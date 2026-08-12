@@ -497,7 +497,7 @@ input{font-family:inherit;border:0;outline:0;background:none;color:inherit;}
   transition:border-radius .24s var(--ease),background .18s var(--ease);
 }
 .composer.open{border-radius:20px;}
-.composer.open .crow{padding-bottom:4px;}
+.composer.open .crow{padding-bottom:10px;}
 .crow{display:flex;align-items:center;gap:12px;padding:14px;}
 .crow input{flex:1;min-width:0;font-size:15px;color:var(--t1);}
 .crow input::placeholder{color:var(--t4);}
@@ -508,7 +508,7 @@ input{font-family:inherit;border:0;outline:0;background:none;color:inherit;}
 }
 .modelpick:hover{background:var(--hover);color:var(--t1);}
 .trow{
-  display:flex;align-items:center;gap:10px;padding:14px 14px 14px;
+  display:flex;align-items:center;gap:10px;padding:18px 14px 14px;
   animation:trowIn .22s var(--ease) both;
 }
 @keyframes trowIn{from{opacity:0;transform:translateY(-4px);}to{opacity:1;transform:none;}}
