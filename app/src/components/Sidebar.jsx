@@ -33,12 +33,13 @@ function Chevron({ open }) {
   );
 }
 
-function ChatRow({ title, pinned, nested, mobile }) {
+function ChatRow({ title, pinned, nested, mobile, onPin }) {
   const [hover, setHover] = useState(false);
 
   /* generous 26px target — the glyph alone was fiddly to hit */
   const PinBtn = () => (
     <motion.button className={`pin ${pinned ? 'on' : ''}`}
+      onClick={e => { e.stopPropagation(); onPin?.(); }}
       aria-label={pinned ? 'Unpin chat' : 'Pin chat'}
       animate={{ opacity: pinned || hover ? 1 : 0 }}
       style={{ pointerEvents: pinned || hover ? 'auto' : 'none' }}
@@ -220,9 +221,27 @@ export default function Sidebar({ user, onNewChat, collapsed, onToggle, mobile, 
   const [foldersOpen, setFoldersOpen] = useState(true);
   const [open, setOpen] = useState({ work:true, research:false, personal:false });
 
-  const pinned = CHATS.filter(c => c.pinned);
+  /* pin state is live: loose chats move between the Pinned group and their date
+     group, while a folder's chats pin to the top of that folder and stay in it */
+  const [chats, setChats] = useState(
+    () => CHATS.map((c, i) => ({ ...c, id:`c${i}` })));
+  const [folders, setFolders] = useState(
+    () => FOLDERS.map(f => ({
+      ...f,
+      chats: f.chats.map((title, i) => ({ title, pinned:false, id:`${f.key}${i}` })),
+    })));
+
+  const pinChat = id =>
+    setChats(list => list.map(c => (c.id === id ? { ...c, pinned: !c.pinned } : c)));
+  const pinInFolder = (key, id) =>
+    setFolders(list => list.map(f => (f.key !== key ? f : {
+      ...f,
+      chats: f.chats.map(c => (c.id === id ? { ...c, pinned: !c.pinned } : c)),
+    })));
+
+  const pinned = chats.filter(c => c.pinned);
   const groups = GROUP_ORDER
-    .map(g => [g, CHATS.filter(c => c.group === g && !c.pinned)])
+    .map(g => [g, chats.filter(c => c.group === g && !c.pinned)])
     .filter(([, rows]) => rows.length);
 
   return (
@@ -282,7 +301,7 @@ export default function Sidebar({ user, onNewChat, collapsed, onToggle, mobile, 
                 </button>
 
                 <Collapse open={foldersOpen}>
-                  {FOLDERS.map(f => (
+                  {folders.map(f => (
                     <div key={f.key}>
                       <motion.button className="folderrow"
                         onClick={() => setOpen(o => ({ ...o, [f.key]: !o[f.key] }))}
@@ -292,7 +311,14 @@ export default function Sidebar({ user, onNewChat, collapsed, onToggle, mobile, 
                         <Chevron open={open[f.key]} />
                       </motion.button>
                       <Collapse open={open[f.key]}>
-                        {f.chats.map(c => <ChatRow key={c} title={c} nested mobile={mobile} />)}
+                        {f.chats.filter(c => c.pinned).map(c => (
+                          <ChatRow key={c.id} title={c.title} pinned nested mobile={mobile}
+                                   onPin={() => pinInFolder(f.key, c.id)} />
+                        ))}
+                        {f.chats.filter(c => !c.pinned).map(c => (
+                          <ChatRow key={c.id} title={c.title} nested mobile={mobile}
+                                   onPin={() => pinInFolder(f.key, c.id)} />
+                        ))}
                       </Collapse>
                     </div>
                   ))}
@@ -301,13 +327,17 @@ export default function Sidebar({ user, onNewChat, collapsed, onToggle, mobile, 
                 {pinned.length > 0 && (
                   <>
                     <div className="datemark first">Pinned</div>
-                    {pinned.map((c, i) => <ChatRow key={`p${i}`} {...c} mobile={mobile} />)}
+                    {pinned.map(c => (
+                      <ChatRow key={c.id} {...c} mobile={mobile} onPin={() => pinChat(c.id)} />
+                    ))}
                   </>
                 )}
                 {groups.map(([label, rows]) => (
                   <div key={label}>
                     <div className="datemark">{label}</div>
-                    {rows.map((c, i) => <ChatRow key={`${label}${i}`} {...c} mobile={mobile} />)}
+                    {rows.map(c => (
+                      <ChatRow key={c.id} {...c} mobile={mobile} onPin={() => pinChat(c.id)} />
+                    ))}
                   </div>
                 ))}
               </Collapse>

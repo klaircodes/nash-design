@@ -7,6 +7,62 @@ import { MODELS, PROVIDERS, FILTERS, SORTS, PERSONAS, fmtDate } from '../lib/dat
 const meta = m => `${fmtDate(m.date)} · ${m.tags.includes('vision') ? 'Vision'
   : m.tags.includes('open-source') ? 'Open source' : 'Text'}`;
 
+
+function Row({ m, bare, model, pinned, onPick, onPin, inline }) {
+  const [hover, setHover] = useState(false);
+  const isPinned = pinned.includes(m.name);
+  return (
+    <motion.div className="mrow" onClick={() => onPick(m.name)}
+      onHoverStart={() => setHover(true)} onHoverEnd={() => setHover(false)}
+      whileHover={{ backgroundColor:'var(--hover)' }} transition={{ duration: dur.hover, ease }}>
+      <div className="mt">
+        <div className="mn">
+          <span className="name">{m.name}</span>
+          {m.isNew && <span className="newtag">New</span>}
+        </div>
+        {!bare && <div className="mm">{meta(m)}</div>}
+      </div>
+      {model === m.name && <span className="tick"><Icon name="check" size={16} /></span>}
+      <div className="rowacts">
+        <motion.button className={`pinbtn ${isPinned ? 'on' : ''}`}
+          onClick={e => { e.stopPropagation(); onPin(m.name); }}
+          aria-label={isPinned ? 'Unpin' : 'Pin'}
+          animate={{ opacity: isPinned || hover || inline ? 1 : 0 }}
+          whileHover={{ color:'var(--t1)' }} whileTap={{ scale: 0.86 }}
+          transition={{ duration: dur.hover, ease }}>
+          <Icon name="pin" size={15} />
+        </motion.button>
+      </div>
+    </motion.div>
+  );
+}
+
+function PersonaRow({ p, bare, model, pinned, onPick, onPin, inline }) {
+  const [hover, setHover] = useState(false);
+  const isPinned = pinned.includes(p.name);
+  return (
+    <motion.div className="mrow" onClick={() => onPick(p.name)}
+      onHoverStart={() => setHover(true)} onHoverEnd={() => setHover(false)}
+      whileHover={{ backgroundColor:'var(--hover)' }} transition={{ duration: dur.hover, ease }}>
+      <div className="mt">
+        <div className="mn"><span className="name">{p.name}</span></div>
+        {!bare && <div className="mm">{p.desc}</div>}
+      </div>
+      {model === p.name && <span className="tick"><Icon name="check" size={16} /></span>}
+      <div className="rowacts">
+        <motion.button className={`pinbtn ${isPinned ? 'on' : ''}`}
+          onClick={e => { e.stopPropagation(); onPin(p.name); }}
+          aria-label={isPinned ? 'Unpin' : 'Pin'}
+          animate={{ opacity: isPinned || hover || inline ? 1 : 0 }}
+          whileHover={{ color:'var(--t1)' }} whileTap={{ scale: 0.86 }}
+          transition={{ duration: dur.hover, ease }}>
+          <Icon name="pin" size={15} />
+        </motion.button>
+      </div>
+    </motion.div>
+  );
+}
+
 export default function ModelPicker({ open, model, pinned, onPick, onPin, onClose, inline }) {
   const [view, setView]     = useState({ kind:'root' });
   const [query, setQuery]   = useState('');
@@ -14,7 +70,6 @@ export default function ModelPicker({ open, model, pinned, onPick, onPin, onClos
   const [sort, setSort]     = useState('newest');
   const [sortOpen, setSortOpen] = useState(false);
   const [filterOpen, setFilterOpen] = useState(false);
-  const [hoverRow, setHoverRow] = useState(null);
 
   /* a fresh open always starts at the root */
   useEffect(() => {
@@ -34,6 +89,7 @@ export default function ModelPicker({ open, model, pinned, onPick, onPin, onClos
   }, [open, view, sortOpen, onClose]);
 
   const q = query.trim().toLowerCase();
+  const rowProps = { model, pinned, onPick, onPin, inline };
 
   const match = m =>
     (filter === 'all' || m.tags.includes(filter)) &&
@@ -87,66 +143,6 @@ export default function ModelPicker({ open, model, pinned, onPick, onPin, onClos
   /* moving between panels always starts from a clean search */
   const go = next => { setView(next); setQuery(''); setSortOpen(false); setFilterOpen(false); };
   const filterLabel = FILTERS.find(f => f.key === filter)?.label;
-
-  const Row = ({ m, bare }) => {
-    const hover = hoverRow === m.name;
-    const isPinned = pinned.includes(m.name);
-    return (
-    <motion.div className="mrow" onClick={() => onPick(m.name)}
-      onHoverStart={() => setHoverRow(m.name)}
-      onHoverEnd={() => setHoverRow(h => (h === m.name ? null : h))}
-      whileHover={{ backgroundColor:'var(--hover)' }} transition={{ duration: dur.hover, ease }}>
-      <div className="mt">
-        <div className="mn">
-          <span className="name">{m.name}</span>
-          {m.isNew && <span className="newtag">New</span>}
-        </div>
-        {!bare && <div className="mm">{meta(m)}</div>}
-      </div>
-      {model === m.name && <span className="tick"><Icon name="check" size={16} /></span>}
-
-      <div className="rowacts">
-        <motion.button
-          className={`pinbtn ${isPinned ? 'on' : ''}`}
-          onClick={e => { e.stopPropagation(); onPin(m.name); }}
-          aria-label={isPinned ? 'Unpin' : 'Pin'}
-          animate={{ opacity: isPinned || hover || inline ? 1 : 0 }}
-          whileHover={{ color:'var(--t1)' }} whileTap={{ scale: 0.86 }}
-          transition={{ duration: dur.hover, ease }}
-        >
-          <Icon name="pin" size={15} />
-        </motion.button>
-
-      </div>
-    </motion.div>
-    );
-  };
-
-  const PersonaRow = ({ p, bare }) => {
-    const hover = hoverRow === p.name;
-    const isPinned = pinned.includes(p.name);
-    return (
-      <motion.div className="mrow" onClick={() => onPick(p.name)}
-        onHoverStart={() => setHoverRow(p.name)}
-        onHoverEnd={() => setHoverRow(h => (h === p.name ? null : h))}
-        whileHover={{ backgroundColor:'var(--hover)' }} transition={{ duration: dur.hover, ease }}>
-        <div className="mt">
-          <div className="mn"><span className="name">{p.name}</span></div>
-          {!bare && <div className="mm">{p.desc}</div>}
-        </div>
-        {model === p.name && <span className="tick"><Icon name="check" size={16} /></span>}
-        <div className="rowacts">
-          <motion.button className={`pinbtn ${isPinned ? 'on' : ''}`}
-            onClick={e => { e.stopPropagation(); onPin(p.name); }}
-            aria-label={isPinned ? 'Unpin' : 'Pin'}
-            animate={{ opacity: isPinned || hover || inline ? 1 : 0 }}
-            whileTap={{ scale: 0.86 }} transition={{ duration: dur.hover, ease }}>
-            <Icon name="pin" size={15} />
-          </motion.button>
-        </div>
-      </motion.div>
-    );
-  };
 
   const Empty = ({ what }) => (
     <div className="mempty">
@@ -326,7 +322,7 @@ export default function ModelPicker({ open, model, pinned, onPick, onPin, onClos
 
                 {rootPinned.length > 0 && (<>
                   <div className="mlabel">Pinned</div>
-                  {rootPinned.map(m => <Row key={m.name} m={m} bare />)}
+                  {rootPinned.map(m => <Row key={m.name} m={m} bare {...rowProps} />)}
                 </>)}
 
                 {rootProviders.length > 0 && (<>
@@ -365,11 +361,11 @@ export default function ModelPicker({ open, model, pinned, onPick, onPin, onClos
               <div className="mscroll">
                 {provPinned.length > 0 && (<>
                   <div className="mlabel">Pinned</div>
-                  {provPinned.map(m => <Row key={m.name} m={m} />)}
+                  {provPinned.map(m => <Row key={m.name} m={m} {...rowProps} />)}
                 </>)}
                 {provRest.length > 0 && (<>
                   <div className="mlabel">All models · {SORTS.find(s => s.key === sort).label.toLowerCase()}</div>
-                  {provRest.map(m => <Row key={m.name} m={m} />)}
+                  {provRest.map(m => <Row key={m.name} m={m} {...rowProps} />)}
                 </>)}
                 {provModels.length === 0 && <Empty what={`${view.name} models`} />}
               </div>
@@ -389,10 +385,10 @@ export default function ModelPicker({ open, model, pinned, onPick, onPin, onClos
               <div className="mscroll">
                 {pinnedPersonas.length > 0 && (<>
                   <div className="mlabel">Pinned</div>
-                  {pinnedPersonas.map(p => <PersonaRow key={p.name} p={p} />)}
+                  {pinnedPersonas.map(p => <PersonaRow key={p.name} p={p} {...rowProps} />)}
                   <div className="mlabel">All personas</div>
                 </>)}
-                {personas.map(p => <PersonaRow key={p.name} p={p} />)}
+                {personas.map(p => <PersonaRow key={p.name} p={p} {...rowProps} />)}
                 {personas.length === 0 && pinnedPersonas.length === 0 && <Empty what="personas" />}
               </div>
               </div>
