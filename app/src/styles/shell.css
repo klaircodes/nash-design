@@ -99,7 +99,8 @@
 .crow input{flex:1;min-width:0;font-size:15px;color:var(--t1);}
 .crow input::placeholder{color:var(--t4);}
 .modelpick{display:flex;align-items:center;gap:6px;padding:6px 8px;border-radius:8px;
-  font-size:13px;color:var(--t2);}
+  font-size:13px;color:var(--t2);max-width:190px;flex:0 0 auto;}
+.modelpick .mname{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .round{
   width:34px;height:34px;flex:0 0 auto;border-radius:50%;display:grid;place-items:center;
   background:var(--elevated);color:var(--t2);

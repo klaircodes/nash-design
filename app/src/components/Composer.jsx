@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import Icon from './Icon.jsx';
+import ModelPicker from './ModelPicker.jsx';
 import { ease, dur, liquid } from '../lib/motion.js';
+import '../styles/models.css';
 
 const TOOLS = [
   { icon:'temp',    label:'Temporary chat' },
@@ -36,9 +38,27 @@ const item = {
 
 export default function Composer() {
   const [open, setOpen] = useState(false);
+  const [picker, setPicker] = useState(false);
+  const [model, setModel] = useState('GPT-4.1');
+  const [pinned, setPinned] = useState(['Claude Opus 4.8', 'GPT-5']);
+
+  const togglePin = name =>
+    setPinned(p => p.includes(name) ? p.filter(x => x !== name) : [...p, name]);
 
   return (
     <div className="composerwrap">
+      <AnimatePresence>
+        {picker && (
+          <ModelPicker
+            open={picker}
+            model={model}
+            pinned={pinned}
+            onPick={name => { setModel(name); setPicker(false); }}
+            onPin={togglePin}
+            onClose={() => setPicker(false)}
+          />
+        )}
+      </AnimatePresence>
       <motion.div
         className="composer"
         animate={{ borderRadius: open ? 20 : 22 }}
@@ -55,10 +75,10 @@ export default function Composer() {
 
           <input placeholder="Ask anything..." />
 
-          <motion.button className="modelpick"
+          <motion.button className="modelpick" onClick={() => setPicker(true)}
             whileHover={{ backgroundColor: 'var(--hover)', color: 'var(--t1)' }}
             transition={{ duration: dur.hover, ease }}>
-            GPT-4.1 <Icon name="chevD" size={14} />
+            <span className="mname">{model}</span> <Icon name="chevD" size={14} />
           </motion.button>
 
           <motion.button className="round"
