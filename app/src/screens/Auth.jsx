@@ -57,7 +57,13 @@ export default function Auth({ onDone }) {
     ? Boolean(email.trim() && password)
     : Boolean(name.trim() && email.trim() && password);
 
-  const submit = () => ready && onDone({ name: name.trim() || 'Klair', email: email.trim() });
+  /* SSO needs no credentials — it signs you straight in.
+     Only the email + password path waits for input. */
+  const enter = () => onDone({
+    name: name.trim() || 'Klair',
+    email: email.trim() || 'claire@backboard.io',
+  });
+  const submit = () => { if (ready) enter(); };
   const swap = () => { setScreen(c.other); setPeeked(false); };
 
   return (
@@ -132,12 +138,12 @@ export default function Auth({ onDone }) {
             <div className="divrow"><i /><span>Or continue with</span><i /></div>
 
             <div className="ssos">
-              <motion.button type="button" className="sso" onClick={submit}
+              <motion.button type="button" className="sso" onClick={enter}
                 whileHover={{ backgroundColor: 'rgba(255,255,255,.07)' }}
                 whileTap={{ scale: 0.994 }} transition={{ duration: dur.hover, ease }}>
                 <Icon name="google" /> Continue with Google
               </motion.button>
-              <motion.button type="button" className="sso" onClick={submit}
+              <motion.button type="button" className="sso" onClick={enter}
                 whileHover={{ backgroundColor: 'rgba(255,255,255,.07)' }}
                 whileTap={{ scale: 0.994 }} transition={{ duration: dur.hover, ease }}>
                 Continue with Backboard SSO
