@@ -191,7 +191,7 @@ const FOLDERS = [
 ];
 
 function sidebar() {
-  const nav = [['plus','New Chat','newchat'],['bookmark','Bookmarks','bookmarks'],
+  const nav = [['plus','New Chat','chat'],['bookmark','Bookmarks','bookmarks'],
                ['users','Persona Marketplace',null],['dots','More',null]];
   return `
   <aside class="sidebar">
@@ -203,8 +203,8 @@ function sidebar() {
     <div class="searchfield">${ico('search',14)}<span>Search messages</span></div>
     <div class="spacer"></div>
     ${nav.map(([i,l,v]) => `
-      <div class="navitem ${(v==='newchat' ? (state.view==='chat'&&!state.activeChat) : state.view===v)?'active':''} ${l==='More'&&state.moreMenu?'active':''}"
-           ${l==='More' ? 'data-more' : (v?`data-go="${v}"`:'')}>
+      <div class="navitem ${(l==='New Chat' ? (state.view==='chat'&&!state.activeChat) : state.view===v)?'active':''} ${l==='More'&&state.moreMenu?'active':''}"
+           ${l==='More' ? 'data-more' : l==='New Chat' ? 'data-newchat' : (v?`data-go="${v}"`:'')}>
         ${ico(i,16)}<span>${l}</span></div>`).join('')}
    </div>
 
@@ -753,8 +753,8 @@ function toasts() {
 const app = document.getElementById('app');
 function render() {
   const view = state.view === 'connectors' ? connectorsView()
-             : state.view === 'chat' ? chatView()
-             : bookmarksView();
+             : state.view === 'bookmarks'  ? bookmarksView()
+             : chatView();
   app.innerHTML = `
     <div class="shell">
       ${sidebar()}
@@ -778,7 +778,7 @@ function render() {
 
 /* ---------- events ---------- */
 function onAppClick(e) {
-  const t = e.target.closest('[data-go],[data-toggle],[data-folder],[data-tab],[data-layout],[data-connect],[data-consent],[data-manage],[data-pause],[data-resume],[data-disconnect],[data-confirmdisconnect],[data-reconnect],[data-closerail],[data-tool],[data-inchat],[data-popover],[data-add],[data-cancel],[data-scrim],[data-themetoggle],[data-clear],[data-toastclose],[data-toastaction],[data-usermenu],[data-signout],[data-more],[data-composer],[data-modelopen],[data-modelclose],[data-modelback],[data-modelscrim],[data-provider],[data-model],[data-pin],[data-mfilter],[data-personas],[data-chat],[data-unpin]');
+  const t = e.target.closest('[data-go],[data-toggle],[data-folder],[data-tab],[data-layout],[data-connect],[data-consent],[data-manage],[data-pause],[data-resume],[data-disconnect],[data-confirmdisconnect],[data-reconnect],[data-closerail],[data-tool],[data-inchat],[data-popover],[data-add],[data-cancel],[data-scrim],[data-themetoggle],[data-clear],[data-toastclose],[data-toastaction],[data-usermenu],[data-signout],[data-more],[data-composer],[data-modelopen],[data-modelclose],[data-modelback],[data-modelscrim],[data-provider],[data-model],[data-pin],[data-mfilter],[data-personas],[data-chat],[data-unpin],[data-newchat]');
   if (!t) {                                        // click-away closes transient surfaces
     if (state.userMenu || state.popover || state.moreMenu) {
       state.userMenu = false; state.popover = false; state.moreMenu = null; render();
@@ -810,6 +810,11 @@ function onAppClick(e) {
   if (d.unpin) {
     const row = state.chats.find(c => c[0] === d.unpin);
     if (row) row[2] = false;
+    render(); return;
+  }
+  if (d.newchat !== undefined) {
+    state.view = 'chat'; state.activeChat = null; state.composerOpen = false;
+    state.popover = false; state.rail = null; state.moreMenu = null; state.modelPanel = null;
     render(); return;
   }
   if (d.chat) { state.activeChat = d.chat; state.view = 'chat'; render(); return; }
