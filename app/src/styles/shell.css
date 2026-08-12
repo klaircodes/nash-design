@@ -74,7 +74,7 @@
 .chatrow .dots{display:flex;color:var(--t3);flex:0 0 auto;}
 .chatrow .pin{
   display:flex;align-items:center;justify-content:center;flex:0 0 auto;
-  width:26px;height:26px;margin:0 -4px;border-radius:7px;color:var(--t4);
+  width:26px;height:26px;margin-right:-8px;border-radius:7px;color:var(--t4);
 }
 .chatrow .pin.on{color:var(--t2);}
 .chatrow .pin:hover{background:var(--surface);color:var(--t1);}
@@ -134,3 +134,22 @@
 .morph .bar{position:absolute;background:currentColor;border-radius:1.5px;}
 .morph .bar.h{left:0;right:0;top:50%;height:1.9px;margin-top:-.95px;}
 .morph .bar.v{top:0;bottom:0;left:50%;width:1.9px;margin-left:-.95px;}
+
+/* ---- organisation switcher ---- */
+.orgveil{position:fixed;inset:0;z-index:60;}
+.orgmenu{
+  position:fixed;z-index:61;width:268px;padding:7px;
+  border-radius:14px;background:var(--elevated);box-shadow:var(--shadow);
+  border:1px solid var(--border);
+}
+.orgrow{
+  width:100%;display:flex;align-items:center;gap:11px;padding:9px 10px;
+  border-radius:9px;text-align:left;color:var(--t3);
+}
+.orgrow .ot{flex:1;min-width:0;}
+.orgrow .ot b{display:block;font-size:13px;font-weight:500;color:var(--t1);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.orgrow .ot small{display:block;font-size:11.5px;color:var(--t3);margin-top:2px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.orgrow .tick{display:flex;color:var(--accent);flex:0 0 auto;}
+.org.open{background:var(--hover);color:var(--t1);}

@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import Icon from './Icon.jsx';
 import { ease, dur, liquid, liquidWide } from '../lib/motion.js';
-import { FOLDERS, CHATS, GROUP_ORDER } from '../lib/data.js';
+import { FOLDERS, CHATS, GROUP_ORDER, ORGS } from '../lib/data.js';
 
 /* Every collapse in the app uses this — height springs to the
    content's own size and eases closed the same way. */
@@ -57,7 +57,6 @@ function ChatRow({ title, pinned, nested }) {
     >
       <span className="title">{title}</span>
       <div className="rowacts">
-        <PinBtn />
         {/* always occupies its slot, so the title truncates at a fixed width
             and no text reflows when the actions fade in */}
         <motion.span className="dots"
@@ -66,8 +65,71 @@ function ChatRow({ title, pinned, nested }) {
           transition={{ duration: dur.hover, ease }}>
           <Icon name="dotsH" size={15} />
         </motion.span>
+        <PinBtn />
       </div>
     </motion.div>
+  );
+}
+
+function OrgSwitcher({ collapsed }) {
+  const [open, setOpen] = useState(false);
+  const [at, setAt]     = useState({ top: 0, left: 0 });
+  const ref = useRef(null);
+
+  /* the sidebar clips its own overflow for the collapse animation, so the
+     menu is measured against the trigger and drawn fixed, outside the panel */
+  const toggle = () => {
+    const r = ref.current?.getBoundingClientRect();
+    if (r) setAt({ top: r.top, left: r.right + 10 });
+    setOpen(v => !v);
+  };
+
+  useEffect(() => { if (collapsed) setOpen(false); }, [collapsed]);
+  useEffect(() => {
+    if (!open) return;
+    const key = e => e.key === 'Escape' && setOpen(false);
+    window.addEventListener('keydown', key);
+    return () => window.removeEventListener('keydown', key);
+  }, [open]);
+
+  return (
+    <>
+      <motion.button ref={ref} className={`org ${open ? 'open' : ''}`} onClick={toggle}
+        whileHover={{ backgroundColor:'var(--hover)', color:'var(--t1)' }}
+        transition={{ duration: dur.hover, ease }}>
+        <Icon name="user" size={15} />
+        <span style={{ flex:1, textAlign:'left' }}>Personal</span>
+        <motion.span style={{ display:'flex' }}
+          animate={{ rotate: open ? 180 : 0 }} transition={{ duration: dur.swap, ease }}>
+          <Icon name="chevD" size={14} />
+        </motion.span>
+      </motion.button>
+
+      <AnimatePresence>
+        {open && (<>
+          <div className="orgveil" onClick={() => setOpen(false)} />
+          <motion.div className="orgmenu" style={{ top: at.top, left: at.left }}
+            initial={{ opacity:0, x:-10, scale:.98 }}
+            animate={{ opacity:1, x:0, scale:1 }}
+            exit={{ opacity:0, x:-8, scale:.98 }}
+            transition={liquid}>
+            <motion.button className="orgrow" onClick={() => setOpen(false)}
+              whileHover={{ backgroundColor:'var(--hover)' }} transition={{ duration: dur.hover, ease }}>
+              <Icon name="user" size={16} />
+              <div className="ot"><b>Personal</b></div>
+              <span className="tick"><Icon name="check" size={15} /></span>
+            </motion.button>
+            {ORGS.map(o => (
+              <motion.button key={o} className="orgrow" onClick={() => setOpen(false)}
+                whileHover={{ backgroundColor:'var(--hover)' }} transition={{ duration: dur.hover, ease }}>
+                <Icon name="building" size={16} />
+                <div className="ot"><b>{o}</b><small>Sign in to this organization</small></div>
+              </motion.button>
+            ))}
+          </motion.div>
+        </>)}
+      </AnimatePresence>
+    </>
   );
 }
 
@@ -118,8 +180,7 @@ export default function Sidebar({ user, onNewChat, collapsed, onToggle }) {
       >
             <div className="sb-head">
               <div className="gap" />
-              <div className="org"><Icon name="user" size={15} />
-                <span style={{flex:1}}>Personal</span><Icon name="chevD" size={14} /></div>
+              <OrgSwitcher collapsed={collapsed} />
               <div className="gap" />
               <div className="searchfield"><Icon name="search" size={14} /><span>Search messages</span></div>
               <div className="gap" />

@@ -91,3 +91,5 @@ export const fmtDate = iso => {
   const d = new Date(iso);
   return d.toLocaleDateString('en-GB', { month:'short', day:'2-digit' });
 };
+
+export const ORGS = ['Mo', 'NashTest', 'Test'];
