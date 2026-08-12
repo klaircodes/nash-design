@@ -78,6 +78,8 @@ const state = {
   modelQuery: '',
   modelFilter: 'All',
   pinned: ['Claude Opus 4.8'],
+  chats: null,          // filled on mount from CHATS
+  activeChat: 'Connector permissions review',
   tab: 'All',
   layout: 'grid',
   query: '',
@@ -167,13 +169,21 @@ function dismissToast(id) {
 }
 
 /* ---------- sidebar ---------- */
-const DATES = [
-  ['Today', ['Connector permissions review', 'Invoice chase — Northwind']],
-  ['Yesterday', ['Q3 roadmap draft', 'Bug triage — render loop']],
-  ['Previous 7 days', ['Voice chat', 'Fork: Testing — What’s Next?']],
-  ['Previous 30 days', ['Friendly Chat Beginnings', 'Creating a PDF summary', 'Whimsical Tales Unfold']],
-  ['June', ['Testing the Waters', 'Voice chat']]
+const CHATS = [
+  ['Connector permissions review','Today',       false],
+  ['Invoice chase — Northwind',   'Today',       false],
+  ['Q3 roadmap draft',            'Yesterday',   true ],
+  ['Bug triage — render loop',    'Yesterday',   false],
+  ['Voice chat',                  'Previous 7 days', false],
+  ['Fork: Testing — What’s Next?','Previous 7 days', false],
+  ['Friendly Chat Beginnings',    'Previous 30 days', false],
+  ['Creating a PDF summary',      'Previous 30 days', true ],
+  ['Whimsical Tales Unfold',      'Previous 30 days', false],
+  ['Testing the Waters',          'June',        false],
+  ['Voice chat',                  'June',        false]
 ];
+const DATE_ORDER = ['Today','Yesterday','Previous 7 days','Previous 30 days','June'];
+
 const FOLDERS = [
   ['work', 'Work', ['Q3 roadmap', 'Pricing research', 'Launch checklist']],
   ['research', 'Research', ['Competitor teardown', 'User interviews']],
@@ -218,14 +228,7 @@ function sidebar() {
           </div></div>`).join('')}
       </div></div>
 
-      ${DATES.map(([label, chats]) => `
-        <div class="datemark">${label}</div>
-        ${chats.map((c,i) => `
-          <div class="chatrow ${label==='Today'&&i===0?'active':''}">
-            <span>${c}</span>
-            ${c==='Q3 roadmap draft' ? `<span class="pin">${ico('pin',13)}</span>` : ''}
-            <span class="dots">${ico('dots',14)}</span>
-          </div>`).join('')}`).join('')}
+      ${chatGroups()}
 
     </div></div>
    </div>
@@ -242,6 +245,31 @@ function sidebar() {
     </div>
    </div>
   </aside>`;
+}
+
+/* ---------- sidebar chat rows ---------- */
+function chatRow(title, pinned, active) {
+  return `
+  <div class="chatrow ${active?'active':''} ${pinned?'pinned':''}" data-chat="${title}">
+    <span>${title}</span>
+    <span class="dots">${ico('dots',14)}</span>
+    ${pinned ? `<button class="pin" data-unpin="${title}" title="Unpin">${ico('pin',13)}</button>` : ''}
+  </div>`;
+}
+function chatGroups() {
+  const pins = state.chats.filter(c => c[2]);
+  let out = '';
+  if (pins.length) {
+    out += `<div class="datemark">Pinned</div>` +
+           pins.map(c => chatRow(c[0], true, c[0] === state.activeChat)).join('');
+  }
+  for (const label of DATE_ORDER) {
+    const rows = state.chats.filter(c => c[1] === label && !c[2]);
+    if (!rows.length) continue;
+    out += `<div class="datemark">${label}</div>` +
+           rows.map(c => chatRow(c[0], false, c[0] === state.activeChat)).join('');
+  }
+  return out;
 }
 
 /* ---------- More flyout ---------- */
@@ -750,7 +778,7 @@ function render() {
 
 /* ---------- events ---------- */
 function onAppClick(e) {
-  const t = e.target.closest('[data-go],[data-toggle],[data-folder],[data-tab],[data-layout],[data-connect],[data-consent],[data-manage],[data-pause],[data-resume],[data-disconnect],[data-confirmdisconnect],[data-reconnect],[data-closerail],[data-tool],[data-inchat],[data-popover],[data-add],[data-cancel],[data-scrim],[data-themetoggle],[data-clear],[data-toastclose],[data-toastaction],[data-usermenu],[data-signout],[data-more],[data-composer],[data-modelopen],[data-modelclose],[data-modelback],[data-modelscrim],[data-provider],[data-model],[data-pin],[data-mfilter],[data-personas]');
+  const t = e.target.closest('[data-go],[data-toggle],[data-folder],[data-tab],[data-layout],[data-connect],[data-consent],[data-manage],[data-pause],[data-resume],[data-disconnect],[data-confirmdisconnect],[data-reconnect],[data-closerail],[data-tool],[data-inchat],[data-popover],[data-add],[data-cancel],[data-scrim],[data-themetoggle],[data-clear],[data-toastclose],[data-toastaction],[data-usermenu],[data-signout],[data-more],[data-composer],[data-modelopen],[data-modelclose],[data-modelback],[data-modelscrim],[data-provider],[data-model],[data-pin],[data-mfilter],[data-personas],[data-chat],[data-unpin]');
   if (!t) {                                        // click-away closes transient surfaces
     if (state.userMenu || state.popover || state.moreMenu) {
       state.userMenu = false; state.popover = false; state.moreMenu = null; render();
@@ -779,6 +807,12 @@ function onAppClick(e) {
   if (d.tab)       state.tab = d.tab;
   if (d.layout)    state.layout = d.layout;
   if (d.clear !== undefined) state.query = '';
+  if (d.unpin) {
+    const row = state.chats.find(c => c[0] === d.unpin);
+    if (row) row[2] = false;
+    render(); return;
+  }
+  if (d.chat) { state.activeChat = d.chat; state.view = 'chat'; render(); return; }
   if (d.composer !== undefined) { state.composerOpen = !state.composerOpen; render(); return; }
   if (d.modelopen !== undefined) { state.modelPanel='root'; state.modelQuery=''; state.modelFilter='All'; render(); return; }
   if (d.modelclose !== undefined || (d.modelscrim !== undefined && e.target === t)) {
@@ -897,6 +931,7 @@ window.NashApp = {
   state,
   mount(user) {
     state.user = user || { name: 'Klair', email: 'claire@backboard.io' };
+    if (!state.chats) state.chats = CHATS.map(c => c.slice());
     state.view = 'connectors';
     state.rail = null; state.modal = null; state.popover = false;
     if (window.NashAuth) window.NashAuth.unmount();

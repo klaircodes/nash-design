@@ -124,12 +124,21 @@ input{font-family:inherit;border:0;outline:0;background:none;color:inherit;}
   border-radius:var(--r-sm);font-size:12.5px;color:var(--t2);
   transition:background .15s var(--ease),color .15s var(--ease);
 }
-.chatrow span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.chatrow .dots{opacity:0;transition:opacity .16s var(--ease);flex:0 0 auto;}
+.chatrow > span:first-child{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+/* ⋯ appears on hover to the LEFT of the pin, so a pinned row's
+   icon stays anchored furthest right and never shifts. */
+.chatrow .dots{
+  opacity:0;flex:0 0 auto;width:0;overflow:hidden;color:var(--t3);
+  transition:opacity .16s var(--ease),width .16s var(--ease);
+}
+.chatrow:hover .dots{opacity:1;width:14px;}
 .chatrow:hover{background:var(--hover);color:var(--t1);}
-.chatrow:hover .dots{opacity:1;}
 .chatrow.active{background:var(--hover);color:var(--t1);}
-.chatrow .pin{flex:0 0 auto;color:var(--t4);}
+.chatrow .pin{
+  flex:0 0 auto;color:var(--t4);display:flex;padding:0;
+  transition:color .16s var(--ease);
+}
+.chatrow .pin:hover{color:var(--t1);}
 .grow{flex:1 1 auto;min-height:12px;}
 .divider{height:1px;background:var(--border);margin:8px 0;}
 .footer{
