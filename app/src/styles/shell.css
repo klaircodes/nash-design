@@ -164,8 +164,9 @@
 
 /* ---------- mobile: HiFi Chat Mobile ---------- */
 .drawerscrim{position:fixed;inset:0;z-index:79;background:var(--app);}
+/* a fixed 16px off the drawer's edge — not centred in whatever space is left */
 .drawerclose{
-  position:absolute;top:0;left:292px;right:0;height:52px;
+  position:absolute;top:0;left:calc(var(--drawerw) + 16px);width:32px;height:52px;
   display:grid;place-items:center;color:var(--t2);
 }
 .disclaim{display:none;text-align:center;font-size:10.5px;color:var(--t4);
@@ -173,11 +174,18 @@
 .disclaim.solo{flex:0 0 auto;margin:0;padding:10px 16px 16px;}
 
 @media (max-width: 720px){
+  /* tracks the phone rather than sitting at one fixed width */
+  :root{--drawerw:min(84vw, 320px);}
+
   /* the panel leaves the flow and rides over the chat */
   .sidebar.drawer{
+    width:var(--drawerw);
     position:fixed;top:0;bottom:0;left:0;z-index:80;
     box-shadow:var(--shadow);border-right:1px solid var(--border);
     border-radius:0 16px 0 16px;
+    /* brand row drops to the top bar's own line, so `nash:` and the collapse
+       mark sit level and the mark never travels vertically */
+    padding-top:4px;
   }
   .sidebar.drawer .sb-body{width:auto;min-width:0;}
 

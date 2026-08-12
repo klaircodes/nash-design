@@ -211,7 +211,7 @@ export default function Sidebar({ user, onNewChat, collapsed, onToggle, mobile, 
     <motion.aside
       className={`sidebar ${mobile ? 'drawer' : ''}`}
       animate={mobile
-        ? { x: drawer ? 0 : -320, width: 292,
+        ? { x: drawer ? 0 : '-104%',
             backgroundColor: 'var(--sunken)', borderRightColor: 'var(--border)' }
         : { x: 0, width: collapsed ? 126 : 280,
             backgroundColor: collapsed ? 'rgba(0,0,0,0)' : 'var(--sunken)',
