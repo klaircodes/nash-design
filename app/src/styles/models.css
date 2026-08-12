@@ -103,3 +103,17 @@
 .mempty b{display:block;font-size:13.5px;font-weight:500;color:var(--t1);margin-bottom:6px;}
 .mempty p{font-size:12.5px;color:var(--t3);line-height:1.6;}
 .mempty button{margin-top:14px;font-size:12.5px;font-weight:500;color:var(--accent);}
+
+/* ---------- mobile: the picker becomes a bottom sheet ---------- */
+@media (max-width: 720px){
+  .scrim{place-items:end stretch;}
+  .mpanel{
+    width:100%;max-width:none;height:min(660px,86vh);
+    border-radius:18px 18px 0 0;
+  }
+  .mhead{padding:16px 16px 12px;}
+  .searchrow,.filterbar{margin:0 16px 12px;padding-left:0;padding-right:0;}
+  .filterbar{padding:0 16px 12px;margin:0;}
+  .sortmenu{right:16px;}
+  .mscroll{padding:0 8px 12px;}
+}

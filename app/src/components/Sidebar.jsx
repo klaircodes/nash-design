@@ -75,13 +75,20 @@ function ChatRow({ title, pinned, nested }) {
    measured against the trigger and drawn fixed, clear of the panel's right edge. */
 function useFlyout(collapsed) {
   const [open, setOpen] = useState(false);
-  const [at, setAt]     = useState({ top: 0, left: 0 });
+  const [at, setAt]     = useState({ top: 0, left: 0, drop: false });
   const ref = useRef(null);
 
   const toggle = () => {
     const r = ref.current?.getBoundingClientRect();
     const panel = ref.current?.closest('.sidebar')?.getBoundingClientRect();
-    if (r) setAt({ top: r.top - 4, left: (panel?.right ?? r.right) + 12 });
+    if (r) {
+      /* beside the panel on desktop; below the trigger when the drawer already
+         owns most of the screen */
+      const beside = (panel?.right ?? r.right) + 12;
+      setAt(beside + 280 > window.innerWidth
+        ? { top: r.bottom + 8, left: r.left, drop: true }
+        : { top: r.top - 4, left: beside, drop: false });
+    }
     setOpen(v => !v);
   };
 
@@ -122,9 +129,9 @@ function MoreMenu({ collapsed }) {
         {open && (<>
           <div className="orgveil" onClick={() => setOpen(false)} />
           <motion.div className="orgmenu compact" style={{ top: at.top, left: at.left }}
-            initial={{ opacity:0, x:-10, scale:.98 }}
-            animate={{ opacity:1, x:0, scale:1 }}
-            exit={{ opacity:0, x:-8, scale:.98 }}
+            initial={{ opacity:0, x: at.drop ? 0 : -10, y: at.drop ? -8 : 0, scale:.98 }}
+            animate={{ opacity:1, x:0, y:0, scale:1 }}
+            exit={{ opacity:0, x: at.drop ? 0 : -8, y: at.drop ? -6 : 0, scale:.98 }}
             transition={liquid}>
             {MORE.map(m => (
               <motion.button key={m.label} className="orgrow" onClick={() => setOpen(false)}
@@ -160,9 +167,9 @@ function OrgSwitcher({ collapsed }) {
         {open && (<>
           <div className="orgveil" onClick={() => setOpen(false)} />
           <motion.div className="orgmenu" style={{ top: at.top, left: at.left }}
-            initial={{ opacity:0, x:-10, scale:.98 }}
-            animate={{ opacity:1, x:0, scale:1 }}
-            exit={{ opacity:0, x:-8, scale:.98 }}
+            initial={{ opacity:0, x: at.drop ? 0 : -10, y: at.drop ? -8 : 0, scale:.98 }}
+            animate={{ opacity:1, x:0, y:0, scale:1 }}
+            exit={{ opacity:0, x: at.drop ? 0 : -8, y: at.drop ? -6 : 0, scale:.98 }}
             transition={liquid}>
             <motion.button className="orgrow" onClick={() => setOpen(false)}
               whileHover={{ backgroundColor:'var(--hover)' }} transition={{ duration: dur.hover, ease }}>
@@ -190,7 +197,7 @@ const NAV = [
   { icon:'users',    label:'Persona Marketplace' },
 ];
 
-export default function Sidebar({ user, onNewChat, collapsed, onToggle }) {
+export default function Sidebar({ user, onNewChat, collapsed, onToggle, mobile, drawer }) {
   const [chatsOpen, setChatsOpen] = useState(true);
   const [foldersOpen, setFoldersOpen] = useState(true);
   const [open, setOpen] = useState({ work:true, research:false, personal:false });
@@ -202,19 +209,20 @@ export default function Sidebar({ user, onNewChat, collapsed, onToggle }) {
 
   return (
     <motion.aside
-      className="sidebar"
-      animate={{
-        width: collapsed ? 126 : 280,
-        backgroundColor: collapsed ? 'rgba(0,0,0,0)' : 'var(--sunken)',
-        borderRightColor: collapsed ? 'rgba(0,0,0,0)' : 'var(--border)',
-      }}
+      className={`sidebar ${mobile ? 'drawer' : ''}`}
+      animate={mobile
+        ? { x: drawer ? 0 : -320, width: 292,
+            backgroundColor: 'var(--sunken)', borderRightColor: 'var(--border)' }
+        : { x: 0, width: collapsed ? 126 : 280,
+            backgroundColor: collapsed ? 'rgba(0,0,0,0)' : 'var(--sunken)',
+            borderRightColor: collapsed ? 'rgba(0,0,0,0)' : 'var(--border)' }}
       transition={liquidWide}
     >
       {/* the brand row never moves and never resizes */}
       <div className="brand">
         <b>nash:</b>
         <motion.button className="panel" onClick={onToggle}
-          aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          aria-label={mobile ? 'Close menu' : collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
           whileHover={{ color: 'var(--t1)' }} whileTap={{ scale: 0.92 }}
           transition={{ duration: dur.hover, ease }}>
           <Icon name="panel" size={18} />
@@ -224,8 +232,9 @@ export default function Sidebar({ user, onNewChat, collapsed, onToggle }) {
       {/* slides out of the clip rather than fading — the panel
           narrows and the content travels with it */}
       <motion.div className="sb-body"
-        animate={{ x: collapsed ? -168 : 0, opacity: collapsed ? 0.15 : 1 }}
-        style={{ pointerEvents: collapsed ? 'none' : 'auto' }}
+        animate={{ x: !mobile && collapsed ? -168 : 0,
+                   opacity: !mobile && collapsed ? 0.15 : 1 }}
+        style={{ pointerEvents: !mobile && collapsed ? 'none' : 'auto' }}
         transition={liquidWide}
       >
             <div className="sb-scroll">

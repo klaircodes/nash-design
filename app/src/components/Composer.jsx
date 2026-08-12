@@ -123,6 +123,8 @@ export default function Composer() {
           )}
         </AnimatePresence>
       </motion.div>
+
+      <p className="disclaim">Nash can make mistakes. Please double-check responses.</p>
     </div>
   );
 }

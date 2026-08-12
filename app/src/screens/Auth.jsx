@@ -89,6 +89,7 @@ export default function Auth({ onDone }) {
       </div>
 
       <div className="cardpane">
+        <span className="mob-mark">Nash</span>
         <AnimatePresence mode="wait">
           <motion.form
             key={screen}

@@ -8,12 +8,19 @@ function greeting() {
   return h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
 }
 
-export default function Chat({ user, sessionKey }) {
+export default function Chat({ user, sessionKey, mobile, onMenu }) {
   const first = (user.name || 'there').split(' ')[0];
   return (
     <div className="main">
       <div className="topbar">
-        <button className="more"><Icon name="dots" size={18} /></button>
+        {mobile && (
+          <motion.button className="menu" onClick={onMenu} aria-label="Open menu"
+            whileTap={{ scale: 0.9 }}>
+            <Icon name="menu" size={20} />
+          </motion.button>
+        )}
+        {mobile && <span className="wordmark">Nash</span>}
+        <button className="more"><Icon name="dotsH" size={18} /></button>
       </div>
       <div className="chatbody">
         <motion.h1

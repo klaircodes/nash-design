@@ -95,3 +95,19 @@
   .cardpane{padding:64px 20px 28px;align-items:flex-start;}
   .inp,.primary,.sso{height:44px;}
 }
+
+/* ---------- mobile: HiFi Login & Signup Mobile ---------- */
+.mob-mark{display:none;font-size:16px;font-weight:500;letter-spacing:-.2px;color:#f6f6f7;}
+[data-theme="light"] .mob-mark{color:#0f1115;}
+
+@media (max-width: 720px){
+  .auth{grid-template-columns:1fr;}
+  .hero{display:none;}
+  .cardpane{
+    flex-direction:column;align-items:stretch;justify-content:flex-start;
+    gap:26px;padding:22px 20px 36px;min-height:100vh;
+  }
+  .mob-mark{display:block;}
+  .form{width:100%;max-width:440px;}
+  .form-head h1{font-size:21px;}
+}
