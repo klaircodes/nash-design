@@ -191,7 +191,7 @@ const FOLDERS = [
 ];
 
 function sidebar() {
-  const nav = [['plus','New Chat','chat'],['bookmark','Bookmarks','bookmarks'],
+  const nav = [['plus','New Chat','newchat'],['bookmark','Bookmarks','bookmarks'],
                ['users','Persona Marketplace',null],['dots','More',null]];
   return `
   <aside class="sidebar">
@@ -203,7 +203,7 @@ function sidebar() {
     <div class="searchfield">${ico('search',14)}<span>Search messages</span></div>
     <div class="spacer"></div>
     ${nav.map(([i,l,v]) => `
-      <div class="navitem ${state.view===v?'active':''} ${l==='More'&&state.moreMenu?'active':''}"
+      <div class="navitem ${(v==='newchat' ? (state.view==='chat'&&!state.activeChat) : state.view===v)?'active':''} ${l==='More'&&state.moreMenu?'active':''}"
            ${l==='More' ? 'data-more' : (v?`data-go="${v}"`:'')}>
         ${ico(i,16)}<span>${l}</span></div>`).join('')}
    </div>
@@ -932,8 +932,11 @@ window.NashApp = {
   mount(user) {
     state.user = user || { name: 'Klair', email: 'claire@backboard.io' };
     if (!state.chats) state.chats = CHATS.map(c => c.slice());
-    state.view = 'connectors';
+    state.view = 'chat';
+    state.activeChat = null;          // a fresh chat, nothing selected
+    state.composerOpen = false;
     state.rail = null; state.modal = null; state.popover = false;
+    state.modelPanel = null; state.moreMenu = null; state.userMenu = false;
     if (window.NashAuth) window.NashAuth.unmount();
     document.addEventListener('click', onAppClick);
     render();
