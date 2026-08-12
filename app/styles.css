@@ -399,13 +399,6 @@ input{font-family:inherit;border:0;outline:0;background:none;color:inherit;}
 .toolcall .th .state{margin-left:auto;font-size:11px;font-weight:500;}
 .toolcall .tool{font-size:11.5px;color:var(--t4);margin:8px 0 9px;}
 .toolcall .res{font-size:12.5px;line-height:1.58;color:var(--t2);}
-.composer{
-  max-width:720px;margin:0 auto 28px;border-radius:22px;background:var(--surface);
-  padding:13px 14px;display:flex;align-items:center;gap:12px;
-  transition:background .18s var(--ease);
-}
-.composer input{flex:1;font-size:15px;}
-.composer input::placeholder{color:var(--t4);}
 .round{
   width:34px;height:34px;flex:0 0 auto;border-radius:50%;display:grid;place-items:center;
   background:var(--elevated);color:var(--t2);
@@ -504,6 +497,7 @@ input{font-family:inherit;border:0;outline:0;background:none;color:inherit;}
   transition:border-radius .24s var(--ease),background .18s var(--ease);
 }
 .composer.open{border-radius:20px;}
+.composer.open .crow{padding-bottom:4px;}
 .crow{display:flex;align-items:center;gap:12px;padding:14px;}
 .crow input{flex:1;min-width:0;font-size:15px;color:var(--t1);}
 .crow input::placeholder{color:var(--t4);}
@@ -514,7 +508,7 @@ input{font-family:inherit;border:0;outline:0;background:none;color:inherit;}
 }
 .modelpick:hover{background:var(--hover);color:var(--t1);}
 .trow{
-  display:flex;align-items:center;gap:10px;padding:0 14px 14px;
+  display:flex;align-items:center;gap:10px;padding:14px 14px 14px;
   animation:trowIn .22s var(--ease) both;
 }
 @keyframes trowIn{from{opacity:0;transform:translateY(-4px);}to{opacity:1;transform:none;}}
