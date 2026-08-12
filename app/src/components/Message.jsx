@@ -158,7 +158,7 @@ function Blocks({ blocks }) {
   });
 }
 
-export default function Message({ role, text, blocks, model, mobile, failed }) {
+export default function Message({ role, text, blocks, model, mobile, failed, pending }) {
   const clampable = role === 'user' && !blocks;
   const [open, setOpen]   = useState(false);
   const [long, setLong]   = useState(false);
@@ -181,6 +181,14 @@ export default function Message({ role, text, blocks, model, mobile, failed }) {
     ro.observe(el);
     return () => ro.disconnect();
   }, [text, clampable]);
+
+  if (pending) return (
+    <motion.div className="msg bot"
+      initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.28, ease }}>
+      <div className="thinking">{pending}…</div>
+    </motion.div>
+  );
 
   return (
     <motion.div className={`msg ${role}`}

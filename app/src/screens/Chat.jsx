@@ -4,7 +4,7 @@ import Icon from '../components/Icon.jsx';
 import Composer from '../components/Composer.jsx';
 import ModelPicker from '../components/ModelPicker.jsx';
 import Message from '../components/Message.jsx';
-import { CONVERSATIONS, REPLY } from '../lib/data.js';
+import { CONVERSATIONS, REPLY, THINKING } from '../lib/data.js';
 import { ease, liquid, liquidWide } from '../lib/motion.js';
 
 function greeting() {
@@ -30,8 +30,18 @@ export default function Chat({ user, sessionKey, openChat, mobile, drawer, onMen
     if (el) el.scrollTop = el.scrollHeight;
   }, [thread]);
 
-  const send = text =>
-    setThread(t => [...t, { role:'user', text }, { role:'bot', text: REPLY, model }]);
+  /* the reply lands after a beat, so the wait has something to show for itself */
+  const timer = useRef(null);
+  useEffect(() => () => clearTimeout(timer.current), []);
+
+  const send = text => {
+    const word = THINKING[Math.floor(Math.random() * THINKING.length)];
+    setThread(t => [...t, { role:'user', text }, { role:'bot', pending: word }]);
+    clearTimeout(timer.current);
+    timer.current = setTimeout(() => {
+      setThread(t => t.map(m => (m.pending ? { role:'bot', text: REPLY, model } : m)));
+    }, 1500);
+  };
   const [picker, setPicker] = useState(false);
   const [tools, setTools]   = useState(false);
 
@@ -81,7 +91,8 @@ export default function Chat({ user, sessionKey, openChat, mobile, drawer, onMen
           <div className="threadin">
             {thread.map((m, i) => (
               <Message key={i} role={m.role} text={m.text} blocks={m.blocks}
-                       failed={m.failed} model={m.model || model} mobile={mobile} />
+                       pending={m.pending} failed={m.failed}
+                       model={m.model || model} mobile={mobile} />
             ))}
           </div>
         </div>

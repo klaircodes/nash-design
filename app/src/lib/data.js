@@ -93,6 +93,13 @@ export const ORGS = ['Mo', 'NashTest', 'Test'];
    Each chat gets its own content; chats without an entry open empty. */
 export const REPLY = 'this is a test thanks for using';
 
+/* shown while a reply is on its way */
+export const THINKING = [
+  'Thinking', 'Brewing', 'Discombobulating', 'Pondering', 'Percolating',
+  'Untangling', 'Rummaging', 'Noodling', 'Marinating', 'Cogitating',
+  'Deliberating', 'Assembling',
+];
+
 export const CONVERSATIONS = {
   'Connector permissions review': [
     { role:'user', text:

@@ -151,6 +151,20 @@
 .bol li b,.bp b{font-weight:600;}
 .bq{border-left:2px solid var(--accent);padding-left:14px;font-size:14.5px;
   line-height:1.6;color:var(--t2);}
+/* light sweeps across the word while the reply is on its way */
+.thinking{
+  font-size:14.5px;color:var(--t3);
+  background:linear-gradient(100deg,var(--t3) 30%,var(--t1) 50%,var(--t3) 70%);
+  background-size:220% 100%;
+  -webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;
+  animation:shimmer 1.6s linear infinite;
+}
+@keyframes shimmer{from{background-position:180% 0;}to{background-position:-80% 0;}}
+@media (prefers-reduced-motion:reduce){
+  .thinking{animation:none;-webkit-text-fill-color:var(--t3);}
+}
+
 /* ---- comparison table ---- */
 .tablewrap{align-self:stretch;overflow-x:auto;border-radius:12px;
   box-shadow:inset 0 0 0 1px var(--border);}
