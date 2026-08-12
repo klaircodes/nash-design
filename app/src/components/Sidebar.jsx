@@ -41,6 +41,7 @@ function ChatRow({ title, pinned, nested }) {
     <motion.button className={`pin ${pinned ? 'on' : ''}`}
       aria-label={pinned ? 'Unpin chat' : 'Pin chat'}
       animate={{ opacity: pinned || hover ? 1 : 0 }}
+      style={{ pointerEvents: pinned || hover ? 'auto' : 'none' }}
       whileTap={{ scale: 0.86 }}
       transition={{ duration: dur.hover, ease }}>
       <Icon name="pin" size={15} />
@@ -57,15 +58,14 @@ function ChatRow({ title, pinned, nested }) {
       <span className="title">{title}</span>
       <div className="rowacts">
         <PinBtn />
-        <AnimatePresence>
-          {hover && (
-            <motion.span className="dots" key="d"
-              initial={{ opacity: 0, width: 0 }} animate={{ opacity: 1, width: 16 }}
-              exit={{ opacity: 0, width: 0 }} transition={{ duration: dur.hover, ease }}>
-              <Icon name="dotsH" size={15} />
-            </motion.span>
-          )}
-        </AnimatePresence>
+        {/* always occupies its slot, so the title truncates at a fixed width
+            and no text reflows when the actions fade in */}
+        <motion.span className="dots"
+          animate={{ opacity: hover ? 1 : 0 }}
+          style={{ pointerEvents: hover ? 'auto' : 'none' }}
+          transition={{ duration: dur.hover, ease }}>
+          <Icon name="dotsH" size={15} />
+        </motion.span>
       </div>
     </motion.div>
   );

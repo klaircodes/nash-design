@@ -71,7 +71,7 @@
 }
 .chatrow .title{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .chatrow .rowacts{display:flex;align-items:center;gap:6px;flex:0 0 auto;}
-.chatrow .dots{display:flex;color:var(--t3);overflow:hidden;}
+.chatrow .dots{display:flex;color:var(--t3);flex:0 0 auto;}
 .chatrow .pin{
   display:flex;align-items:center;justify-content:center;flex:0 0 auto;
   width:26px;height:26px;margin:0 -4px;border-radius:7px;color:var(--t4);
