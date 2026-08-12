@@ -16,6 +16,7 @@ export default function App() {
   const [drawer, setDrawer]       = useState(false);
   const [openChat, setOpenChat]   = useState(null);
   const [view, setView]           = useState('chat');
+  const [useMemory, setUseMemory] = useState(true);
   const mobile = useIsMobile();
 
   return (
@@ -61,7 +62,8 @@ export default function App() {
                    collapsed={mobile ? false : collapsed}
                    onToggle={() => mobile ? setDrawer(false) : setCollapsed(v => !v)} />
           {view === 'memories'
-            ? <Memories mobile={mobile} drawer={drawer} onMenu={() => setDrawer(true)} />
+            ? <Memories mobile={mobile} drawer={drawer} onMenu={() => setDrawer(true)}
+                        use={useMemory} onUse={setUseMemory} />
             : <Chat user={user} sessionKey={session} openChat={openChat} mobile={mobile}
                     drawer={drawer} onMenu={() => setDrawer(true)} />}
         </motion.div>

@@ -122,23 +122,22 @@ function Row({ m, mobile, onEdit, onDelete, onCopy }) {
   );
 }
 
-export default function Memories({ mobile, drawer, onMenu }) {
+export default function Memories({ mobile, drawer, onMenu, use, onUse }) {
   const [list, setList]     = useState(MEMORIES);
-  const [use, setUse]       = useState(true);
   const [query, setQuery]   = useState('');
   const [filter, setFilter] = useState('All');
   const [page, setPage]     = useState(1);
   const [dialog, setDialog] = useState(null);   // null | {} | memory
   const [undo, setUndo]     = useState(null);
   const [loading, setLoading] = useState(true);
-  const [offline, setOffline] = useState(false);
+  const [hideOff, setHideOff] = useState(false);
 
-  /* a short settle so filtering and searching read as fetching, not snapping */
+  /* only opening the page fetches. Filtering and paging are local, so they
+     switch instantly rather than pretending to load. */
   useEffect(() => {
-    setLoading(true);
-    const t = setTimeout(() => setLoading(false), 520);
+    const t = setTimeout(() => setLoading(false), 560);
     return () => clearTimeout(t);
-  }, [query, filter, page]);
+  }, []);
 
   /* Page size follows the viewport: fit as many rows as there is room for, and
      if the whole list fits there is nothing to page through. */
@@ -188,7 +187,8 @@ export default function Memories({ mobile, drawer, onMenu }) {
     setDialog(null);
   };
 
-  useEffect(() => { setOffline(!use); }, [use]);
+  /* the reminder comes back every time you open the page while it is off */
+  useEffect(() => { setHideOff(false); }, [use]);
 
   const remove = m => {
     setList(l => l.filter(x => x.id !== m.id));
@@ -257,7 +257,7 @@ export default function Memories({ mobile, drawer, onMenu }) {
             <b>Use memory</b>
             <small>Allow Nash to use saved memories in future responses.</small>
           </div>
-          <Toggle on={use} onChange={setUse} label="Use memory" />
+          <Toggle on={use} onChange={onUse} label="Use memory" />
         </div>
 
         <div className="filters memfilters">
@@ -321,30 +321,30 @@ export default function Memories({ mobile, drawer, onMenu }) {
         )}
       </div>
 
-      <AnimatePresence>
-        {offline && (
-          <motion.div className="toast warn" key="off"
-            initial={{ opacity:0, y:12 }} animate={{ opacity:1, y:0 }}
-            exit={{ opacity:0, y:8 }} transition={liquid}>
-            <Icon name="memoff" size={16} />
-            <span>Memory is off — these are kept, but Nash will not use them in replies.</span>
-            <button className="x" onClick={() => setOffline(false)} aria-label="Dismiss">
-              <Icon name="x" size={14} />
-            </button>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <div className="toasts">
+        <AnimatePresence initial={false}>
+          {!use && !hideOff && (
+            <motion.div className="toast warn" key="off"
+              initial={{ opacity:0, y:14 }} animate={{ opacity:1, y:0 }}
+              exit={{ opacity:0, y:10 }} transition={liquid}>
+              <Icon name="memoff" size={17} />
+              <span>Memory is off — these are kept, but Nash will not use them in replies.</span>
+              <button className="x" onClick={() => setHideOff(true)} aria-label="Dismiss">
+                <Icon name="x" size={14} />
+              </button>
+            </motion.div>
+          )}
 
-      <AnimatePresence>
-        {undo && (
-          <motion.div className="toast"
-            initial={{ opacity:0, y:12 }} animate={{ opacity:1, y:0 }}
-            exit={{ opacity:0, y:8 }} transition={liquid}>
-            <span>Memory deleted</span>
-            <button onClick={() => { setList(l => [undo, ...l]); setUndo(null); }}>Undo</button>
-          </motion.div>
-        )}
-      </AnimatePresence>
+          {undo && (
+            <motion.div className="toast" key="undo"
+              initial={{ opacity:0, y:14 }} animate={{ opacity:1, y:0 }}
+              exit={{ opacity:0, y:10 }} transition={liquid}>
+              <span>Memory deleted</span>
+              <button onClick={() => { setList(l => [undo, ...l]); setUndo(null); }}>Undo</button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
 
       <AnimatePresence>
         {dialog && (
