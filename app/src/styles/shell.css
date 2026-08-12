@@ -215,11 +215,11 @@
   /* ---- Add to Chat ---- */
   /* sits on the page, above the input box — so its cards need their own surface */
   .addto{padding:4px 0 14px;}
-  .addto .tile,.addto .group,.addto .addto-x{background:var(--surface);}
+  .addto .tile,.addto .group{background:var(--surface);}
   .addto-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
   .addto-head h4{font-size:16px;font-weight:600;letter-spacing:-.2px;color:var(--t1);}
   .addto-x{
-    width:30px;height:30px;border-radius:50%;background:var(--elevated);
+    width:30px;height:30px;border-radius:50%;
     display:grid;place-items:center;color:var(--t2);flex:0 0 auto;
   }
   .tiles{display:grid;grid-template-columns:1fr 1fr;gap:12px;}

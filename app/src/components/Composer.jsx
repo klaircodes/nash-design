@@ -46,8 +46,7 @@ const ADDLIST = [
   { icon:'wave',    label:'Voice Mode' },
 ];
 
-export default function Composer({ model, onOpenPicker }) {
-  const [open, setOpen] = useState(false);
+export default function Composer({ model, onOpenPicker, tools: open, onToggleTools }) {
   const [text, setText] = useState('');
   const ta = useRef(null);
   const mobile = useIsMobile();
@@ -65,7 +64,7 @@ export default function Composer({ model, onOpenPicker }) {
     <div className="addto">
       <div className="addto-head">
         <h4>Add to Chat</h4>
-        <motion.button className="addto-x" onClick={() => setOpen(false)} aria-label="Close"
+        <motion.button className="addto-x" onClick={onToggleTools} aria-label="Close"
           whileTap={{ scale: 0.9 }} transition={{ duration: dur.hover, ease }}>
           <Icon name="x" size={15} />
         </motion.button>
@@ -119,7 +118,7 @@ export default function Composer({ model, onOpenPicker }) {
         transition={{ duration: dur.move, ease }}
       >
         <div className="crow">
-          <motion.button className="round" onClick={() => setOpen(v => !v)}
+          <motion.button className="round" onClick={onToggleTools}
             aria-label={open ? 'Hide tools' : 'Show tools'}
             whileHover={{ backgroundColor: 'var(--border)' }}
             whileTap={{ scale: 0.94 }}

@@ -13,6 +13,12 @@ function greeting() {
 export default function Chat({ user, sessionKey, mobile, drawer, onMenu }) {
   const first = (user.name || 'there').split(' ')[0];
   const [picker, setPicker] = useState(false);
+  const [tools, setTools]   = useState(false);
+
+  /* on a phone both panels occupy the same slab above the composer, so opening
+     one closes the other rather than stacking them */
+  const openPicker  = () => { if (mobile) setTools(false); setPicker(true); };
+  const toggleTools = () => { if (mobile) setPicker(false); setTools(v => !v); };
   const [model, setModel]   = useState('GPT-4.1');
   const [pinned, setPinned] = useState(['Claude Opus 4.8', 'GPT-5']);
 
@@ -68,7 +74,8 @@ export default function Chat({ user, sessionKey, mobile, drawer, onMenu }) {
       </AnimatePresence>
 
 
-      <Composer model={model} onOpenPicker={() => setPicker(true)} />
+      <Composer model={model} onOpenPicker={openPicker}
+                tools={tools} onToggleTools={toggleTools} />
 
       <AnimatePresence>{!mobile && picker && pick}</AnimatePresence>
     </div>
