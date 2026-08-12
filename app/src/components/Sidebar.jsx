@@ -127,6 +127,7 @@ function MoreMenu({ collapsed, mobile }) {
     <>
       {MORE.map(m => (
         <motion.button key={m.label} className="navitem"
+          whileHover={{ backgroundColor:'var(--hover)', color:'var(--t1)' }}
           whileTap={{ scale: 0.99 }} transition={{ duration: dur.hover, ease }}>
           <Icon name={m.icon} size={16} /><span>{m.label}</span>
         </motion.button>

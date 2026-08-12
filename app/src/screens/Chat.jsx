@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import Icon from '../components/Icon.jsx';
 import Composer from '../components/Composer.jsx';
 import ModelPicker from '../components/ModelPicker.jsx';
-import { ease, liquidWide } from '../lib/motion.js';
+import { ease, liquid, liquidWide } from '../lib/motion.js';
 
 function greeting() {
   const h = new Date().getHours();
@@ -26,45 +26,47 @@ export default function Chat({ user, sessionKey, mobile, drawer, onMenu }) {
   );
   return (
     <div className="main">
-      {/* picking a model is its own screen — none of the chat's chrome belongs on it */}
-      {!(mobile && picker) && (
-        <div className="topbar">
-          {/* same element as the one beside the open drawer — shared layoutId, so
-              it travels there instead of one vanishing and another appearing */}
-          {mobile && !drawer && (
-            <motion.button className="menu" layoutId="sbtoggle" onClick={onMenu}
-              aria-label="Open sidebar" whileTap={{ scale: 0.9 }} transition={liquidWide}>
-              <Icon name="panel" size={19} />
-            </motion.button>
-          )}
-          <button className="more"><Icon name="dotsH" size={18} /></button>
-        </div>
-      )}
+      <div className="topbar">
+        {/* same element as the one beside the open drawer — shared layoutId, so
+            it travels there instead of one vanishing and another appearing */}
+        {mobile && !drawer && (
+          <motion.button className="menu" layoutId="sbtoggle" onClick={onMenu}
+            aria-label="Open sidebar" whileTap={{ scale: 0.9 }} transition={liquidWide}>
+            <Icon name="panel" size={19} />
+          </motion.button>
+        )}
+        <button className="more"><Icon name="dotsH" size={18} /></button>
+      </div>
 
-      {/* on a phone the picker replaces the conversation instead of covering it */}
-      <AnimatePresence mode="wait" initial={false}>
-        {mobile && picker ? (
-          <motion.div key="pick" className="pickhost">{pick}</motion.div>
-        ) : (
-          <motion.div key="body" className="chatbody"
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            transition={{ duration: 0.2, ease }}>
-            <motion.h1
-              key={sessionKey}
-              className="greet"
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.45, ease }}
-            >
-              {greeting()}, {first}
-            </motion.h1>
+      <div className="chatbody">
+        <motion.h1
+          key={sessionKey}
+          className="greet"
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.45, ease }}
+        >
+          {greeting()}, {first}
+        </motion.h1>
+      </div>
+
+      {/* phone: opens above the composer at roughly the height of Add to Chat,
+          scrolling inside itself — the conversation stays on screen */}
+      <AnimatePresence initial={false}>
+        {mobile && picker && (
+          <motion.div key="pick" className="pickhost"
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ height: liquid, opacity: { duration: 0.2, ease } }}
+            style={{ overflow: 'hidden' }}>
+            {pick}
           </motion.div>
         )}
       </AnimatePresence>
 
-      {mobile && picker
-        ? <p className="disclaim solo">Nash can make mistakes. Please double-check responses.</p>
-        : <Composer model={model} onOpenPicker={() => setPicker(true)} />}
+
+      <Composer model={model} onOpenPicker={() => setPicker(true)} />
 
       <AnimatePresence>{!mobile && picker && pick}</AnimatePresence>
     </div>

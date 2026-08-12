@@ -116,7 +116,7 @@
 .sortmenu.under{position:absolute;top:40px;left:0;right:auto;}
 
 /* ---------- phone: a screen of its own, not a sheet ---------- */
-.pickhost{flex:1;min-height:0;display:flex;flex-direction:column;}
+.pickhost{flex:0 0 auto;display:flex;flex-direction:column;}
 .mpanel.inline{
   width:100%;max-width:none;height:auto;flex:1;min-height:0;
   border-radius:0;background:transparent;box-shadow:none;
@@ -124,10 +124,12 @@
 [data-theme="light"] .mpanel.inline{background:transparent;}
 
 @media (max-width: 720px){
-  /* no top bar above it any more, so the header buys back that breathing room */
-  .mhead{padding:26px 16px 16px;}
-  .searchrow{margin:0 16px 14px;}
-  .filterbar{padding:0 16px 12px;}
-  .sortmenu{right:16px;}
-  .mscroll{padding:0 8px 8px;}
+  .pickhost{max-height:52vh;padding:0 4px;}
+  .mpanel.inline{max-height:52vh;}
+  .mhead{padding:6px 12px 12px;}
+  .mhead h3{font-size:16px;}
+  .searchrow{margin:0 12px 12px;}
+  .filterbar{padding:0 12px 10px;}
+  .sortmenu{right:12px;}
+  .mscroll{padding:0 6px 6px;}
 }
