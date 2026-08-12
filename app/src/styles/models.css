@@ -129,12 +129,17 @@
      composer's placeholder and with Add to Chat's list rows. */
   .pickhost{height:52vh;padding:0 12px;}
   .mpanel.inline{height:100%;max-height:none;}
-  .mhead{padding:6px 0 12px;}
+  /* matches Add to Chat: same top offset, same 14px to the content below,
+     and the close sits on the title's line rather than centred on the block */
+  .mhead{padding:4px 0 14px;align-items:flex-start;}
   .mhead h3{font-size:16px;}
+  .mhead .iconbtn{width:30px;height:30px;margin-top:-4px;}
   .searchrow{margin:0 0 12px;}
   .filterbar{padding:0 0 10px;}
   .sortmenu{right:0;}
-  .mscroll{padding:0 0 6px;}
+  /* the cut at the panel's edge reads as a scroll boundary, not a clipped row */
+  .mscroll{padding:0 0 10px;
+    mask-image:linear-gradient(180deg,#000 0,#000 calc(100% - 26px),transparent 100%);}
   .mrow{padding:11px 12px;}
   .mlabel{padding:12px 12px 8px;}
 }

@@ -204,7 +204,8 @@
   .greet{font-size:20px;text-align:center;letter-spacing:-.3px;}
 
   /* input claims its own line; the controls sit beneath it */
-  .composerwrap{max-width:none;padding:0 12px 14px;}
+  /* breathing room so a panel above never reads as running under the input */
+  .composerwrap{max-width:none;padding:12px 12px 14px;}
   .crow{flex-wrap:wrap;gap:10px;padding:12px;}
   .crow textarea{order:-1;flex:1 0 100%;font-size:14px;max-height:132px;}
   .crow .modelpick{margin-left:auto;max-width:150px;font-size:12.5px;}
@@ -216,7 +217,8 @@
   /* sits on the page, above the input box — so its cards need their own surface */
   .addto{padding:4px 0 14px;}
   .addto .tile,.addto .group{background:var(--surface);}
-  .addto-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+  .addto-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;
+    height:30px;}
   .addto-head h4{font-size:16px;font-weight:600;letter-spacing:-.2px;color:var(--t1);}
   .addto-x{
     width:30px;height:30px;border-radius:50%;
