@@ -101,18 +101,6 @@ export default function ModelPicker({ open, model, pinned, onPick, onPin, onClos
           <Icon name={isPinned && hover ? 'pinOff' : 'pin'} size={15} />
         </motion.button>
 
-        <AnimatePresence>
-          {hover && (
-            <motion.button className="rowmore" key="more"
-              onClick={e => e.stopPropagation()} aria-label="More"
-              initial={{ opacity:0, width:0 }} animate={{ opacity:1, width:18 }}
-              exit={{ opacity:0, width:0 }}
-              whileHover={{ color:'var(--t1)' }} whileTap={{ scale: 0.86 }}
-              transition={{ duration: dur.hover, ease }}>
-              <Icon name="dots" size={15} />
-            </motion.button>
-          )}
-        </AnimatePresence>
       </div>
     </motion.div>
     );
