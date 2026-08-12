@@ -16,6 +16,9 @@ export const dur = {
 /* a soft, liquid expand — used by the composer and sidebar sections */
 export const liquid = { type: 'spring', stiffness: 260, damping: 32, mass: 0.9 };
 
+/* slightly softer, for larger moves like the sidebar width */
+export const liquidWide = { type: 'spring', stiffness: 210, damping: 30, mass: 0.95 };
+
 export const fadeUp = {
   initial: { opacity: 0, y: 6 },
   animate: { opacity: 1, y: 0 },
