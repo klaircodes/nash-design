@@ -320,7 +320,7 @@
 .drawerscrim{position:fixed;inset:0;z-index:79;background:var(--app);}
 /* a fixed 16px off the drawer's edge — not centred in whatever space is left */
 .drawerclose{
-  position:absolute;top:0;left:calc(var(--drawerw) + 16px);width:32px;height:52px;
+  position:absolute;top:0;left:calc(var(--drawerw) + 16px);width:32px;height:56px;
   display:grid;place-items:center;color:var(--t2);
 }
 .disclaim{display:none;text-align:center;font-size:10.5px;color:var(--t4);
@@ -340,15 +340,15 @@
     border-radius:0 16px 0 16px;
     /* brand row drops to the top bar's own line, so `nash:` and the collapse
        mark sit level and the mark never travels vertically */
-    padding-top:4px;
+    padding-top:6px;
   }
   .sidebar.drawer .sb-body{width:auto;min-width:0;}
 
-  .topbar{position:relative;height:52px;padding:0 14px;gap:10px;}
+  .topbar{position:relative;height:56px;padding:0 14px;gap:10px;}
   .topbar .menu{color:var(--t2);display:flex;align-items:center;}
 
-  .chatbody{padding:16px;}
-  .threadin{padding:6px 12px 16px;gap:16px;}
+  .chatbody{padding:22px 16px 16px;}
+  .threadin{padding:16px 12px 16px;gap:16px;}
   .msg .bubble{max-width:92%;}
   .msg.user .bubble{max-width:84%;}
   .mtext{font-size:14px;}
