@@ -161,8 +161,14 @@
   .memacts{position:absolute;top:11px;right:12px;}
   .memrow{position:relative;}
   .memtext{font-size:13.5px;}
-  .memdialog{width:100%;max-width:none;border-radius:16px 16px 0 0;}
-  .scrim:has(.memdialog){place-items:end stretch;}
+  /* centred, not stuck to the bottom edge, and never taller than the screen */
+  .scrim:has(.memdialog){place-items:center;padding:24px 16px;}
+  .memdialog{width:100%;max-width:none;border-radius:16px;
+    max-height:calc(100vh - 48px);}
+  .memform{overflow-y:auto;}
+  /* scope pills wrap rather than running off the sheet */
+  .memform .filters{flex-wrap:wrap;}
+  .memform textarea{resize:none;min-height:120px;}
   .memfoot{padding:14px 16px 18px;}
   .memfoot .primary.sm,.memfoot .ghost{flex:1;}
   .toasts{left:16px;right:16px;bottom:16px;align-items:stretch;}
