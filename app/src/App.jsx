@@ -1,19 +1,31 @@
 import { useState } from 'react';
+import { AnimatePresence, motion } from 'motion/react';
 import Auth from './screens/Auth.jsx';
+import Chat from './screens/Chat.jsx';
+import Sidebar from './components/Sidebar.jsx';
+import { ease } from './lib/motion.js';
+import './styles/shell.css';
 
 export default function App() {
   const [user, setUser] = useState(null);
-
-  if (!user) return <Auth onDone={setUser} />;
+  const [session, setSession] = useState(0);   // bumping this starts a fresh chat
 
   return (
-    <div style={{ display:'grid', placeItems:'center', height:'100%', gap:8 }}>
-      <div style={{ textAlign:'center' }}>
-        <h1 style={{ fontSize:24, fontWeight:600 }}>Signed in as {user.name}</h1>
-        <p style={{ color:'var(--t3)', fontSize:13, marginTop:6 }}>
-          Shell and chat land in the next increment.
-        </p>
-      </div>
-    </div>
+    <AnimatePresence mode="wait">
+      {!user ? (
+        <motion.div key="auth" style={{ height:'100%' }}
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+          transition={{ duration: 0.22, ease }}>
+          <Auth onDone={setUser} />
+        </motion.div>
+      ) : (
+        <motion.div key="app" className="shell"
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+          transition={{ duration: 0.28, ease }}>
+          <Sidebar user={user} onNewChat={() => setSession(s => s + 1)} />
+          <Chat user={user} sessionKey={session} />
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }

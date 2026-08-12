@@ -1,0 +1,95 @@
+/* ============================================================
+   App shell — sidebar spec from DESIGN.md §3
+   ============================================================ */
+.shell{display:flex;height:100%;background:var(--app);overflow:hidden;}
+
+/* ---------- sidebar ---------- */
+.sidebar{
+  width:280px;flex:0 0 auto;display:flex;flex-direction:column;
+  padding:14px 12px 12px;background:var(--sunken);
+  border-right:1px solid var(--border);overflow:hidden;
+}
+.sb-head,.sb-foot{flex:0 0 auto;display:flex;flex-direction:column;gap:2px;}
+.sb-foot{padding-top:8px;}
+.sb-scroll{
+  flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;
+  display:flex;flex-direction:column;gap:2px;margin:0 -4px;padding:0 4px;
+  scrollbar-width:thin;scrollbar-color:transparent transparent;
+}
+.sidebar:hover .sb-scroll{scrollbar-color:var(--border) transparent;}
+.sb-scroll::-webkit-scrollbar{width:6px;}
+.sb-scroll::-webkit-scrollbar-thumb{background:transparent;border-radius:3px;}
+.sidebar:hover .sb-scroll::-webkit-scrollbar-thumb{background:var(--border);}
+
+/* rows never compress */
+.brand,.org,.searchfield,.navitem,.sechead,.folderrow,
+.folderchat,.datemark,.chatrow,.gap,.rule,.userrow{flex:0 0 auto;}
+
+.brand{height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 8px;}
+.brand b{font-size:17px;font-weight:600;letter-spacing:-.2px;}
+.brand .panel{color:var(--t3);display:flex;}
+.gap{height:10px;}
+.org,.searchfield{
+  height:36px;display:flex;align-items:center;gap:9px;padding:0 11px;
+  border-radius:9px;background:var(--surface);color:var(--t2);font-size:12.5px;
+}
+.searchfield span{color:var(--t4);}
+.navitem{
+  height:34px;display:flex;align-items:center;gap:11px;padding:0 9px;width:100%;
+  border-radius:var(--r-sm);font-size:12.5px;color:var(--t2);text-align:left;
+}
+.navitem.active{background:var(--hover);color:var(--t1);}
+.sechead{
+  height:32px;display:flex;align-items:center;justify-content:space-between;width:100%;
+  padding:0 9px;font-size:11px;font-weight:500;color:var(--t3);
+  letter-spacing:.06em;text-transform:uppercase;
+}
+.folderrow{
+  height:34px;display:flex;align-items:center;gap:11px;padding:0 9px;width:100%;
+  border-radius:var(--r-sm);font-size:12.5px;color:var(--t2);text-align:left;
+}
+.folderrow .chev{margin-left:auto;display:flex;}
+.folderchat{
+  height:30px;display:flex;align-items:center;padding:0 9px 0 31px;
+  border-radius:var(--r-sm);font-size:12px;color:var(--t3);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.datemark{
+  height:30px;display:flex;align-items:center;padding:0 9px;
+  font-size:11px;font-weight:500;color:var(--t3);margin-top:14px;
+}
+.datemark.first{margin-top:0;}
+.chatrow{
+  height:32px;display:flex;align-items:center;gap:8px;padding:0 9px;
+  border-radius:var(--r-sm);font-size:12.5px;color:var(--t2);cursor:default;
+}
+.chatrow .title{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.chatrow .dots{display:flex;color:var(--t3);}
+.chatrow .pin{display:flex;color:var(--t4);flex:0 0 auto;}
+.rule{height:1px;background:var(--border);margin:8px 0;}
+.userrow{height:48px;display:flex;align-items:center;gap:10px;padding:0 9px;border-radius:9px;}
+.avatar{width:30px;height:30px;border-radius:50%;background:var(--elevated);
+  display:grid;place-items:center;font-size:12px;font-weight:500;color:var(--t2);}
+.who{flex:1;min-width:0;}
+.who b{display:block;font-size:12.5px;font-weight:500;}
+.who small{display:block;font-size:11px;color:var(--t3);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+
+/* ---------- main ---------- */
+.main{flex:1;min-width:0;display:flex;flex-direction:column;}
+.chatbody{flex:1;min-height:0;display:grid;place-items:center;padding:24px;}
+.greet{font-size:30px;font-weight:600;letter-spacing:-.5px;color:var(--t1);}
+
+/* ---------- composer (static for now) ---------- */
+.composerwrap{width:100%;max-width:768px;margin:0 auto;padding:0 24px 28px;flex:0 0 auto;}
+.composer{border-radius:22px;background:var(--surface);}
+.crow{display:flex;align-items:center;gap:12px;padding:14px;}
+.crow input{flex:1;min-width:0;font-size:15px;color:var(--t1);}
+.crow input::placeholder{color:var(--t4);}
+.modelpick{display:flex;align-items:center;gap:6px;padding:6px 8px;border-radius:8px;
+  font-size:13px;color:var(--t2);}
+.round{
+  width:34px;height:34px;flex:0 0 auto;border-radius:50%;display:grid;place-items:center;
+  background:var(--elevated);color:var(--t2);
+}
+.round.accent{background:var(--accent);color:#fff;}
