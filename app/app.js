@@ -167,6 +167,7 @@ function sidebar() {
                ['users','Persona Marketplace',null],['dots','More',null]];
   return `
   <aside class="sidebar">
+   <div class="sb-head">
     <div class="brand"><b>nash:</b><span style="color:var(--t3)">${ico('panel',18)}</span></div>
     <div class="spacer"></div>
     <div class="org">${ico('user',15)}<span style="flex:1">Personal</span>${ico('chevD',14)}</div>
@@ -176,8 +177,10 @@ function sidebar() {
     ${nav.map(([i,l,v]) => `
       <div class="navitem ${state.view===v?'active':''}" ${v?`data-go="${v}"`:''}>
         ${ico(i,16)}<span>${l}</span></div>`).join('')}
-    <div class="spacer" style="height:8px"></div>
+   </div>
 
+   <div class="sb-scroll">
+    <div class="spacer" style="height:8px"></div>
     <div class="sechead ${state.chatsOpen?'':'collapsed'}" data-toggle="chats">
       <span>Chats</span>${ico('chevD',14,'chev')}
     </div>
@@ -206,8 +209,9 @@ function sidebar() {
           </div>`).join('')}`).join('')}
 
     </div></div>
+   </div>
 
-    <div class="grow"></div>
+   <div class="sb-foot">
     <div class="divider"></div>
     <div style="position:relative">
       ${state.userMenu ? usermenu() : ''}
@@ -217,6 +221,7 @@ function sidebar() {
         ${ico('gear',14)}
       </div>
     </div>
+   </div>
   </aside>`;
 }
 
@@ -710,7 +715,6 @@ document.addEventListener('keydown', e => {
 /* ---------- sign out ---------- */
 document.addEventListener('click', e => {
   if (!e.target.closest('[data-signout]')) return;
-  try { localStorage.removeItem('nash.session'); } catch (x) {}
   document.removeEventListener('click', onAppClick);
   const app = document.getElementById('app');
   app.style.transition = 'opacity .24s var(--ease)';
@@ -721,10 +725,8 @@ document.addEventListener('click', e => {
 /* ---------- mount ---------- */
 window.NashApp = {
   state,
-  mount() {
-    let s = null;
-    try { s = JSON.parse(localStorage.getItem('nash.session') || 'null'); } catch (x) {}
-    state.user = s || { name: 'Klair', email: 'claire@backboard.io' };
+  mount(user) {
+    state.user = user || { name: 'Klair', email: 'claire@backboard.io' };
     state.view = 'connectors';
     state.rail = null; state.modal = null; state.popover = false;
     if (window.NashAuth) window.NashAuth.unmount();
