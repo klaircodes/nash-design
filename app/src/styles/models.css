@@ -26,7 +26,7 @@
   flex:1;min-width:0;height:42px;border-radius:10px;background:var(--surface);
   display:flex;align-items:center;gap:10px;padding:0 13px;color:var(--t3);
 }
-.searchrow.withsort .fsort{width:42px;height:42px;border-radius:10px;background:var(--surface);}
+.searchrow.withsort .fsort{width:42px;height:42px;border-radius:10px;}
 .searchrow .sortmenu{top:48px;right:0;}
 .msearch input{flex:1;min-width:0;font-size:13.5px;color:var(--t1);}
 .msearch input::placeholder{color:var(--t4);}

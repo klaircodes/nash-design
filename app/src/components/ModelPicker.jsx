@@ -70,7 +70,7 @@ export default function ModelPicker({ open, model, pinned, onPick, onPin, onClos
   const go = next => { setView(next); setQuery(''); setSortOpen(false); };
   const filterLabel = FILTERS.find(f => f.key === filter)?.label;
 
-  const Row = ({ m }) => (
+  const Row = ({ m, bare }) => (
     <motion.div className="mrow" onClick={() => onPick(m.name)}
       whileHover={{ backgroundColor:'var(--hover)' }} transition={{ duration: dur.hover, ease }}>
       <div className="mt">
@@ -78,7 +78,7 @@ export default function ModelPicker({ open, model, pinned, onPick, onPin, onClos
           <span className="name">{m.name}</span>
           {m.isNew && <span className="newtag">New</span>}
         </div>
-        <div className="mm">{meta(m)}</div>
+        {!bare && <div className="mm">{meta(m)}</div>}
       </div>
       {model === m.name && <span className="tick"><Icon name="check" size={16} /></span>}
       <motion.button
@@ -210,7 +210,7 @@ export default function ModelPicker({ open, model, pinned, onPick, onPin, onClos
 
                 {rootPinned.length > 0 && (<>
                   <div className="mlabel">Pinned</div>
-                  {rootPinned.map(m => <Row key={m.name} m={m} />)}
+                  {rootPinned.map(m => <Row key={m.name} m={m} bare />)}
                 </>)}
 
                 {rootProviders.length > 0 && (<>
