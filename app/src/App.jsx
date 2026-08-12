@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import Auth from './screens/Auth.jsx';
 import Chat from './screens/Chat.jsx';
 import Sidebar from './components/Sidebar.jsx';
+import Icon from './components/Icon.jsx';
 import { ease, liquidWide } from './lib/motion.js';
 import useIsMobile from './lib/useIsMobile.js';
 import './styles/shell.css';
@@ -32,7 +33,12 @@ export default function App() {
             {mobile && drawer && (
               <motion.div className="drawerscrim" onClick={() => setDrawer(false)}
                 initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                transition={{ duration: 0.22, ease }} />
+                transition={{ duration: 0.22, ease }}>
+                <motion.button className="drawerclose" aria-label="Close sidebar"
+                  onClick={() => setDrawer(false)} whileTap={{ scale: 0.9 }}>
+                  <Icon name="panel" size={19} />
+                </motion.button>
+              </motion.div>
             )}
           </AnimatePresence>
 

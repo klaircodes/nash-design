@@ -7,12 +7,13 @@ import { MODELS, PROVIDERS, FILTERS, SORTS, PERSONAS, fmtDate } from '../lib/dat
 const meta = m => `${fmtDate(m.date)} · ${m.tags.includes('vision') ? 'Vision'
   : m.tags.includes('open-source') ? 'Open source' : 'Text'}`;
 
-export default function ModelPicker({ open, model, pinned, onPick, onPin, onClose }) {
+export default function ModelPicker({ open, model, pinned, onPick, onPin, onClose, inline }) {
   const [view, setView]     = useState({ kind:'root' });
   const [query, setQuery]   = useState('');
   const [filter, setFilter] = useState('all');
   const [sort, setSort]     = useState('newest');
   const [sortOpen, setSortOpen] = useState(false);
+  const [filterOpen, setFilterOpen] = useState(false);
   const [hoverRow, setHoverRow] = useState(null);
 
   /* a fresh open always starts at the root */
@@ -75,7 +76,7 @@ export default function ModelPicker({ open, model, pinned, onPick, onPin, onClos
   const clearAll = () => { setQuery(''); setFilter('all'); setSortOpen(false); };
 
   /* moving between panels always starts from a clean search */
-  const go = next => { setView(next); setQuery(''); setSortOpen(false); };
+  const go = next => { setView(next); setQuery(''); setSortOpen(false); setFilterOpen(false); };
   const filterLabel = FILTERS.find(f => f.key === filter)?.label;
 
   const Row = ({ m, bare }) => {
@@ -148,6 +149,63 @@ export default function ModelPicker({ open, model, pinned, onPick, onPin, onClos
     </div>
   );
 
+  const sortLabel = SORTS.find(s2 => s2.key === sort)?.label;
+
+  /* phone: two labelled dropdowns. desktop: the scrolling pill strip. */
+  const Dropdowns = () => (
+    <div className="filterbar dd">
+      <div className="ddwrap">
+        <motion.button className={`ddbtn ${filterOpen ? 'on' : ''}`}
+          onClick={() => { setFilterOpen(v => !v); setSortOpen(false); }}
+          whileTap={{ scale: 0.98 }} transition={{ duration: dur.hover, ease }}>
+          <Icon name="funnel" size={13} /><span>Filter</span><b>{filterLabel}</b>
+          <Icon name="chevD" size={13} />
+        </motion.button>
+        <AnimatePresence>
+          {filterOpen && (
+            <motion.div className="sortmenu under"
+              initial={{ opacity:0, y:-6, scale:.98 }} animate={{ opacity:1, y:0, scale:1 }}
+              exit={{ opacity:0, y:-6, scale:.98 }} transition={{ duration:0.18, ease }}>
+              {FILTERS.map(f => (
+                <motion.button key={f.key} className="sortrow"
+                  onClick={() => { setFilter(f.key); setFilterOpen(false); }}
+                  whileTap={{ scale: 0.99 }} transition={{ duration: dur.hover, ease }}>
+                  {f.label}
+                  {filter === f.key && <span className="tick"><Icon name="check" size={14} /></span>}
+                </motion.button>
+              ))}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+
+      <div className="ddwrap">
+        <motion.button className={`ddbtn ${sortOpen ? 'on' : ''}`}
+          onClick={() => { setSortOpen(v => !v); setFilterOpen(false); }}
+          whileTap={{ scale: 0.98 }} transition={{ duration: dur.hover, ease }}>
+          <Icon name="sort" size={13} /><span>Sort</span><b>{sortLabel}</b>
+          <Icon name="chevD" size={13} />
+        </motion.button>
+        <AnimatePresence>
+          {sortOpen && (
+            <motion.div className="sortmenu under"
+              initial={{ opacity:0, y:-6, scale:.98 }} animate={{ opacity:1, y:0, scale:1 }}
+              exit={{ opacity:0, y:-6, scale:.98 }} transition={{ duration:0.18, ease }}>
+              {SORTS.map(so => (
+                <motion.button key={so.key} className="sortrow"
+                  onClick={() => { setSort(so.key); setSortOpen(false); }}
+                  whileTap={{ scale: 0.99 }} transition={{ duration: dur.hover, ease }}>
+                  {so.label}
+                  {sort === so.key && <span className="tick"><Icon name="check" size={14} /></span>}
+                </motion.button>
+              ))}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    </div>
+  );
+
   const Filters = () => (
     <div className="filterbar">
       <div className="filters">
@@ -214,17 +272,21 @@ export default function ModelPicker({ open, model, pinned, onPick, onPin, onClos
 
   if (!open) return null;
 
-  return (
-    <motion.div className="scrim" onClick={onClose}
-      initial={{ opacity:0 }} animate={{ opacity:1 }} exit={{ opacity:0 }}
-      transition={{ duration:0.18, ease }}>
-      <motion.div className="mpanel"
-        onClick={e => {
-          e.stopPropagation();
-          if (sortOpen && !e.target.closest('.fsort') && !e.target.closest('.sortmenu')) setSortOpen(false);
-        }}
-        initial={{ opacity:0, y:10, scale:.99 }} animate={{ opacity:1, y:0, scale:1 }}
-        exit={{ opacity:0, y:8, scale:.99 }} transition={liquid}>
+  /* inline = the phone's full-screen view, sitting between the top bar and the
+     composer. Otherwise it's the desktop dialog, centred over a scrim. */
+  const body = (
+    <motion.div className={`mpanel ${inline ? 'inline' : ''}`}
+      onClick={e => {
+        e.stopPropagation();
+        if (sortOpen && !e.target.closest('.fsort') && !e.target.closest('.ddbtn')
+            && !e.target.closest('.sortmenu')) setSortOpen(false);
+        if (filterOpen && !e.target.closest('.ddbtn') && !e.target.closest('.sortmenu'))
+          setFilterOpen(false);
+      }}
+      initial={inline ? { opacity:0, y:14 } : { opacity:0, y:10, scale:.99 }}
+      animate={inline ? { opacity:1, y:0 }  : { opacity:1, y:0, scale:1 }}
+      exit={inline    ? { opacity:0, y:10 } : { opacity:0, y:8, scale:.99 }}
+      transition={liquid}>
 
         <AnimatePresence mode="wait" initial={false}>
           <motion.div key={view.kind + (view.name || '')}
@@ -241,7 +303,7 @@ export default function ModelPicker({ open, model, pinned, onPick, onPin, onClos
                   whileHover={{ backgroundColor:'var(--hover)', color:'var(--t1)' }}><Icon name="x" size={16} /></motion.button>
               </div>
               <Search placeholder="Search 17,000+ models..." />
-              <Filters />
+              {inline ? <Dropdowns /> : <Filters />}
               <div className="mscroll">
                 {!q && filter === 'all' && (
                   <motion.button className="mrow first" onClick={() => go({ kind:'personas' })}
@@ -289,7 +351,8 @@ export default function ModelPicker({ open, model, pinned, onPick, onPin, onClos
                 <motion.button className="iconbtn" onClick={onClose}
                   whileHover={{ backgroundColor:'var(--hover)', color:'var(--t1)' }}><Icon name="x" size={16} /></motion.button>
               </div>
-              <Search placeholder={`Search ${view.name} models...`} withSort />
+              <Search placeholder={`Search ${view.name} models...`} withSort={!inline} />
+              {inline && <Dropdowns />}
               <div className="mscroll">
                 {provPinned.length > 0 && (<>
                   <div className="mlabel">Pinned</div>
@@ -320,7 +383,16 @@ export default function ModelPicker({ open, model, pinned, onPick, onPin, onClos
 
           </motion.div>
         </AnimatePresence>
-      </motion.div>
+    </motion.div>
+  );
+
+  if (inline) return body;
+
+  return (
+    <motion.div className="scrim" onClick={onClose}
+      initial={{ opacity:0 }} animate={{ opacity:1 }} exit={{ opacity:0 }}
+      transition={{ duration:0.18, ease }}>
+      {body}
     </motion.div>
   );
 }

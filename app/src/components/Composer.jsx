@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import Icon from './Icon.jsx';
-import ModelPicker from './ModelPicker.jsx';
 import { ease, dur, liquid } from '../lib/motion.js';
 import '../styles/models.css';
 
@@ -36,29 +35,13 @@ const item = {
   show:   { opacity: 1, y: 0, transition: { duration: 0.3, ease } },
 };
 
-export default function Composer() {
+/* the model lives in Chat: on a phone the picker is a full screen of its own,
+   so it can't be owned by the composer it sits above */
+export default function Composer({ model, onOpenPicker }) {
   const [open, setOpen] = useState(false);
-  const [picker, setPicker] = useState(false);
-  const [model, setModel] = useState('GPT-4.1');
-  const [pinned, setPinned] = useState(['Claude Opus 4.8', 'GPT-5']);
-
-  const togglePin = name =>
-    setPinned(p => p.includes(name) ? p.filter(x => x !== name) : [...p, name]);
 
   return (
     <div className="composerwrap">
-      <AnimatePresence>
-        {picker && (
-          <ModelPicker
-            open={picker}
-            model={model}
-            pinned={pinned}
-            onPick={name => { setModel(name); setPicker(false); }}
-            onPin={togglePin}
-            onClose={() => setPicker(false)}
-          />
-        )}
-      </AnimatePresence>
       <motion.div
         className="composer"
         animate={{ borderRadius: open ? 20 : 22 }}
@@ -75,7 +58,7 @@ export default function Composer() {
 
           <input placeholder="Ask anything..." />
 
-          <motion.button className="modelpick" onClick={() => setPicker(true)}
+          <motion.button className="modelpick" onClick={onOpenPicker}
             whileHover={{ backgroundColor: 'var(--hover)', color: 'var(--t1)' }}
             transition={{ duration: dur.hover, ease }}>
             <span className="mname">{model}</span> <Icon name="chevD" size={14} />

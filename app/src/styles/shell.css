@@ -163,8 +163,11 @@
 .org.open{background:var(--hover);color:var(--t1);}
 
 /* ---------- mobile: HiFi Chat Mobile ---------- */
-.drawerscrim{position:fixed;inset:0;z-index:79;background:rgba(0,0,0,.55);}
-[data-theme="light"] .drawerscrim{background:rgba(16,18,24,.38);}
+.drawerscrim{position:fixed;inset:0;z-index:79;background:var(--app);}
+.drawerclose{
+  position:absolute;top:0;left:292px;right:0;height:52px;
+  display:grid;place-items:center;color:var(--t2);
+}
 .disclaim{display:none;text-align:center;font-size:10.5px;color:var(--t4);
   margin-top:9px;letter-spacing:.1px;}
 
@@ -173,6 +176,7 @@
   .sidebar.drawer{
     position:fixed;top:0;bottom:0;left:0;z-index:80;
     box-shadow:var(--shadow);border-right:1px solid var(--border);
+    border-radius:0 16px 0 16px;
   }
   .sidebar.drawer .sb-body{width:auto;min-width:0;}
 

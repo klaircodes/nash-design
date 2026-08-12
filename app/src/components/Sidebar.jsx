@@ -221,12 +221,12 @@ export default function Sidebar({ user, onNewChat, collapsed, onToggle, mobile, 
       {/* the brand row never moves and never resizes */}
       <div className="brand">
         <b>nash:</b>
-        <motion.button className="panel" onClick={onToggle}
-          aria-label={mobile ? 'Close menu' : collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+        {!mobile && <motion.button className="panel" onClick={onToggle}
+          aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
           whileHover={{ color: 'var(--t1)' }} whileTap={{ scale: 0.92 }}
           transition={{ duration: dur.hover, ease }}>
           <Icon name="panel" size={18} />
-        </motion.button>
+        </motion.button>}
       </div>
 
       {/* slides out of the clip rather than fading — the panel
