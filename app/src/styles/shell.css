@@ -170,6 +170,7 @@
 }
 .disclaim{display:none;text-align:center;font-size:10.5px;color:var(--t4);
   margin-top:9px;letter-spacing:.1px;}
+.disclaim.solo{flex:0 0 auto;margin:0;padding:10px 16px 16px;}
 
 @media (max-width: 720px){
   /* the panel leaves the flow and rides over the chat */
@@ -199,4 +200,5 @@
   .round.sm{width:30px;height:30px;}
   .trow{gap:8px;padding:18px 12px 12px;flex-wrap:wrap;}
   .disclaim{display:block;}
+  .topbar .menu{width:32px;height:32px;display:grid;place-items:center;}
 }

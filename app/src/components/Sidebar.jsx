@@ -33,15 +33,15 @@ function Chevron({ open }) {
   );
 }
 
-function ChatRow({ title, pinned, nested }) {
+function ChatRow({ title, pinned, nested, mobile }) {
   const [hover, setHover] = useState(false);
 
   /* generous 26px target — the glyph alone was fiddly to hit */
   const PinBtn = () => (
     <motion.button className={`pin ${pinned ? 'on' : ''}`}
       aria-label={pinned ? 'Unpin chat' : 'Pin chat'}
-      animate={{ opacity: pinned || hover ? 1 : 0 }}
-      style={{ pointerEvents: pinned || hover ? 'auto' : 'none' }}
+      animate={{ opacity: pinned || hover || mobile ? 1 : 0 }}
+      style={{ pointerEvents: pinned || hover || mobile ? 'auto' : 'none' }}
       whileTap={{ scale: 0.86 }}
       transition={{ duration: dur.hover, ease }}>
       <Icon name="pin" size={15} />
@@ -60,8 +60,8 @@ function ChatRow({ title, pinned, nested }) {
         {/* always occupies its slot, so the title truncates at a fixed width
             and no text reflows when the actions fade in */}
         <motion.span className="dots"
-          animate={{ opacity: hover ? 1 : 0 }}
-          style={{ pointerEvents: hover ? 'auto' : 'none' }}
+          animate={{ opacity: hover || mobile ? 1 : 0 }}
+          style={{ pointerEvents: hover || mobile ? 'auto' : 'none' }}
           transition={{ duration: dur.hover, ease }}>
           <Icon name="dotsH" size={15} />
         </motion.span>
@@ -274,7 +274,7 @@ export default function Sidebar({ user, onNewChat, collapsed, onToggle, mobile, 
                         <Chevron open={open[f.key]} />
                       </motion.button>
                       <Collapse open={open[f.key]}>
-                        {f.chats.map(c => <ChatRow key={c} title={c} nested />)}
+                        {f.chats.map(c => <ChatRow key={c} title={c} nested mobile={mobile} />)}
                       </Collapse>
                     </div>
                   ))}
@@ -283,13 +283,13 @@ export default function Sidebar({ user, onNewChat, collapsed, onToggle, mobile, 
                 {pinned.length > 0 && (
                   <>
                     <div className="datemark first">Pinned</div>
-                    {pinned.map((c, i) => <ChatRow key={`p${i}`} {...c} />)}
+                    {pinned.map((c, i) => <ChatRow key={`p${i}`} {...c} mobile={mobile} />)}
                   </>
                 )}
                 {groups.map(([label, rows]) => (
                   <div key={label}>
                     <div className="datemark">{label}</div>
-                    {rows.map((c, i) => <ChatRow key={`${label}${i}`} {...c} />)}
+                    {rows.map((c, i) => <ChatRow key={`${label}${i}`} {...c} mobile={mobile} />)}
                   </div>
                 ))}
               </Collapse>

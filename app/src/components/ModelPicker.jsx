@@ -51,13 +51,6 @@ export default function ModelPicker({ open, model, pinned, onPick, onPin, onClos
   const rootPinned = useMemo(
     () => sorted(MODELS.filter(m => pinned.includes(m.name) && match(m))),
     [pinned, q, filter, sort]);
-  /* personas carry no date or tags, so they sort and filter separately */
-  const rootPinnedPersonas = useMemo(
-    () => (filter === 'all'
-      ? PERSONAS.filter(p => pinned.includes(p.name) &&
-          (!q || p.name.toLowerCase().includes(q) || p.desc.toLowerCase().includes(q)))
-      : []),
-    [pinned, q, filter]);
   const rootProviders = useMemo(() => PROVIDERS
     .map(p => ({ ...p, count: MODELS.filter(m => m.provider === p.name && match(m)).length }))
     .filter(p => p.count > 0), [q, filter]);
@@ -70,8 +63,10 @@ export default function ModelPicker({ open, model, pinned, onPick, onPin, onClos
   const provPinned = provModels.filter(m => pinned.includes(m.name));
   const provRest   = provModels.filter(m => !pinned.includes(m.name));
 
-  const personas = PERSONAS.filter(p =>
-    !q || p.name.toLowerCase().includes(q) || p.desc.toLowerCase().includes(q));
+  const personaMatch = p =>
+    !q || p.name.toLowerCase().includes(q) || p.desc.toLowerCase().includes(q);
+  const pinnedPersonas = PERSONAS.filter(p => pinned.includes(p.name) && personaMatch(p));
+  const personas       = PERSONAS.filter(p => !pinned.includes(p.name) && personaMatch(p));
 
   const clearAll = () => { setQuery(''); setFilter('all'); setSortOpen(false); };
 
@@ -101,7 +96,7 @@ export default function ModelPicker({ open, model, pinned, onPick, onPin, onClos
           className={`pinbtn ${isPinned ? 'on' : ''}`}
           onClick={e => { e.stopPropagation(); onPin(m.name); }}
           aria-label={isPinned ? 'Unpin' : 'Pin'}
-          animate={{ opacity: isPinned || hover ? 1 : 0 }}
+          animate={{ opacity: isPinned || hover || inline ? 1 : 0 }}
           whileHover={{ color:'var(--t1)' }} whileTap={{ scale: 0.86 }}
           transition={{ duration: dur.hover, ease }}
         >
@@ -130,7 +125,7 @@ export default function ModelPicker({ open, model, pinned, onPick, onPin, onClos
           <motion.button className={`pinbtn ${isPinned ? 'on' : ''}`}
             onClick={e => { e.stopPropagation(); onPin(p.name); }}
             aria-label={isPinned ? 'Unpin' : 'Pin'}
-            animate={{ opacity: isPinned || hover ? 1 : 0 }}
+            animate={{ opacity: isPinned || hover || inline ? 1 : 0 }}
             whileTap={{ scale: 0.86 }} transition={{ duration: dur.hover, ease }}>
             <Icon name="pin" size={15} />
           </motion.button>
@@ -303,7 +298,7 @@ export default function ModelPicker({ open, model, pinned, onPick, onPin, onClos
                   whileHover={{ backgroundColor:'var(--hover)', color:'var(--t1)' }}><Icon name="x" size={16} /></motion.button>
               </div>
               <Search placeholder="Search 17,000+ models..." />
-              {inline ? <Dropdowns /> : <Filters />}
+              <Filters />
               <div className="mscroll">
                 {!q && filter === 'all' && (
                   <motion.button className="mrow first" onClick={() => go({ kind:'personas' })}
@@ -314,9 +309,8 @@ export default function ModelPicker({ open, model, pinned, onPick, onPin, onClos
                   </motion.button>
                 )}
 
-                {(rootPinned.length > 0 || rootPinnedPersonas.length > 0) && (<>
+                {rootPinned.length > 0 && (<>
                   <div className="mlabel">Pinned</div>
-                  {rootPinnedPersonas.map(p => <PersonaRow key={p.name} p={p} bare />)}
                   {rootPinned.map(m => <Row key={m.name} m={m} bare />)}
                 </>)}
 
@@ -335,8 +329,7 @@ export default function ModelPicker({ open, model, pinned, onPick, onPin, onClos
                   ))}
                 </>)}
 
-                {rootPinned.length === 0 && rootPinnedPersonas.length === 0
-                  && rootProviders.length === 0 && <Empty what="models" />}
+                {rootPinned.length === 0 && rootProviders.length === 0 && <Empty what="models" />}
               </div>
             </>)}
 
@@ -351,8 +344,7 @@ export default function ModelPicker({ open, model, pinned, onPick, onPin, onClos
                 <motion.button className="iconbtn" onClick={onClose}
                   whileHover={{ backgroundColor:'var(--hover)', color:'var(--t1)' }}><Icon name="x" size={16} /></motion.button>
               </div>
-              <Search placeholder={`Search ${view.name} models...`} withSort={!inline} />
-              {inline && <Dropdowns />}
+              <Search placeholder={`Search ${view.name} models...`} withSort />
               <div className="mscroll">
                 {provPinned.length > 0 && (<>
                   <div className="mlabel">Pinned</div>
@@ -376,8 +368,13 @@ export default function ModelPicker({ open, model, pinned, onPick, onPin, onClos
               </div>
               <Search placeholder="Search personas..." />
               <div className="mscroll">
+                {pinnedPersonas.length > 0 && (<>
+                  <div className="mlabel">Pinned</div>
+                  {pinnedPersonas.map(p => <PersonaRow key={p.name} p={p} />)}
+                  <div className="mlabel">All personas</div>
+                </>)}
                 {personas.map(p => <PersonaRow key={p.name} p={p} />)}
-                {personas.length === 0 && <Empty what="personas" />}
+                {personas.length === 0 && pinnedPersonas.length === 0 && <Empty what="personas" />}
               </div>
             </>)}
 

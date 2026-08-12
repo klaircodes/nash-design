@@ -124,10 +124,9 @@
 [data-theme="light"] .mpanel.inline{background:transparent;}
 
 @media (max-width: 720px){
-  .mhead{padding:4px 16px 12px;}
-  .mhead h3{font-size:22px;}
-  .searchrow{margin:0 16px 12px;}
-  .filterbar{padding:0 16px 10px;}
-  .mscroll{padding:0 8px 6px;}
-  .mhead .iconbtn{width:30px;height:30px;border-radius:50%;background:var(--surface);}
+  .mhead{padding:6px 16px 14px;}
+  .searchrow{margin:0 16px 14px;}
+  .filterbar{padding:0 16px 12px;}
+  .sortmenu{right:16px;}
+  .mscroll{padding:0 8px 8px;}
 }

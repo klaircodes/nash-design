@@ -34,8 +34,9 @@ export default function App() {
               <motion.div className="drawerscrim" onClick={() => setDrawer(false)}
                 initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                 transition={{ duration: 0.22, ease }}>
-                <motion.button className="drawerclose" aria-label="Close sidebar"
-                  onClick={() => setDrawer(false)} whileTap={{ scale: 0.9 }}>
+                <motion.button className="drawerclose" layoutId="sbtoggle"
+                  aria-label="Close sidebar" onClick={() => setDrawer(false)}
+                  whileTap={{ scale: 0.9 }} transition={liquidWide}>
                   <Icon name="panel" size={19} />
                 </motion.button>
               </motion.div>
@@ -47,8 +48,8 @@ export default function App() {
                    mobile={mobile} drawer={drawer}
                    collapsed={mobile ? false : collapsed}
                    onToggle={() => mobile ? setDrawer(false) : setCollapsed(v => !v)} />
-          <Chat user={user} sessionKey={session}
-                mobile={mobile} onMenu={() => setDrawer(true)} />
+          <Chat user={user} sessionKey={session} mobile={mobile}
+                drawer={drawer} onMenu={() => setDrawer(true)} />
         </motion.div>
       )}
     </AnimatePresence>

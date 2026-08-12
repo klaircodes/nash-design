@@ -3,14 +3,14 @@ import { motion, AnimatePresence } from 'motion/react';
 import Icon from '../components/Icon.jsx';
 import Composer from '../components/Composer.jsx';
 import ModelPicker from '../components/ModelPicker.jsx';
-import { ease } from '../lib/motion.js';
+import { ease, liquidWide } from '../lib/motion.js';
 
 function greeting() {
   const h = new Date().getHours();
   return h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
 }
 
-export default function Chat({ user, sessionKey, mobile, onMenu }) {
+export default function Chat({ user, sessionKey, mobile, drawer, onMenu }) {
   const first = (user.name || 'there').split(' ')[0];
   const [picker, setPicker] = useState(false);
   const [model, setModel]   = useState('GPT-4.1');
@@ -27,9 +27,11 @@ export default function Chat({ user, sessionKey, mobile, onMenu }) {
   return (
     <div className="main">
       <div className="topbar">
-        {mobile && (
-          <motion.button className="menu" onClick={onMenu} aria-label="Open sidebar"
-            whileTap={{ scale: 0.9 }}>
+        {/* same element as the one beside the open drawer — shared layoutId, so
+            it travels there instead of one vanishing and another appearing */}
+        {mobile && !drawer && (
+          <motion.button className="menu" layoutId="sbtoggle" onClick={onMenu}
+            aria-label="Open sidebar" whileTap={{ scale: 0.9 }} transition={liquidWide}>
             <Icon name="panel" size={19} />
           </motion.button>
         )}
@@ -57,7 +59,9 @@ export default function Chat({ user, sessionKey, mobile, onMenu }) {
         )}
       </AnimatePresence>
 
-      <Composer model={model} onOpenPicker={() => setPicker(true)} />
+      {mobile && picker
+        ? <p className="disclaim solo">Nash can make mistakes. Please double-check responses.</p>
+        : <Composer model={model} onOpenPicker={() => setPicker(true)} />}
 
       <AnimatePresence>{!mobile && picker && pick}</AnimatePresence>
     </div>
