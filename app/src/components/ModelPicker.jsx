@@ -63,7 +63,7 @@ export default function ModelPicker({ open, model, pinned, onPick, onPin, onClos
 
   const personas = PERSONAS.filter(p => !q || p.toLowerCase().includes(q));
 
-  const clearAll = () => { setQuery(''); setFilter('all'); };
+  const clearAll = () => { setQuery(''); setFilter('all'); setSortOpen(false); };
   const filterLabel = FILTERS.find(f => f.key === filter)?.label;
 
   const Row = ({ m }) => (
@@ -106,7 +106,7 @@ export default function ModelPicker({ open, model, pinned, onPick, onPin, onClos
         <span className="flabel">Filter</span>
         {FILTERS.map(f => (
           <motion.button key={f.key} className={`fpill ${filter === f.key ? 'on' : ''}`}
-            onClick={() => setFilter(f.key)}
+            onClick={() => { setFilter(f.key); setSortOpen(false); }}
             whileHover={filter === f.key ? {} : { backgroundColor:'var(--border)' }}
             whileTap={{ scale: 0.97 }} transition={{ duration: dur.hover, ease }}>
             {f.label}
@@ -146,7 +146,7 @@ export default function ModelPicker({ open, model, pinned, onPick, onPin, onClos
     <div className="msearch">
       <Icon name="search" size={15} />
       <input autoFocus value={query} placeholder={placeholder}
-             onChange={e => setQuery(e.target.value)} />
+             onChange={e => { setQuery(e.target.value); setSortOpen(false); }} />
       {query && (
         <button className="clear" onClick={() => setQuery('')} aria-label="Clear search">
           <Icon name="x" size={14} />
@@ -161,7 +161,11 @@ export default function ModelPicker({ open, model, pinned, onPick, onPin, onClos
     <motion.div className="scrim" onClick={onClose}
       initial={{ opacity:0 }} animate={{ opacity:1 }} exit={{ opacity:0 }}
       transition={{ duration:0.18, ease }}>
-      <motion.div className="mpanel" onClick={e => e.stopPropagation()}
+      <motion.div className="mpanel"
+        onClick={e => {
+          e.stopPropagation();
+          if (sortOpen && !e.target.closest('.fsort') && !e.target.closest('.sortmenu')) setSortOpen(false);
+        }}
         initial={{ opacity:0, y:10, scale:.99 }} animate={{ opacity:1, y:0, scale:1 }}
         exit={{ opacity:0, y:8, scale:.99 }} transition={liquid}>
 
@@ -188,8 +192,8 @@ export default function ModelPicker({ open, model, pinned, onPick, onPin, onClos
                 </>)}
 
                 {!q && filter === 'all' && (
-                  <motion.button className="mrow card" onClick={() => setView({ kind:'personas' })}
-                    whileHover={{ backgroundColor:'var(--elevated)' }} transition={{ duration: dur.hover, ease }}>
+                  <motion.button className="mrow" onClick={() => setView({ kind:'personas' })}
+                    whileHover={{ backgroundColor:'var(--hover)' }} transition={{ duration: dur.hover, ease }}>
                     <div className="mt"><div className="mn"><span className="name">Personas</span></div>
                       <div className="mm">{PERSONAS.length} saved presets</div></div>
                     <Icon name="chevR" size={16} />
