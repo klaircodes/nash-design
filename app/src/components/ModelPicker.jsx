@@ -203,8 +203,7 @@ export default function ModelPicker({ open, model, pinned, onPick, onPin, onClos
                       onClick={() => setView({ kind:'provider', name:p.name })}
                       whileHover={{ backgroundColor:'var(--hover)' }} transition={{ duration: dur.hover, ease }}>
                       <div className="mt">
-                        <div className="mn"><span className="name">{p.name}</span>
-                          <span className="count">{p.count}</span></div>
+                        <div className="mn"><span className="name">{p.name}</span></div>
                         <div className="mm">{p.note}</div>
                       </div>
                       <Icon name="chevR" size={16} />

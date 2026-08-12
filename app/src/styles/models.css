@@ -78,8 +78,6 @@
 .mn span.name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .mm{font-size:12px;color:var(--t3);margin-top:3px;
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.count{font-size:11px;font-weight:500;padding:2px 8px;border-radius:6px;
-  background:var(--surface);color:var(--t3);}
 .newtag{font-size:10.5px;font-weight:500;padding:2px 8px;border-radius:6px;
   background:rgba(99,91,255,.18);color:var(--accent);}
 .tick{color:var(--accent);display:flex;flex:0 0 auto;}
