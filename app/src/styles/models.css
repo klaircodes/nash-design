@@ -137,9 +137,11 @@
   .searchrow{margin:0 0 12px;}
   .filterbar{padding:0 0 10px;}
   .sortmenu{right:0;}
-  /* the cut at the panel's edge reads as a scroll boundary, not a clipped row */
-  .mscroll{padding:0 0 10px;
-    mask-image:linear-gradient(180deg,#000 0,#000 calc(100% - 26px),transparent 100%);}
+  /* the list gets its own card, same as Add to Chat's groups, so the panel
+     reads as a surface over the chat instead of dissolving into it */
+  .mpanel.inline .mscroll{
+    background:var(--surface);border-radius:14px;padding:4px 0 6px;
+  }
   .mrow{padding:11px 12px;}
   .mlabel{padding:12px 12px 8px;}
 }
