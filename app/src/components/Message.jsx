@@ -93,11 +93,53 @@ function ImageBlock({ ratio = '3 / 2' }) {
   return <div className="imgblock" style={{ aspectRatio: ratio }} />;
 }
 
+function Table({ head, rows }) {
+  return (
+    <div className="tablewrap">
+      <table className="btable">
+        <thead><tr>{head.map((h, i) => <th key={i}>{h}</th>)}</tr></thead>
+        <tbody>
+          {rows.map((r, i) => (
+            <tr key={i}>{r.map((c, j) => <td key={j}>{c}</td>)}</tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+/* a file the reply produced, offered for download */
+function ResultFile({ name, meta }) {
+  return (
+    <div className="resultfile">
+      <span className="ic"><Icon name="code" size={15} /></span>
+      <div className="t"><b>{name}</b><small>{meta}</small></div>
+      <motion.button className="dl"
+        whileHover={{ backgroundColor:'var(--border)', color:'var(--t1)' }}
+        whileTap={{ scale: 0.97 }} transition={{ duration: dur.hover, ease }}>
+        Download
+      </motion.button>
+    </div>
+  );
+}
+
+function ErrorBlock({ v }) {
+  return (
+    <div className="errblock">
+      <Icon name="alert" size={17} />
+      <p>{v}</p>
+    </div>
+  );
+}
+
 function Blocks({ blocks }) {
   return blocks.map((b, i) => {
     if (b.t === 'code')  return <CodeBlock key={i} lang={b.lang} v={b.v} />;
     if (b.t === 'file')  return <FileCard key={i} name={b.name} meta={b.meta} />;
     if (b.t === 'img')   return <ImageBlock key={i} ratio={b.ratio} />;
+    if (b.t === 'table') return <Table key={i} head={b.head} rows={b.rows} />;
+    if (b.t === 'dl')    return <ResultFile key={i} name={b.name} meta={b.meta} />;
+    if (b.t === 'error') return <ErrorBlock key={i} v={b.v} />;
     if (b.t === 'doc')   return <DocBlock key={i} title={b.title} v={b.v} />;
     if (b.t === 'h2')    return <h2 key={i} className="bh2">{b.v}</h2>;
     if (b.t === 'h3')    return <h3 key={i} className="bh3">{b.v}</h3>;
@@ -116,7 +158,7 @@ function Blocks({ blocks }) {
   });
 }
 
-export default function Message({ role, text, blocks, model, mobile }) {
+export default function Message({ role, text, blocks, model, mobile, failed }) {
   const clampable = role === 'user' && !blocks;
   const [open, setOpen]   = useState(false);
   const [long, setLong]   = useState(false);
@@ -146,7 +188,9 @@ export default function Message({ role, text, blocks, model, mobile }) {
       initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.32, ease }}>
       <div className="bubble">
-        {role === 'bot' && model && <div className="who">{model}</div>}
+        {role === 'bot' && model && (
+          <div className="who">{model}{failed && <span className="fail"> · Failed</span>}</div>
+        )}
 
         <motion.div ref={body}
           className={`mtext ${clampable && long && !open ? 'clamped' : ''}`}
@@ -171,7 +215,7 @@ export default function Message({ role, text, blocks, model, mobile }) {
         </AnimatePresence>
 
         {/* actions live under the reply and surface on hover */}
-        {role === 'bot' && (
+        {role === 'bot' && !failed && (
           <motion.div className="acts"
             /* touch has no hover, so on a phone they simply stay put */
             animate={{ opacity: hover || mobile ? 1 : 0 }}

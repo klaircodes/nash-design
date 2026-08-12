@@ -151,6 +151,35 @@
 .bol li b,.bp b{font-weight:600;}
 .bq{border-left:2px solid var(--accent);padding-left:14px;font-size:14.5px;
   line-height:1.6;color:var(--t2);}
+/* ---- comparison table ---- */
+.tablewrap{align-self:stretch;overflow-x:auto;border-radius:12px;
+  box-shadow:inset 0 0 0 1px var(--border);}
+.btable{width:100%;border-collapse:collapse;font-size:13.5px;}
+.btable th,.btable td{text-align:left;padding:13px 16px;white-space:nowrap;}
+.btable th{font-weight:500;color:var(--t1);border-bottom:1px solid var(--border);}
+.btable td{color:var(--t2);}
+.btable tbody tr + tr td{border-top:1px solid var(--border);}
+
+/* ---- a file the reply produced ---- */
+.resultfile{align-self:stretch;display:flex;align-items:center;gap:13px;
+  padding:12px 12px 12px 14px;border-radius:12px;box-shadow:inset 0 0 0 1px var(--border);}
+.resultfile .ic{width:32px;height:32px;border-radius:8px;flex:0 0 auto;
+  display:grid;place-items:center;background:var(--surface);color:var(--t3);}
+.resultfile .t{flex:1;min-width:0;}
+.resultfile .t b{display:block;font-size:13.5px;font-weight:600;color:var(--t1);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.resultfile .t small{display:block;font-size:12px;color:var(--t3);margin-top:2px;}
+.resultfile .dl{height:34px;padding:0 15px;border-radius:9px;flex:0 0 auto;
+  background:var(--surface);color:var(--t2);font-size:13px;font-weight:500;}
+
+/* ---- a reply that failed ---- */
+.who .fail{color:var(--danger,#e5647d);}
+.errblock{align-self:stretch;display:flex;align-items:flex-start;gap:12px;
+  padding:15px 16px;border-radius:12px;color:var(--danger,#e5647d);
+  background:rgba(229,100,125,.09);box-shadow:inset 0 0 0 1px rgba(229,100,125,.28);}
+.errblock p{font-size:13.5px;line-height:1.55;}
+.errblock svg{flex:0 0 auto;margin-top:1px;}
+
 .imgblock{background:var(--elevated);border-radius:12px;align-self:stretch;
   width:100%;max-width:420px;}
 .msg.user .imgblock{max-width:none;}

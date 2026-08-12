@@ -1,21 +1,17 @@
 /* Placeholder content. Nothing here navigates yet. */
 export const FOLDERS = [
-  { key:'work',     label:'Work',     chats:['Pricing research','Launch checklist'] },
-  { key:'research', label:'Research', chats:['Competitor teardown'] },
-  { key:'personal', label:'Personal', chats:['Reading list'] },
+  { key:'work',     label:'Work',     chats:['Q3 roadmap draft','Pricing research'] },
+  { key:'research', label:'Research', chats:['Competitor teardown','Naming a design pattern'] },
+  { key:'personal', label:'Personal', chats:['Resume review'] },
 ];
 
-/* every chat here has its own thread in CONVERSATIONS — nothing repeats */
+/* loose chats; the rest live in FOLDERS. Every title has its own thread. */
 export const CHATS = [
-  { title:'Connector permissions review', group:'Today',           pinned:false },
-  { title:'Invoice chase — Northwind',    group:'Today',           pinned:false },
-  { title:'Q3 roadmap draft',             group:'Yesterday',       pinned:true  },
-  { title:'Bug triage — render loop',     group:'Yesterday',       pinned:false },
-  { title:'Creating a PDF summary',       group:'Previous 7 days', pinned:true  },
-  { title:'Voice chat',                   group:'Previous 7 days', pinned:false },
+  { title:'Connector permissions review',   group:'Today',           pinned:false },
+  { title:'Bug triage — render loop',       group:'Yesterday',       pinned:false },
   { title:'Why .map() returns a new array', group:'Previous 7 days', pinned:false },
-  { title:'Resume review',                group:'Previous 7 days', pinned:false },
-  { title:'Naming a design pattern',      group:'Previous 30 days', pinned:false },
+  { title:'Voice chat',                     group:'Previous 7 days', pinned:true  },
+  { title:'Comparing models',               group:'Today',           pinned:false },
 ];
 
 export const GROUP_ORDER = ['Today','Yesterday','Previous 7 days','Previous 30 days','June'];
@@ -150,20 +146,28 @@ export const CONVERSATIONS = {
     ]},
   ],
 
-  'Invoice chase — Northwind': [
-    { role:'user', text:'Draft a short follow-up on the Northwind invoice. Firm, not rude.' },
-    { role:'bot',  text:REPLY },
-  ],
 
-  'Creating a PDF summary': [
-    { role:'user', text:'Summarise the attached spec into one page a PM can skim.' },
-    { role:'bot', blocks:[
-      { t:'p',  v:'One page, four sections: what changes, what does not, what it costs, and what has to be decided this week.' },
-      { t:'ul', v:[
-        'Scope — sidebar, composer, and the model picker only.',
-        'Out of scope — bookmarks and MCP, which ship after.',
-        'Open — whether personas keep their own pinned list.',
-      ]},
+
+  'Comparing models': [
+    { role:'user', text:'Compare GPT-5, Claude Opus 5, and Gemini 3 Pro for me.' },
+    { role:'bot', model:'Claude Sonnet 5', blocks:[
+      { t:'p', v:'Here is a comparison of the models:' },
+      { t:'table',
+        head:['Model','Speed','Quality','Cost'],
+        rows:[
+          ['GPT-5',          'Fast',   'High',      '$$'],
+          ['Claude Opus 5',  'Medium', 'Very high', '$$$'],
+          ['Gemini 3 Pro',   'Fast',   'High',      '$$'],
+        ]},
+    ]},
+    { role:'user', text:'Create a simple portfolio website for me.' },
+    { role:'bot', model:'Claude Sonnet 5', blocks:[
+      { t:'p',  v:'I have created the site — one page, no dependencies. Here is the file:' },
+      { t:'dl', name:'portfolio.html', meta:'Code · HTML' },
+    ]},
+    { role:'user', text:'Analyse this 500-page PDF and summarise every chapter.' },
+    { role:'bot', model:'Claude Opus 4.8', failed:true, blocks:[
+      { t:'error', v:'Something went wrong generating the response. The model may be overloaded. Please try again or switch to a different model.' },
     ]},
   ],
 
@@ -223,10 +227,6 @@ export const CONVERSATIONS = {
     ]},
   ],
 
-  'Launch checklist': [
-    { role:'user', text:'What is left before we can call this launchable?' },
-    { role:'bot',  text:REPLY },
-  ],
 
   'Competitor teardown': [
     { role:'user', text:'Pull apart their onboarding — where does it lose people?' },
@@ -236,10 +236,6 @@ export const CONVERSATIONS = {
     ]},
   ],
 
-  'Reading list': [
-    { role:'user', text:'Add the token piece to the list and tell me what is still unread.' },
-    { role:'bot',  text:REPLY },
-  ],
 
   'Bug triage — render loop': [
     { role:'user', text:'The sidebar re-renders on every hover. Where would you look first?' },

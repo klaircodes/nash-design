@@ -81,7 +81,7 @@ export default function Chat({ user, sessionKey, openChat, mobile, drawer, onMen
           <div className="threadin">
             {thread.map((m, i) => (
               <Message key={i} role={m.role} text={m.text} blocks={m.blocks}
-                       model={m.model || model} mobile={mobile} />
+                       failed={m.failed} model={m.model || model} mobile={mobile} />
             ))}
           </div>
         </div>
