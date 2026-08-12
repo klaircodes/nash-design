@@ -26,18 +26,21 @@ export default function Chat({ user, sessionKey, mobile, drawer, onMenu }) {
   );
   return (
     <div className="main">
-      <div className="topbar">
-        {/* same element as the one beside the open drawer — shared layoutId, so
-            it travels there instead of one vanishing and another appearing */}
-        {mobile && !drawer && (
-          <motion.button className="menu" layoutId="sbtoggle" onClick={onMenu}
-            aria-label="Open sidebar" whileTap={{ scale: 0.9 }} transition={liquidWide}>
-            <Icon name="panel" size={19} />
-          </motion.button>
-        )}
-        {mobile && <span className="wordmark">Nash</span>}
-        <button className="more"><Icon name="dotsH" size={18} /></button>
-      </div>
+      {/* picking a model is its own screen — none of the chat's chrome belongs on it */}
+      {!(mobile && picker) && (
+        <div className="topbar">
+          {/* same element as the one beside the open drawer — shared layoutId, so
+              it travels there instead of one vanishing and another appearing */}
+          {mobile && !drawer && (
+            <motion.button className="menu" layoutId="sbtoggle" onClick={onMenu}
+              aria-label="Open sidebar" whileTap={{ scale: 0.9 }} transition={liquidWide}>
+              <Icon name="panel" size={19} />
+            </motion.button>
+          )}
+          <button className="more"><Icon name="dotsH" size={18} /></button>
+        </div>
+      )}
+
       {/* on a phone the picker replaces the conversation instead of covering it */}
       <AnimatePresence mode="wait" initial={false}>
         {mobile && picker ? (
