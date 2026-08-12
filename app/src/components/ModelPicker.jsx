@@ -51,9 +51,23 @@ export default function ModelPicker({ open, model, pinned, onPick, onPin, onClos
   const rootPinned = useMemo(
     () => sorted(MODELS.filter(m => pinned.includes(m.name) && match(m))),
     [pinned, q, filter, sort]);
-  const rootProviders = useMemo(() => PROVIDERS
-    .map(p => ({ ...p, count: MODELS.filter(m => m.provider === p.name && match(m)).length }))
-    .filter(p => p.count > 0), [q, filter]);
+  const rootProviders = useMemo(() => {
+    const list = PROVIDERS
+      .map((p, i) => {
+        const own = MODELS.filter(m => m.provider === p.name && match(m));
+        return {
+          ...p, i,
+          count: own.length,
+          newest: own.reduce((a, m) => (m.date > a ? m.date : a), ''),
+          oldest: own.reduce((a, m) => (!a || m.date < a ? m.date : a), ''),
+        };
+      })
+      .filter(p => p.count > 0);
+    if (sort === 'az')     list.sort((a, b) => a.name.localeCompare(b.name));
+    if (sort === 'newest') list.sort((a, b) => b.newest.localeCompare(a.newest) || a.i - b.i);
+    if (sort === 'oldest') list.sort((a, b) => a.oldest.localeCompare(b.oldest) || a.i - b.i);
+    return list;
+  }, [q, filter, sort]);
 
   /* provider */
   const provModels = useMemo(() => {
@@ -316,7 +330,7 @@ export default function ModelPicker({ open, model, pinned, onPick, onPin, onClos
                 </>)}
 
                 {rootProviders.length > 0 && (<>
-                  <div className="mlabel">Providers · most used first</div>
+                  <div className="mlabel">Providers · {sortLabel.toLowerCase()}</div>
                   {rootProviders.map(p => (
                     <motion.button key={p.name} className="mrow"
                       onClick={() => go({ kind:'provider', name:p.name })}
