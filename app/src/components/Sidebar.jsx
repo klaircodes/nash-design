@@ -133,12 +133,12 @@ function useFlyout(collapsed) {
 }
 
 const MORE = [
-  { icon:'books',   label:'Library' },
-  { icon:'memory',  label:'Memories' },
-  { icon:'clip',    label:'MCP Settings' },
+  { icon:'books',   label:'Library',      view:'library' },
+  { icon:'memory',  label:'Memories',     view:'memories' },
+  { icon:'clip',    label:'MCP Settings', view:'mcp' },
 ];
 
-function MoreMenu({ collapsed, mobile }) {
+function MoreMenu({ collapsed, mobile, view, onNav }) {
   const { open, setOpen, at, ref, toggle } = useFlyout(collapsed);
 
   /* a flyout needs somewhere to fly to; on a phone the drawer owns the screen,
@@ -146,7 +146,8 @@ function MoreMenu({ collapsed, mobile }) {
   if (mobile) return (
     <>
       {MORE.map(m => (
-        <motion.button key={m.label} className="navitem"
+        <motion.button key={m.label} className={`navitem ${view === m.view ? 'active' : ''}`}
+          onClick={() => onNav?.(m.view)}
           whileHover={{ backgroundColor:'var(--hover)', color:'var(--t1)' }}
           whileTap={{ scale: 0.99 }} transition={{ duration: dur.hover, ease }}>
           <Icon name={m.icon} size={16} /><span>{m.label}</span>
@@ -172,10 +173,12 @@ function MoreMenu({ collapsed, mobile }) {
             exit={{ opacity:0, x: at.drop ? 0 : -8, y: at.drop ? -6 : 0, scale:.98 }}
             transition={liquid}>
             {MORE.map(m => (
-              <motion.button key={m.label} className="orgrow" onClick={() => setOpen(false)}
+              <motion.button key={m.label} className="orgrow"
+                onClick={() => { setOpen(false); onNav?.(m.view); }}
                 whileHover={{ backgroundColor:'var(--hover)' }} transition={{ duration: dur.hover, ease }}>
                 <Icon name={m.icon} size={16} />
                 <div className="ot"><b>{m.label}</b></div>
+                {view === m.view && <span className="tick"><Icon name="check" size={15} /></span>}
               </motion.button>
             ))}
           </motion.div>
@@ -242,7 +245,7 @@ const NAV = [
 ];
 
 export default function Sidebar({ user, onNewChat, collapsed, onToggle, mobile, drawer,
-                                 openChat, onOpenChat }) {
+                                 openChat, onOpenChat, view, onNav }) {
   const [chatsOpen, setChatsOpen] = useState(true);
   const [foldersOpen, setFoldersOpen] = useState(true);
   const [open, setOpen] = useState({ work:true, research:false, personal:false });
@@ -436,14 +439,14 @@ export default function Sidebar({ user, onNewChat, collapsed, onToggle, mobile, 
               <div className="gap" />
               {NAV.map(n => (
                 <motion.button key={n.label}
-                  className={`navitem ${n.label === 'New Chat' ? 'active' : ''}`}
+                  className={`navitem ${n.label === 'New Chat' && view === 'chat' ? 'active' : ''}`}
                   onClick={n.label === 'New Chat' ? onNewChat : undefined}
                   whileHover={{ backgroundColor:'var(--hover)', color:'var(--t1)' }}
                   whileTap={{ scale: 0.99 }} transition={{ duration: dur.hover, ease }}>
                   <Icon name={n.icon} size={16} /><span>{n.label}</span>
                 </motion.button>
               ))}
-              <MoreMenu collapsed={collapsed} mobile={mobile} />
+              <MoreMenu collapsed={collapsed} mobile={mobile} view={view} onNav={onNav} />
               <div className="gap" style={{ height: 8 }} />
               <button className="sechead" onClick={() => setChatsOpen(v => !v)}>
                 <span>Chats</span><Chevron open={chatsOpen} />

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import Auth from './screens/Auth.jsx';
 import Chat from './screens/Chat.jsx';
+import Memories from './screens/Memories.jsx';
 import Sidebar from './components/Sidebar.jsx';
 import Icon from './components/Icon.jsx';
 import { ease, liquidWide } from './lib/motion.js';
@@ -14,6 +15,7 @@ export default function App() {
   const [collapsed, setCollapsed] = useState(false);
   const [drawer, setDrawer]       = useState(false);
   const [openChat, setOpenChat]   = useState(null);
+  const [view, setView]           = useState('chat');
   const mobile = useIsMobile();
 
   return (
@@ -45,17 +47,23 @@ export default function App() {
           </AnimatePresence>
 
           <Sidebar user={user}
-                   onNewChat={() => { setSession(s => s + 1); setOpenChat(null); setDrawer(false); }}
+                   onNewChat={() => {
+                     setSession(s => s + 1); setOpenChat(null);
+                     setView('chat'); setDrawer(false);
+                   }}
+                   view={view} onNav={v => { setView(v); setDrawer(false); }}
                    openChat={openChat}
                    onOpenChat={c => {
                      setOpenChat(c ? { ...c, at: Date.now() } : null);
-                     if (c) setDrawer(false);
+                     if (c) { setView('chat'); setDrawer(false); }
                    }}
                    mobile={mobile} drawer={drawer}
                    collapsed={mobile ? false : collapsed}
                    onToggle={() => mobile ? setDrawer(false) : setCollapsed(v => !v)} />
-          <Chat user={user} sessionKey={session} openChat={openChat} mobile={mobile}
-                drawer={drawer} onMenu={() => setDrawer(true)} />
+          {view === 'memories'
+            ? <Memories mobile={mobile} drawer={drawer} onMenu={() => setDrawer(true)} />
+            : <Chat user={user} sessionKey={session} openChat={openChat} mobile={mobile}
+                    drawer={drawer} onMenu={() => setDrawer(true)} />}
         </motion.div>
       )}
     </AnimatePresence>
