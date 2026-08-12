@@ -83,73 +83,37 @@ function MemoryDialog({ open, draft, onSave, onClose }) {
   );
 }
 
-function Row({ m, mobile, onEdit, onDelete }) {
+function Row({ m, mobile, onEdit, onDelete, onCopy }) {
   const [hover, setHover] = useState(false);
-  const [menu, setMenu]   = useState(false);
-  const show = hover || mobile || menu;
+  const show = hover || mobile;
 
   return (
-    <motion.div className="memrow"
-      onHoverStart={() => setHover(true)}
-      onHoverEnd={() => { setHover(false); setMenu(false); }}
-      layout
-      initial={{ opacity:0, y:6 }} animate={{ opacity:1, y:0 }}
-      exit={{ opacity:0, scale:.98 }}
-      transition={{ layout: liquid, duration: dur.swap, ease }}>
+    <motion.div className="memrow" key={m.id}
+      onHoverStart={() => setHover(true)} onHoverEnd={() => setHover(false)}>
       <div className="memmeta">
         <span>{m.tokens} tokens</span>
         <i>·</i>
-        <span>{fmtMemDate(m.date)}</span>
+        <span>{mobile ? fmtMemDate(m.date).replace(/,.*/, '') : fmtMemDate(m.date)}</span>
         <i>·</i>
         <span className={`scope ${m.scope.toLowerCase()}`}>{m.scope}</span>
         <i>·</i>
         <span className="from">From: {m.from}</span>
 
         <div className="memacts">
-          <motion.button aria-label="Edit" onClick={() => onEdit(m)}
-            animate={{ opacity: show ? 1 : 0 }}
-            style={{ pointerEvents: show ? 'auto' : 'none' }}
-            whileHover={{ color:'var(--t1)', backgroundColor:'var(--surface)' }}
-            whileTap={{ scale: 0.9 }} transition={{ duration: dur.hover, ease }}>
-            <Icon name="edit" size={15} />
-          </motion.button>
-          <motion.button aria-label="Delete" onClick={() => onDelete(m)}
-            animate={{ opacity: show ? 1 : 0 }}
-            style={{ pointerEvents: show ? 'auto' : 'none' }}
-            whileHover={{ color:'var(--err)', backgroundColor:'var(--surface)' }}
-            whileTap={{ scale: 0.9 }} transition={{ duration: dur.hover, ease }}>
-            <Icon name="trash" size={15} />
-          </motion.button>
-          <div className="more">
-            <motion.button aria-label="More" onClick={() => setMenu(v => !v)}
+          {[
+            { icon:'edit',  label:'Edit',   run:() => onEdit(m) },
+            { icon:'trash', label:'Delete', run:() => onDelete(m), danger:true },
+            { icon:'copy',  label:'Copy',   run:() => onCopy(m) },
+          ].map(a => (
+            <motion.button key={a.icon} aria-label={a.label} onClick={a.run}
               animate={{ opacity: show ? 1 : 0 }}
               style={{ pointerEvents: show ? 'auto' : 'none' }}
-              whileHover={{ color:'var(--t1)', backgroundColor:'var(--surface)' }}
+              whileHover={{ color: a.danger ? 'var(--err)' : 'var(--t1)',
+                            backgroundColor:'var(--surface)' }}
               whileTap={{ scale: 0.9 }} transition={{ duration: dur.hover, ease }}>
-              <Icon name="dotsH" size={15} />
+              <Icon name={a.icon} size={15} />
             </motion.button>
-            <AnimatePresence>
-              {menu && (
-                <motion.div className="sortmenu memmenu"
-                  initial={{ opacity:0, y:-6, scale:.98 }} animate={{ opacity:1, y:0, scale:1 }}
-                  exit={{ opacity:0, y:-6, scale:.98 }} transition={{ duration:0.18, ease }}>
-                  <button className="sortrow" onClick={() => { setMenu(false); onEdit(m); }}>
-                    <Icon name="edit" size={14} /> Edit
-                  </button>
-                  <button className="sortrow" onClick={() => setMenu(false)}>
-                    <Icon name="copy" size={14} /> Copy text
-                  </button>
-                  <button className="sortrow" onClick={() => setMenu(false)}>
-                    <Icon name="temp" size={14} /> Open source chat
-                  </button>
-                  <button className="sortrow danger"
-                    onClick={() => { setMenu(false); onDelete(m); }}>
-                    <Icon name="trash" size={14} /> Delete
-                  </button>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
+          ))}
         </div>
       </div>
 
@@ -166,6 +130,15 @@ export default function Memories({ mobile, drawer, onMenu }) {
   const [page, setPage]     = useState(1);
   const [dialog, setDialog] = useState(null);   // null | {} | memory
   const [undo, setUndo]     = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [offline, setOffline] = useState(false);
+
+  /* a short settle so filtering and searching read as fetching, not snapping */
+  useEffect(() => {
+    setLoading(true);
+    const t = setTimeout(() => setLoading(false), 520);
+    return () => clearTimeout(t);
+  }, [query, filter, page]);
 
   /* Page size follows the viewport: fit as many rows as there is room for, and
      if the whole list fits there is nothing to page through. */
@@ -215,6 +188,8 @@ export default function Memories({ mobile, drawer, onMenu }) {
     setDialog(null);
   };
 
+  useEffect(() => { setOffline(!use); }, [use]);
+
   const remove = m => {
     setList(l => l.filter(x => x.id !== m.id));
     setUndo(m);
@@ -230,19 +205,24 @@ export default function Memories({ mobile, drawer, onMenu }) {
   return (
     <div className="main">
       {mobile && (
-        <div className="topbar">
+        <div className="topbar pagebar">
           {!drawer && (
             <motion.button className="menu" layoutId="sbtoggle" onClick={onMenu}
               aria-label="Open sidebar" whileTap={{ scale: 0.9 }} transition={liquidWide}>
               <Icon name="panel" size={19} />
             </motion.button>
           )}
-          <button className="more"><Icon name="dotsH" size={18} /></button>
+          <span className="wordmark">Memories</span>
+          <motion.button className="round accent" onClick={() => setDialog({})}
+            aria-label="Add memory" whileTap={{ scale: 0.94 }}
+            transition={{ duration: dur.press, ease }}>
+            <Icon name="plus" size={17} />
+          </motion.button>
         </div>
       )}
 
       <div className="page" ref={host}>
-        <div className="pagehead">
+        <div className="pagehead deskonly">
           <div className="pt">
             <h1>Memories</h1>
             <p>Manage what Nash remembers across chats.</p>
@@ -293,28 +273,23 @@ export default function Memories({ mobile, drawer, onMenu }) {
           })}
         </div>
 
-        {/* the list stays readable when memory is off, but says it is inert */}
-        <AnimatePresence initial={false}>
-          {!use && (
-            <motion.div className="notice" key="off"
-              initial={{ height:0, opacity:0 }} animate={{ height:'auto', opacity:1 }}
-              exit={{ height:0, opacity:0 }} transition={{ duration: dur.swap, ease }}>
-              <Icon name="alert" size={15} />
-              <p>Memory is off. These are kept, but Nash will not use them in replies.</p>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        <div className={`memlist ${use ? '' : 'muted'}`} ref={listTop}>
+          {loading
+            ? Array.from({ length: Math.min(perPage, 3) }).map((_, i) => (
+                <div className="memrow skel" key={`s${i}`} aria-hidden="true">
+                  <div className="sk-meta">
+                    <i style={{ width: 62 }} /><i style={{ width: 74 }} /><i style={{ width: 48 }} />
+                  </div>
+                  <i className="sk-line" style={{ width: '92%' }} />
+                  <i className="sk-line" style={{ width: '58%' }} />
+                </div>
+              ))
+            : slice.map(m => (
+                <Row key={m.id} m={m} mobile={mobile}
+                  onEdit={setDialog} onDelete={remove} onCopy={() => {}} />
+              ))}
 
-        <motion.div className={`memlist ${use ? '' : 'muted'}`} ref={listTop}
-          layout transition={liquid}>
-          <AnimatePresence mode="popLayout" initial={false}>
-            {slice.map(m => (
-              <Row key={m.id} m={m} mobile={mobile}
-                onEdit={setDialog} onDelete={remove} />
-            ))}
-          </AnimatePresence>
-
-          {shown.length === 0 && (
+          {!loading && shown.length === 0 && (
             <div className="memempty">
               {list.length === 0 ? (<>
                 <b>No memories yet</b>
@@ -329,7 +304,7 @@ export default function Memories({ mobile, drawer, onMenu }) {
               </>)}
             </div>
           )}
-        </motion.div>
+        </div>
 
         {pages > 1 && (
           <div className="pager">
@@ -345,6 +320,20 @@ export default function Memories({ mobile, drawer, onMenu }) {
           </div>
         )}
       </div>
+
+      <AnimatePresence>
+        {offline && (
+          <motion.div className="toast warn" key="off"
+            initial={{ opacity:0, y:12 }} animate={{ opacity:1, y:0 }}
+            exit={{ opacity:0, y:8 }} transition={liquid}>
+            <Icon name="memoff" size={16} />
+            <span>Memory is off — these are kept, but Nash will not use them in replies.</span>
+            <button className="x" onClick={() => setOffline(false)} aria-label="Dismiss">
+              <Icon name="x" size={14} />
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <AnimatePresence>
         {undo && (

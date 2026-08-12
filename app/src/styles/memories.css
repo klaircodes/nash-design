@@ -42,13 +42,19 @@
 .fpill .n{margin-left:7px;font-size:11px;color:var(--t4);}
 .fpill.on .n{color:rgba(255,255,255,.72);}
 
-/* ---- notice when memory is off ---- */
-.notice{overflow:hidden;}
-.notice p{font-size:12.5px;line-height:1.5;}
-.notice > *{vertical-align:middle;}
-.notice{display:flex;align-items:center;gap:10px;color:var(--warn);
-  background:var(--warn-bg);border-radius:10px;padding:0 14px;margin-bottom:16px;}
-.notice:not([style*="height: 0"]){min-height:42px;}
+/* ---- skeleton ---- */
+.memrow.skel{pointer-events:none;}
+.sk-meta{display:flex;gap:10px;margin-bottom:12px;}
+.memrow.skel i{display:block;height:10px;border-radius:5px;background:var(--elevated);
+  position:relative;overflow:hidden;}
+.sk-line{margin-top:9px;height:11px !important;}
+.memrow.skel i::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(100deg,transparent 20%,var(--hover) 50%,transparent 80%);
+  animation:skel 1.3s linear infinite;
+}
+@keyframes skel{from{transform:translateX(-100%);}to{transform:translateX(100%);}}
+@media (prefers-reduced-motion:reduce){.memrow.skel i::after{animation:none;}}
 
 /* ---- rows ---- */
 .memlist{display:flex;flex-direction:column;gap:12px;}
@@ -100,6 +106,11 @@
 .toast button{height:30px;padding:0 12px;border-radius:8px;
   font-size:13px;font-weight:500;color:var(--accent);}
 .toast button:hover{background:var(--hover);}
+.toast.warn{color:var(--warn);padding-left:16px;}
+.toast.warn span{color:var(--t1);}
+.toast.warn .x{width:28px;height:28px;padding:0;display:grid;place-items:center;
+  color:var(--t3);}
+.toast.warn .x:hover{background:var(--hover);color:var(--t1);}
 
 /* ---- add / edit dialog ---- */
 .memdialog{width:520px;max-width:calc(100vw - 40px);border-radius:16px;
@@ -121,10 +132,12 @@
 /* ---------- mobile ---------- */
 @media (max-width: 720px){
   .page{padding:6px 16px 44px;}
-  .pagehead{flex-direction:column;gap:14px;margin-bottom:18px;}
-  .pagehead h1{font-size:22px;letter-spacing:-.3px;}
-  .pagehead p{font-size:13px;}
-  .primary.sm{width:100%;}
+  .pagehead.deskonly{display:none;}
+  .topbar.pagebar .wordmark{
+    position:absolute;left:50%;transform:translateX(-50%);
+    font-size:15px;font-weight:600;letter-spacing:-.2px;color:var(--t1);
+  }
+  .topbar.pagebar .round.accent{margin-left:auto;}
   .page .searchrow{margin-bottom:16px;}
   .iconbtn.boxed{width:42px;height:42px;}
   .userow{gap:14px;}
