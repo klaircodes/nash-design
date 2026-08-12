@@ -38,7 +38,7 @@ body{
   margin:0; font-family:Poppins,-apple-system,system-ui,sans-serif;
   background:var(--sunken); color:var(--t1);
   -webkit-font-smoothing:antialiased;
-  transition:background .4s var(--ease), color .4s var(--ease);
+  transition:background .22s var(--ease), color .22s var(--ease);
 }
 button{font-family:inherit;border:0;background:none;color:inherit;cursor:pointer;}
 input{font-family:inherit;border:0;outline:0;background:none;color:inherit;}
@@ -46,14 +46,14 @@ input{font-family:inherit;border:0;outline:0;background:none;color:inherit;}
 
 /* ---------- shell ---------- */
 .shell{display:flex;height:100vh;background:var(--app);overflow:hidden;
-  transition:background .4s var(--ease);}
+  transition:background .22s var(--ease);}
 
 /* ---------- sidebar ---------- */
 .sidebar{
   width:280px;flex:0 0 280px;display:flex;flex-direction:column;gap:2px;
   padding:14px 12px 12px;background:var(--sunken);
   border-right:1px solid var(--border);overflow-y:auto;
-  transition:background .4s var(--ease),border-color .4s var(--ease);
+  transition:background .22s var(--ease),border-color .22s var(--ease);
 }
 .sidebar::-webkit-scrollbar{width:8px;}
 .sidebar::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
@@ -141,8 +141,8 @@ input{font-family:inherit;border:0;outline:0;background:none;color:inherit;}
 .content::-webkit-scrollbar{width:10px;}
 .content::-webkit-scrollbar-thumb{background:var(--border);border-radius:5px;}
 
-.view{animation:viewIn .42s var(--ease) both;}
-@keyframes viewIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+.view{animation:viewIn .3s var(--ease) both;}
+@keyframes viewIn{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:none;}}
 
 .pagehead{display:flex;align-items:flex-start;gap:12px;margin-bottom:20px;}
 .pagehead h1{margin:0 0 5px;font-size:24px;font-weight:600;letter-spacing:-.3px;}
@@ -183,9 +183,9 @@ input{font-family:inherit;border:0;outline:0;background:none;color:inherit;}
 .card{
   border-radius:var(--r-card);padding:16px 16px 14px;background:var(--surface);
   display:flex;flex-direction:column;gap:12px;
-  transition:background .18s var(--ease),transform .18s var(--ease);
+  transition:background .18s var(--ease);
 }
-.card:hover{background:var(--hover);transform:translateY(-1px);}
+.card:hover{background:var(--hover);}
 .card .top{display:flex;align-items:center;gap:10px;}
 .iconbox{
   width:29px;height:29px;flex:0 0 auto;border-radius:var(--r-sm);
@@ -269,9 +269,9 @@ input{font-family:inherit;border:0;outline:0;background:none;color:inherit;}
 .rail{
   width:320px;flex:0 0 320px;border-left:1px solid var(--border);
   display:flex;flex-direction:column;background:var(--app);
-  animation:railIn .32s var(--ease) both;
+  animation:railIn .26s var(--ease) both;
 }
-@keyframes railIn{from{transform:translateX(24px);opacity:0;}to{transform:none;opacity:1;}}
+@keyframes railIn{from{transform:translateX(12px);opacity:0;}to{transform:none;opacity:1;}}
 .rail .rhead{display:flex;align-items:center;gap:11px;padding:22px 20px 17px;}
 .rail .rhead .tc{flex:1;min-width:0;}
 .rail .rhead b{display:block;font-size:15px;font-weight:600;}
@@ -315,7 +315,7 @@ input{font-family:inherit;border:0;outline:0;background:none;color:inherit;}
   animation:modalIn .2s var(--ease) both;
 }
 [data-theme="light"] .modal{background:var(--app);}
-@keyframes modalIn{from{opacity:0;transform:translateY(10px) scale(.985);}to{opacity:1;transform:none;}}
+@keyframes modalIn{from{opacity:0;transform:translateY(6px) scale(.994);}to{opacity:1;transform:none;}}
 .modal h3{margin:0;font-size:15px;font-weight:500;}
 .modal .mhead{display:flex;align-items:center;gap:10px;}
 .modal p.lead{margin:0;font-size:12.5px;line-height:1.6;color:var(--t3);}
@@ -331,10 +331,10 @@ input{font-family:inherit;border:0;outline:0;background:none;color:inherit;}
   width:440px;max-width:calc(100vw - 380px);
   display:flex;align-items:center;gap:10px;padding:11px 10px 11px 14px;
   border-radius:12px;background:var(--elevated);box-shadow:var(--shadow);
-  animation:toastIn .45s var(--ease) both;
+  animation:toastIn .34s var(--ease) both;
 }
 [data-theme="light"] .toast{background:var(--app);border:1px solid var(--border);}
-@keyframes toastIn{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:none;}}
+@keyframes toastIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
 .toast.out{animation:toastOut .3s var(--ease) both;}
 @keyframes toastOut{to{opacity:0;transform:translateY(10px);}}
 .toast span{flex:1;font-size:13px;}
@@ -346,7 +346,7 @@ input{font-family:inherit;border:0;outline:0;background:none;color:inherit;}
   animation:popIn .2s var(--ease) both;
 }
 [data-theme="light"] .popover{background:var(--app);border:1px solid var(--border);}
-@keyframes popIn{from{opacity:0;transform:translateY(8px) scale(.99);}to{opacity:1;transform:none;}}
+@keyframes popIn{from{opacity:0;transform:translateY(5px) scale(.996);}to{opacity:1;transform:none;}}
 .popover .phead{display:flex;align-items:center;gap:9px;padding:13px 14px;}
 .popover .phead b{flex:1;font-size:13px;font-weight:500;}
 .popover .prule{height:1px;background:var(--border);}
@@ -362,7 +362,7 @@ input{font-family:inherit;border:0;outline:0;background:none;color:inherit;}
 
 /* ---------- chat ---------- */
 .thread{max-width:720px;margin:0 auto;padding:20px 0 8px;}
-.msg{margin-bottom:26px;animation:viewIn .4s var(--ease) both;}
+.msg{margin-bottom:26px;animation:viewIn .32s var(--ease) both;}
 .msg.user{display:flex;justify-content:flex-end;}
 .msg.user .bubble{
   max-width:440px;padding:12px 16px;border-radius:16px;
@@ -372,7 +372,7 @@ input{font-family:inherit;border:0;outline:0;background:none;color:inherit;}
 .msg.ai .body{font-size:14px;line-height:1.64;color:var(--t2);}
 .toolcall{
   border-radius:12px;padding:12px 14px;background:var(--surface);margin-bottom:14px;
-  animation:viewIn .4s var(--ease) both;
+  animation:viewIn .32s var(--ease) both;
 }
 .toolcall .th{display:flex;align-items:center;gap:8px;font-size:12px;}
 .toolcall .th b{font-weight:500;}
@@ -429,3 +429,12 @@ input{font-family:inherit;border:0;outline:0;background:none;color:inherit;}
 }
 .themebtn:hover{background:var(--elevated);color:var(--t1);}
 .hidden{display:none !important;}
+
+
+/* ---------- accessibility ---------- */
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{
+    animation-duration:.001ms !important;animation-iteration-count:1 !important;
+    transition-duration:.001ms !important;scroll-behavior:auto !important;
+  }
+}

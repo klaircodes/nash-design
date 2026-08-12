@@ -40,16 +40,26 @@ const I = {
   spin:'<path d="M21 12a9 9 0 1 1-6.219-8.56"/>',
   sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
   moon:'<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>',
-  x:'<path d="M18 6L6 18M6 6l12 12"/>'
+  x:'<path d="M18 6L6 18M6 6l12 12"/>',
+  lock:'<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
+  eye:'<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>',
+  eyeoff:'<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>',
+  google:'<path d="M21.35 11.1H12v3.2h5.35a4.6 4.6 0 0 1-2 3l3.2 2.5c1.87-1.73 2.95-4.28 2.95-7.3 0-.6-.05-1.1-.15-1.4z"/><path d="M12 22c2.7 0 4.96-.9 6.55-2.4l-3.2-2.5c-.9.6-2.05.95-3.35.95-2.6 0-4.8-1.75-5.6-4.1l-3.3 2.55A10 10 0 0 0 12 22z"/><path d="M6.4 13.95a6 6 0 0 1 0-3.9L3.1 7.5a10 10 0 0 0 0 9z"/><path d="M12 5.95c1.47 0 2.78.5 3.82 1.5l2.84-2.84A10 10 0 0 0 3.1 7.5l3.3 2.55C7.2 7.7 9.4 5.95 12 5.95z"/>',
+  back:'<line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>',
+  chevR:'<polyline points="9 18 15 12 9 6"/>',
+  logout:'<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>'
 };
 const ico = (n, s = 16, cls = '') =>
   `<svg class="${cls}" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none"
-     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${I[n]}</svg>`;
+     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${I[n]||''}</svg>`;
+window.__ico = ico;
 
 /* ---------- state ---------- */
 const state = {
   view: 'connectors',
-  theme: 'dark',
+  theme: (() => { try { return localStorage.getItem('nash.theme') || 'dark'; } catch (e) { return 'dark'; } })(),
+  user: { name:'Klair', email:'claire@backboard.io' },
+  userMenu: false,
   tab: 'All',
   layout: 'grid',
   query: '',
@@ -199,12 +209,38 @@ function sidebar() {
 
     <div class="grow"></div>
     <div class="divider"></div>
-    <div class="footer">
-      <div class="avatar">K</div>
-      <div class="who"><b>Klair</b><small>claire@backboard.io</small></div>
-      ${ico('gear',14)}
+    <div style="position:relative">
+      ${state.userMenu ? usermenu() : ''}
+      <div class="footer" data-usermenu>
+        <div class="avatar">${(state.user.name||'K')[0].toUpperCase()}</div>
+        <div class="who"><b>${state.user.name||'Klair'}</b><small>${state.user.email}</small></div>
+        ${ico('gear',14)}
+      </div>
     </div>
   </aside>`;
+}
+
+/* ---------- user / settings menu ---------- */
+function usermenu() {
+  return `
+  <div class="popover" style="bottom:56px;left:0;width:252px">
+    <div class="plist" style="padding:6px">
+      <div class="prow" style="gap:10px"><span style="color:var(--t3)">${ico('gear',15)}</span>
+        <div class="tt"><b>Settings</b></div></div>
+
+      <div class="prow" style="gap:10px;align-items:center">
+        <span style="color:var(--t3)">${ico(state.theme==='dark'?'moon':'sun',15)}</span>
+        <div class="tt"><b>Appearance</b><small>${state.theme==='dark'?'Dark':'Light'}</small></div>
+        <div class="toggle sm ${state.theme==='light'?'on':''}" data-theme><div class="knob"></div></div>
+      </div>
+
+      <div style="height:1px;background:var(--border);margin:6px 4px"></div>
+
+      <div class="prow" style="gap:10px" data-signout>
+        <span style="color:var(--err)">${ico('logout',15)}</span>
+        <div class="tt"><b style="color:var(--err)">Sign out</b></div></div>
+    </div>
+  </div>`;
 }
 
 /* ---------- connector card ---------- */
@@ -553,9 +589,6 @@ function render() {
     <div class="shell">
       ${sidebar()}
       <div class="main">
-        <button class="themebtn" data-theme>
-          ${ico(state.theme==='dark'?'sun':'moon',14)}${state.theme==='dark'?'Light':'Dark'}
-        </button>
         <div class="content">${view}</div>
         ${state.view==='connectors' ? rail() : ''}
         ${modal()}
@@ -569,10 +602,16 @@ function render() {
 }
 
 /* ---------- events ---------- */
-document.addEventListener('click', e => {
-  const t = e.target.closest('[data-go],[data-toggle],[data-folder],[data-tab],[data-layout],[data-connect],[data-consent],[data-manage],[data-pause],[data-resume],[data-disconnect],[data-confirmdisconnect],[data-reconnect],[data-closerail],[data-tool],[data-inchat],[data-popover],[data-add],[data-cancel],[data-scrim],[data-theme],[data-clear],[data-toastclose],[data-toastaction]');
-  if (!t) return;
+function onAppClick(e) {
+  const t = e.target.closest('[data-go],[data-toggle],[data-folder],[data-tab],[data-layout],[data-connect],[data-consent],[data-manage],[data-pause],[data-resume],[data-disconnect],[data-confirmdisconnect],[data-reconnect],[data-closerail],[data-tool],[data-inchat],[data-popover],[data-add],[data-cancel],[data-scrim],[data-theme],[data-clear],[data-toastclose],[data-toastaction],[data-usermenu],[data-signout]');
+  if (!t) {                                        // click-away closes transient surfaces
+    if (state.userMenu || state.popover) { state.userMenu = false; state.popover = false; render(); }
+    return;
+  }
   const d = t.dataset;
+  if (d.signout !== undefined) return;             // handled by its own listener
+  if (d.usermenu !== undefined) { state.userMenu = !state.userMenu; render(); return; }
+  if (!d.theme && !d.usermenu) state.userMenu = false;
 
   if (d.scrim && e.target !== t) return;               // only the backdrop closes
   if (d.go)        { state.view = d.go; state.popover = false; state.rail = null; }
@@ -585,6 +624,7 @@ document.addEventListener('click', e => {
   if (d.theme !== undefined) {
     state.theme = state.theme === 'dark' ? 'light' : 'dark';
     document.documentElement.dataset.theme = state.theme;
+    try { localStorage.setItem('nash.theme', state.theme); } catch (x) {}
   }
   if (d.popover !== undefined) state.popover = !state.popover;
   if (d.add !== undefined)     state.modal = { kind:'add' };
@@ -652,7 +692,7 @@ document.addEventListener('click', e => {
     return;
   }
   render();
-});
+}
 
 document.addEventListener('input', e => {
   if (e.target.id === 'q') { state.query = e.target.value; render(); }
@@ -667,5 +707,28 @@ document.addEventListener('keydown', e => {
   }
 });
 
-document.documentElement.dataset.theme = state.theme;
-render();
+/* ---------- sign out ---------- */
+document.addEventListener('click', e => {
+  if (!e.target.closest('[data-signout]')) return;
+  try { localStorage.removeItem('nash.session'); } catch (x) {}
+  document.removeEventListener('click', onAppClick);
+  const app = document.getElementById('app');
+  app.style.transition = 'opacity .24s var(--ease)';
+  app.style.opacity = '0';
+  setTimeout(() => { app.style.opacity = ''; window.NashAuth.mount(); }, 240);
+});
+
+/* ---------- mount ---------- */
+window.NashApp = {
+  state,
+  mount() {
+    let s = null;
+    try { s = JSON.parse(localStorage.getItem('nash.session') || 'null'); } catch (x) {}
+    state.user = s || { name: 'Klair', email: 'claire@backboard.io' };
+    state.view = 'connectors';
+    state.rail = null; state.modal = null; state.popover = false;
+    if (window.NashAuth) window.NashAuth.unmount();
+    document.addEventListener('click', onAppClick);
+    render();
+  }
+};
