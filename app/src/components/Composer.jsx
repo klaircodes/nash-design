@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import Icon from './Icon.jsx';
 import { ease, dur, liquid } from '../lib/motion.js';
+import useIsMobile from '../lib/useIsMobile.js';
 import '../styles/models.css';
 
 const TOOLS = [
@@ -37,11 +38,70 @@ const item = {
 
 /* the model lives in Chat: on a phone the picker is a full screen of its own,
    so it can't be owned by the composer it sits above */
+/* phone: the tool strip has nowhere to lay itself out, so the same accordion
+   opens an "Add to Chat" panel instead of a row of pills */
+const ADDLIST = [
+  { icon:'temp',    label:'Temp Chat' },
+  { icon:'servers', label:'MCP Servers', more:true },
+  { icon:'wave',    label:'Voice Mode' },
+];
+
 export default function Composer({ model, onOpenPicker }) {
   const [open, setOpen] = useState(false);
+  const mobile = useIsMobile();
+
+  const AddToChat = () => (
+    <div className="addto">
+      <div className="addto-head">
+        <h4>Add to Chat</h4>
+        <motion.button className="addto-x" onClick={() => setOpen(false)} aria-label="Close"
+          whileTap={{ scale: 0.9 }} transition={{ duration: dur.hover, ease }}>
+          <Icon name="x" size={15} />
+        </motion.button>
+      </div>
+
+      <motion.div className="tiles" variants={row} initial="hidden" animate="show">
+        <motion.button className="tile" variants={item}>
+          <Icon name="clip" size={21} /><span>Add File</span>
+        </motion.button>
+        <motion.button className="tile" variants={item}>
+          <Icon name="image" size={21} /><span>Image</span>
+        </motion.button>
+      </motion.div>
+
+      <motion.div className="group" variants={row} initial="hidden" animate="show">
+        {ADDLIST.map(a => (
+          <motion.button key={a.label} className="grow" variants={item}>
+            <Icon name={a.icon} size={17} /><span>{a.label}</span>
+            {a.more && <Icon name="chevR" size={15} />}
+          </motion.button>
+        ))}
+      </motion.div>
+
+      <motion.div className="group" variants={row} initial="hidden" animate="show">
+        <motion.button className="grow" variants={item}>
+          <Icon name="gear" size={17} /><span>Settings</span><Icon name="chevR" size={15} />
+        </motion.button>
+      </motion.div>
+    </div>
+  );
 
   return (
     <div className="composerwrap">
+      <AnimatePresence initial={false}>
+        {open && mobile && (
+          <motion.div key="addto"
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ height: liquid, opacity: { duration: 0.2, ease } }}
+            style={{ overflow: 'hidden' }}
+          >
+            <AddToChat />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <motion.div
         className="composer"
         animate={{ borderRadius: open ? 20 : 22 }}
@@ -80,7 +140,7 @@ export default function Composer({ model, onOpenPicker }) {
         {/* height animates to the row's own size, with a spring so it
             settles rather than stopping dead. Eases closed too. */}
         <AnimatePresence initial={false}>
-          {open && (
+          {open && !mobile && (
             <motion.div key="tools"
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: 'auto', opacity: 1 }}
