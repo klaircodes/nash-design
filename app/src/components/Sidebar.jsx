@@ -80,7 +80,9 @@ function OrgSwitcher({ collapsed }) {
      menu is measured against the trigger and drawn fixed, outside the panel */
   const toggle = () => {
     const r = ref.current?.getBoundingClientRect();
-    if (r) setAt({ top: r.top, left: r.right + 10 });
+    /* clear the whole panel, not just the trigger, or the menu lands on top of it */
+    const panel = ref.current?.closest('.sidebar')?.getBoundingClientRect();
+    if (r) setAt({ top: r.top - 4, left: (panel?.right ?? r.right) + 12 });
     setOpen(v => !v);
   };
 
