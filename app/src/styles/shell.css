@@ -79,7 +79,7 @@
 
 /* ---------- composer (static for now) ---------- */
 .composerwrap{width:100%;max-width:768px;margin:0 auto;padding:0 24px 28px;flex:0 0 auto;}
-.composer{border-radius:22px;background:var(--surface);}
+.composer{background:var(--surface);overflow:hidden;}
 .crow{display:flex;align-items:center;gap:12px;padding:14px;}
 .crow input{flex:1;min-width:0;font-size:15px;color:var(--t1);}
 .crow input::placeholder{color:var(--t4);}
@@ -90,3 +90,20 @@
   background:var(--elevated);color:var(--t2);
 }
 .round.accent{background:var(--accent);color:#fff;}
+.round.sm{width:34px;height:34px;}
+
+/* 36px between the input row and the tool row */
+.trow{display:flex;align-items:center;gap:10px;padding:22px 14px 14px;}
+.sp{flex:1;}
+.pill{
+  height:34px;border-radius:17px;padding:0 14px 0 12px;display:flex;align-items:center;gap:8px;
+  background:var(--elevated);font-size:13px;color:var(--t2);flex:0 0 auto;
+}
+.pill:hover{background:var(--border);color:var(--t1);}
+.round.sm:hover{background:var(--border);color:var(--t1);}
+
+/* the + / − mark */
+.morph{position:relative;width:17px;height:17px;display:block;}
+.morph .bar{position:absolute;background:currentColor;border-radius:1.5px;}
+.morph .bar.h{left:0;right:0;top:50%;height:1.9px;margin-top:-.95px;}
+.morph .bar.v{top:0;bottom:0;left:50%;width:1.9px;margin-left:-.95px;}
