@@ -11,10 +11,12 @@
 }
 /* fills whatever width the sidebar currently has, so the toggle is never clipped */
 .sidebar .brand{width:auto;align-self:stretch;flex:0 0 auto;}
-/* the body keeps its width while the aside narrows, so nothing squashes */
+/* Keeps its width while the aside narrows, so nothing squashes —
+   but it must still shrink vertically, or the footer is pushed
+   past the bottom of the sidebar instead of pinning to it. */
 .sb-body{
   flex:1 1 auto;min-height:0;display:flex;flex-direction:column;
-  width:256px;flex-shrink:0;
+  width:256px;min-width:256px;
 }
 .sb-head,.sb-foot{flex:0 0 auto;display:flex;flex-direction:column;gap:2px;}
 .sb-foot{padding-top:8px;}
