@@ -209,4 +209,5 @@
   .trow{gap:8px;padding:18px 12px 12px;flex-wrap:wrap;}
   .disclaim{display:block;}
   .topbar .menu{width:32px;height:32px;display:grid;place-items:center;}
+  .chatrow .rowacts{min-width:0;gap:0;}
 }

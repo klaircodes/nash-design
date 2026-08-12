@@ -40,8 +40,8 @@ function ChatRow({ title, pinned, nested, mobile }) {
   const PinBtn = () => (
     <motion.button className={`pin ${pinned ? 'on' : ''}`}
       aria-label={pinned ? 'Unpin chat' : 'Pin chat'}
-      animate={{ opacity: pinned || hover || mobile ? 1 : 0 }}
-      style={{ pointerEvents: pinned || hover || mobile ? 'auto' : 'none' }}
+      animate={{ opacity: pinned || hover ? 1 : 0 }}
+      style={{ pointerEvents: pinned || hover ? 'auto' : 'none' }}
       whileTap={{ scale: 0.86 }}
       transition={{ duration: dur.hover, ease }}>
       <Icon name="pin" size={15} />
@@ -56,16 +56,19 @@ function ChatRow({ title, pinned, nested, mobile }) {
       transition={{ duration: dur.hover, ease }}
     >
       <span className="title">{title}</span>
+      {/* Touch has no hover, so nothing can be revealed on demand — showing an
+          overflow menu and an empty pin on every row just adds noise. On a phone
+          only genuinely pinned rows carry a mark, and it only unpins. */}
       <div className="rowacts">
-        {/* always occupies its slot, so the title truncates at a fixed width
-            and no text reflows when the actions fade in */}
-        <motion.span className="dots"
-          animate={{ opacity: hover || mobile ? 1 : 0 }}
-          style={{ pointerEvents: hover || mobile ? 'auto' : 'none' }}
-          transition={{ duration: dur.hover, ease }}>
-          <Icon name="dotsH" size={15} />
-        </motion.span>
-        <PinBtn />
+        {!mobile && (
+          <motion.span className="dots"
+            animate={{ opacity: hover ? 1 : 0 }}
+            style={{ pointerEvents: hover ? 'auto' : 'none' }}
+            transition={{ duration: dur.hover, ease }}>
+            <Icon name="dotsH" size={15} />
+          </motion.span>
+        )}
+        {(!mobile || pinned) && <PinBtn />}
       </div>
     </motion.div>
   );
