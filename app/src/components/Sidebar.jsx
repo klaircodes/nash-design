@@ -95,10 +95,12 @@ export default function Sidebar({ user, onNewChat, collapsed, onToggle }) {
         </motion.button>
       </div>
 
+      {/* slides out of the clip rather than fading — the panel
+          narrows and the content travels with it */}
       <motion.div className="sb-body"
-        animate={{ opacity: collapsed ? 0 : 1 }}
+        animate={{ x: collapsed ? -168 : 0, opacity: collapsed ? 0.15 : 1 }}
         style={{ pointerEvents: collapsed ? 'none' : 'auto' }}
-        transition={{ duration: collapsed ? 0.14 : 0.22, ease, delay: collapsed ? 0 : 0.08 }}
+        transition={liquidWide}
       >
             <div className="sb-head">
               <div className="gap" />

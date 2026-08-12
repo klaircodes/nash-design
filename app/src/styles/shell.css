@@ -9,8 +9,8 @@
   padding:14px 12px 12px;background:var(--sunken);
   border-right:1px solid var(--border);border-right-style:solid;overflow:hidden;
 }
-/* the mark row keeps its exact size and position in both states */
-.sidebar .brand{width:256px;flex:0 0 auto;}
+/* fills whatever width the sidebar currently has, so the toggle is never clipped */
+.sidebar .brand{width:auto;align-self:stretch;flex:0 0 auto;}
 /* the body keeps its width while the aside narrows, so nothing squashes */
 .sb-body{
   flex:1 1 auto;min-height:0;display:flex;flex-direction:column;
