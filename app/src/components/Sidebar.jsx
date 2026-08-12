@@ -33,7 +33,7 @@ function Chevron({ open }) {
   );
 }
 
-function ChatRow({ title, pinned, nested, mobile, onPin }) {
+function ChatRow({ title, pinned, nested, mobile, onPin, onOpen, active }) {
   const [hover, setHover] = useState(false);
 
   /* generous 26px target — the glyph alone was fiddly to hit */
@@ -50,10 +50,11 @@ function ChatRow({ title, pinned, nested, mobile, onPin }) {
   );
 
   return (
-    <motion.div className={`chatrow ${nested ? 'nested' : ''}`}
+    <motion.div className={`chatrow ${nested ? 'nested' : ''} ${active ? 'active' : ''}`}
+      onClick={onOpen}
       onHoverStart={() => setHover(true)} onHoverEnd={() => setHover(false)}
-      animate={{ backgroundColor: hover ? 'var(--hover)' : 'rgba(0,0,0,0)',
-                 color: hover ? 'var(--t1)' : 'var(--t2)' }}
+      animate={{ backgroundColor: active || hover ? 'var(--hover)' : 'rgba(0,0,0,0)',
+                 color: active || hover ? 'var(--t1)' : 'var(--t2)' }}
       transition={{ duration: dur.hover, ease }}
     >
       <span className="title">{title}</span>
@@ -216,7 +217,8 @@ const NAV = [
   { icon:'users',    label:'Persona Marketplace' },
 ];
 
-export default function Sidebar({ user, onNewChat, collapsed, onToggle, mobile, drawer }) {
+export default function Sidebar({ user, onNewChat, collapsed, onToggle, mobile, drawer,
+                                 openChat, onOpenChat }) {
   const [chatsOpen, setChatsOpen] = useState(true);
   const [foldersOpen, setFoldersOpen] = useState(true);
   const [open, setOpen] = useState({ work:true, research:false, personal:false });
@@ -313,10 +315,14 @@ export default function Sidebar({ user, onNewChat, collapsed, onToggle, mobile, 
                       <Collapse open={open[f.key]}>
                         {f.chats.filter(c => c.pinned).map(c => (
                           <ChatRow key={c.id} title={c.title} pinned nested mobile={mobile}
+                                   active={openChat?.id === c.id}
+                                   onOpen={() => onOpenChat?.({ id:c.id, title:c.title })}
                                    onPin={() => pinInFolder(f.key, c.id)} />
                         ))}
                         {f.chats.filter(c => !c.pinned).map(c => (
                           <ChatRow key={c.id} title={c.title} nested mobile={mobile}
+                                   active={openChat?.id === c.id}
+                                   onOpen={() => onOpenChat?.({ id:c.id, title:c.title })}
                                    onPin={() => pinInFolder(f.key, c.id)} />
                         ))}
                       </Collapse>
@@ -328,7 +334,10 @@ export default function Sidebar({ user, onNewChat, collapsed, onToggle, mobile, 
                   <>
                     <div className="datemark first">Pinned</div>
                     {pinned.map(c => (
-                      <ChatRow key={c.id} {...c} mobile={mobile} onPin={() => pinChat(c.id)} />
+                      <ChatRow key={c.id} {...c} mobile={mobile}
+                               active={openChat?.id === c.id}
+                               onOpen={() => onOpenChat?.({ id:c.id, title:c.title })}
+                               onPin={() => pinChat(c.id)} />
                     ))}
                   </>
                 )}
@@ -336,7 +345,10 @@ export default function Sidebar({ user, onNewChat, collapsed, onToggle, mobile, 
                   <div key={label}>
                     <div className="datemark">{label}</div>
                     {rows.map(c => (
-                      <ChatRow key={c.id} {...c} mobile={mobile} onPin={() => pinChat(c.id)} />
+                      <ChatRow key={c.id} {...c} mobile={mobile}
+                               active={openChat?.id === c.id}
+                               onOpen={() => onOpenChat?.({ id:c.id, title:c.title })}
+                               onPin={() => pinChat(c.id)} />
                     ))}
                   </div>
                 ))}

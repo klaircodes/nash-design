@@ -13,6 +13,7 @@ export default function App() {
   const [session, setSession] = useState(0);   // bumping this starts a fresh chat
   const [collapsed, setCollapsed] = useState(false);
   const [drawer, setDrawer]       = useState(false);
+  const [openChat, setOpenChat]   = useState(null);
   const mobile = useIsMobile();
 
   return (
@@ -44,11 +45,13 @@ export default function App() {
           </AnimatePresence>
 
           <Sidebar user={user}
-                   onNewChat={() => { setSession(s => s + 1); setDrawer(false); }}
+                   onNewChat={() => { setSession(s => s + 1); setOpenChat(null); setDrawer(false); }}
+                   openChat={openChat}
+                   onOpenChat={c => { setOpenChat({ ...c, at: Date.now() }); setDrawer(false); }}
                    mobile={mobile} drawer={drawer}
                    collapsed={mobile ? false : collapsed}
                    onToggle={() => mobile ? setDrawer(false) : setCollapsed(v => !v)} />
-          <Chat user={user} sessionKey={session} mobile={mobile}
+          <Chat user={user} sessionKey={session} openChat={openChat} mobile={mobile}
                 drawer={drawer} onMenu={() => setDrawer(true)} />
         </motion.div>
       )}

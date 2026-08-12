@@ -93,3 +93,54 @@ export const fmtDate = iso => {
 };
 
 export const ORGS = ['Mo', 'NashTest', 'Test'];
+
+/* Canned threads. Frontend only — no model is called; the reply is fixed. */
+export const REPLY = 'this is a test thanks for using';
+
+const LONG_USER =
+  'Can you take the connector permissions review from last week and turn it into ' +
+  'something I can actually hand to the security team? I want the scopes we ask ' +
+  'for laid out per connector, a note on which ones are read-only versus write, ' +
+  'and a short paragraph on what happens to a token when someone leaves the ' +
+  'workspace. If a connector needs a scope we cannot justify, flag it rather than ' +
+  'quietly listing it. Keep the tone plain — no marketing language, no hedging. ' +
+  'It should read like something an engineer wrote for another engineer, and it ' +
+  'needs to survive being pasted into a ticket without losing its structure.';
+
+const LONG_REPLY =
+  'Here is the shape I would use. Each connector gets its own block with the ' +
+  'scopes it requests, the reason it needs them, and whether the access is read ' +
+  'or write. Anything that cannot be justified in one sentence goes in a separate ' +
+  'list at the end so it is impossible to miss. Token handling is its own short ' +
+  'section because it is the part security will actually read first: tokens are ' +
+  'revoked on seat removal, refresh tokens are not reissued, and any cached ' +
+  'artefacts are dropped on the next sweep. Nothing else in the document depends ' +
+  'on that section, so it can be lifted out wholesale if they want it separately.';
+
+export const CONVERSATIONS = {
+  'Connector permissions review': [
+    { role:'user', text:LONG_USER },
+    { role:'bot',  text:LONG_REPLY },
+    { role:'user', text:'Good. Which one is the risky scope?' },
+    { role:'bot',  text:REPLY },
+  ],
+  'Invoice chase — Northwind': [
+    { role:'user', text:'Draft a short follow-up on the Northwind invoice. Firm, not rude.' },
+    { role:'bot',  text:REPLY },
+  ],
+  'Q3 roadmap draft': [
+    { role:'user', text:'What is still unresolved in the Q3 draft?' },
+    { role:'bot',  text:LONG_REPLY },
+    { role:'user', text:'Cut it to three bullets.' },
+    { role:'bot',  text:REPLY },
+  ],
+  'Bug triage — render loop': [
+    { role:'user', text:'The sidebar re-renders on every hover. Where would you look first?' },
+    { role:'bot',  text:REPLY },
+  ],
+};
+
+export const FALLBACK_THREAD = [
+  { role:'user', text:'Picking this back up — where did we leave it?' },
+  { role:'bot',  text:REPLY },
+];

@@ -1,8 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import Icon from '../components/Icon.jsx';
 import Composer from '../components/Composer.jsx';
 import ModelPicker from '../components/ModelPicker.jsx';
+import Message from '../components/Message.jsx';
+import { CONVERSATIONS, FALLBACK_THREAD, REPLY } from '../lib/data.js';
 import { ease, liquid, liquidWide } from '../lib/motion.js';
 
 function greeting() {
@@ -10,8 +12,25 @@ function greeting() {
   return h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
 }
 
-export default function Chat({ user, sessionKey, mobile, drawer, onMenu }) {
+export default function Chat({ user, sessionKey, openChat, mobile, drawer, onMenu }) {
   const first = (user.name || 'there').split(' ')[0];
+  const [thread, setThread] = useState([]);
+  const scroller = useRef(null);
+
+  /* New Chat empties the thread; opening one from the sidebar loads its own. */
+  useEffect(() => { setThread([]); }, [sessionKey]);
+  useEffect(() => {
+    if (openChat) setThread(CONVERSATIONS[openChat.title] || FALLBACK_THREAD);
+  }, [openChat]);
+
+  /* stay pinned to the newest message */
+  useEffect(() => {
+    const el = scroller.current;
+    if (el) el.scrollTop = el.scrollHeight;
+  }, [thread]);
+
+  const send = text =>
+    setThread(t => [...t, { role:'user', text }, { role:'bot', text: REPLY }]);
   const [picker, setPicker] = useState(false);
   const [tools, setTools]   = useState(false);
 
@@ -44,17 +63,25 @@ export default function Chat({ user, sessionKey, mobile, drawer, onMenu }) {
         <button className="more"><Icon name="dotsH" size={18} /></button>
       </div>
 
-      <div className="chatbody">
-        <motion.h1
-          key={sessionKey}
-          className="greet"
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.45, ease }}
-        >
-          {greeting()}, {first}
-        </motion.h1>
-      </div>
+      {thread.length === 0 ? (
+        <div className="chatbody">
+          <motion.h1
+            key={sessionKey}
+            className="greet"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.45, ease }}
+          >
+            {greeting()}, {first}
+          </motion.h1>
+        </div>
+      ) : (
+        <div className="thread" ref={scroller}>
+          <div className="threadin">
+            {thread.map((m, i) => <Message key={i} role={m.role} text={m.text} />)}
+          </div>
+        </div>
+      )}
 
       {/* phone: opens above the composer at roughly the height of Add to Chat,
           scrolling inside itself — the conversation stays on screen */}
@@ -74,7 +101,7 @@ export default function Chat({ user, sessionKey, mobile, drawer, onMenu }) {
       </AnimatePresence>
 
 
-      <Composer model={model} onOpenPicker={openPicker}
+      <Composer model={model} onOpenPicker={openPicker} onSend={send}
                 tools={tools} onToggleTools={toggleTools} />
 
       <AnimatePresence>{!mobile && picker && pick}</AnimatePresence>

@@ -46,8 +46,14 @@ const ADDLIST = [
   { icon:'wave',    label:'Voice Mode' },
 ];
 
-export default function Composer({ model, onOpenPicker, tools: open, onToggleTools }) {
+export default function Composer({ model, onOpenPicker, tools: open, onToggleTools, onSend }) {
   const [text, setText] = useState('');
+  const send = () => {
+    const body = text.trim();
+    if (!body) return;
+    onSend?.(body);
+    setText('');
+  };
   const ta = useRef(null);
   const mobile = useIsMobile();
 
@@ -127,7 +133,11 @@ export default function Composer({ model, onOpenPicker, tools: open, onToggleToo
           </motion.button>
 
           <textarea ref={ta} rows={1} placeholder="Ask anything..."
-            value={text} onChange={e => setText(e.target.value)} />
+            value={text} onChange={e => setText(e.target.value)}
+            onKeyDown={e => {
+              /* Enter sends, Shift+Enter breaks the line */
+              if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
+            }} />
 
           <motion.button className="modelpick" onClick={onOpenPicker}
             whileHover={{ backgroundColor: 'var(--hover)', color: 'var(--t1)' }}
@@ -141,7 +151,7 @@ export default function Composer({ model, onOpenPicker, tools: open, onToggleToo
             <Icon name="mic" size={16} />
           </motion.button>
 
-          <motion.button className="round accent"
+          <motion.button className="round accent" onClick={send} aria-label="Send"
             whileHover={{ opacity: 0.9 }} whileTap={{ scale: 0.94 }}
             transition={{ duration: dur.hover, ease }}>
             <Icon name="send" size={16} />
