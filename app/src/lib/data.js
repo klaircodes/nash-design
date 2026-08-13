@@ -317,18 +317,18 @@ Object.assign(CONVERSATIONS, {
 });
 
 /* ---------- memories ---------- */
-export const MEM_SCOPES = ['Global', 'Workspace', 'Persona', 'Chat'];
+export const MEM_SCOPES = ['Global', 'Persona', 'Chat'];
 
 const MEM_SEED = [
   ['The user prefers Prometheus + Grafana for monitoring. They use alertmanager for routing and have a custom dashboard for SLO tracking.', 'Global', 'Open-source monitoring chat', 20, '2026-04-07'],
   ['Writes in British English. Prefers “colour”, “behaviour”, and em dashes over parentheses.', 'Global', 'Onboarding copy pass', 14, '2026-04-05'],
-  ['The design system uses a 4px spacing scale. Anything off-scale is a bug, not a variant.', 'Workspace', 'Design system audit', 17, '2026-03-29'],
-  ['Ships to production on Thursdays. Never on a Friday, never the day before a holiday.', 'Workspace', 'Release checklist', 15, '2026-03-24'],
+  ['The design system uses a 4px spacing scale. Anything off-scale is a bug, not a variant.', 'Global', 'Design system audit', 17, '2026-03-29'],
+  ['Ships to production on Thursdays. Never on a Friday, never the day before a holiday.', 'Global', 'Release checklist', 15, '2026-03-24'],
   ['The Code Reviewer persona should lead with the failure scenario before the fix.', 'Persona', 'Persona tuning', 13, '2026-03-18'],
   ['Prefers answers that state the assumption up front rather than asking a clarifying question.', 'Persona', 'Persona tuning', 15, '2026-03-11'],
   ['In this thread, “the panel” always means the model picker, not the sidebar.', 'Chat', 'Comparing models', 13, '2026-03-04'],
   ['Treat every price in this thread as USD unless stated otherwise.', 'Chat', 'Pricing research', 11, '2026-02-26'],
-  ['Do not suggest adding dependencies. This project stays on the standard library.', 'Workspace', 'Bug triage — render loop', 14, '2026-02-19'],
+  ['Do not suggest adding dependencies. This project stays on the standard library.', 'Global', 'Bug triage — render loop', 14, '2026-02-19'],
   ['The user is on a 14-inch laptop; check layouts at 1440×900 before calling them done.', 'Global', 'Design system audit', 18, '2026-02-12'],
 ];
 

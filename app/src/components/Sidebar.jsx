@@ -352,7 +352,8 @@ const NAV = [
 ];
 
 export default function Sidebar({ user, onNewChat, collapsed, onToggle, mobile, drawer,
-                                 openChat, onOpenChat, view, onNav, onNotify }) {
+                                 openChat, onOpenChat, view, onNav, onNotify,
+                                 extraChats = [] }) {
   const [chatsOpen, setChatsOpen] = useState(true);
   const [foldersOpen, setFoldersOpen] = useState(true);
   const [open, setOpen] = useState({ work:true, research:false, personal:false });
@@ -440,20 +441,15 @@ export default function Sidebar({ user, onNewChat, collapsed, onToggle, mobile, 
     setOver(null);
   };
 
-  /* dropping onto a chat drops it into that slot — inside a folder, or in the
-     loose list, where it also adopts the target's date group */
+  /* Reordering only happens inside a folder. Date groups are a record of when
+     a chat happened, so a chat can leave one for a folder but never be dragged
+     into a different date. */
   const dropOnChat = (target, where) => {
     if (!drag || drag.kind !== 'chat' || drag.id === target.id) return;
+    if (where === 'loose') { setDrag(null); setOver(null); return; }
     detach();
     const moving = { id: drag.id, title: drag.title, pinned: false };
-    if (where === 'loose') {
-      setChats(list => {
-        const rest = list.filter(c => c.id !== drag.id);
-        const at = rest.findIndex(c => c.id === target.id);
-        rest.splice(at < 0 ? rest.length : at, 0, { ...moving, group: target.group });
-        return rest;
-      });
-    } else {
+    {
       setFolders(list => list.map(f => {
         if (f.key !== where) return f;
         const rest = f.chats.filter(c => c.id !== drag.id);
@@ -479,6 +475,7 @@ export default function Sidebar({ user, onNewChat, collapsed, onToggle, mobile, 
 
   /* one handler for every row action, whether the chat is loose or in a folder */
   const rowAction = (id, from) => (key, arg) => {
+    const forked = extraChats.find(c => c.id === id);
     const patch = (list, fn) => list.map(c => (c.id === id ? fn(c) : c));
     const drop  = list => list.filter(c => c.id !== id);
     const inFolder = fn =>
@@ -529,6 +526,17 @@ export default function Sidebar({ user, onNewChat, collapsed, onToggle, mobile, 
       ...f,
       chats: f.chats.map(c => (c.id === id ? { ...c, pinned: !c.pinned } : c)),
     })));
+
+  /* forks arrive from above; adopt any we have not seen yet */
+  useEffect(() => {
+    if (!extraChats.length) return;
+    setChats(list => {
+      const have = new Set(list.map(c => c.id));
+      const fresh = extraChats.filter(c => !have.has(c.id))
+        .map(c => ({ id: c.id, title: c.title, group: c.group, pinned: false }));
+      return fresh.length ? [...fresh, ...list] : list;
+    });
+  }, [extraChats]);
 
   const q = query.trim().toLowerCase();
   const hit = c => !q || haystack(c.title).includes(q);
@@ -672,7 +680,8 @@ export default function Sidebar({ user, onNewChat, collapsed, onToggle, mobile, 
                                                  drop:() => dropOnChat(c, f.key) }}
                                    folders={folders} onAction={rowAction(c.id, f.key)}
                                    active={openChat?.id === c.id}
-                                   onOpen={() => onOpenChat?.({ id:c.id, title:c.title })}
+                                   onOpen={() => onOpenChat?.({ id:c.id, title:c.title,
+                                 messages: extraChats.find(x => x.id === c.id)?.messages })}
                                    onPin={() => pinInFolder(f.key, c.id)} />
                         ))}
                         {f.chats.filter(c => !c.pinned).map(c => (
@@ -683,7 +692,8 @@ export default function Sidebar({ user, onNewChat, collapsed, onToggle, mobile, 
                                                  drop:() => dropOnChat(c, f.key) }}
                                    folders={folders} onAction={rowAction(c.id, f.key)}
                                    active={openChat?.id === c.id}
-                                   onOpen={() => onOpenChat?.({ id:c.id, title:c.title })}
+                                   onOpen={() => onOpenChat?.({ id:c.id, title:c.title,
+                                 messages: extraChats.find(x => x.id === c.id)?.messages })}
                                    onPin={() => pinInFolder(f.key, c.id)} />
                         ))}
                       </Collapse>
@@ -702,7 +712,8 @@ export default function Sidebar({ user, onNewChat, collapsed, onToggle, mobile, 
                                              drop:() => dropOnChat(c, 'loose') }}
                                folders={folders} onAction={rowAction(c.id, 'loose')}
                                active={openChat?.id === c.id}
-                               onOpen={() => onOpenChat?.({ id:c.id, title:c.title })}
+                               onOpen={() => onOpenChat?.({ id:c.id, title:c.title,
+                                 messages: extraChats.find(x => x.id === c.id)?.messages })}
                                onPin={() => pinChat(c.id)} />
                     ))}
                   </>
@@ -720,7 +731,8 @@ export default function Sidebar({ user, onNewChat, collapsed, onToggle, mobile, 
                                              drop:() => dropOnChat(c, 'loose') }}
                                folders={folders} onAction={rowAction(c.id, 'loose')}
                                active={openChat?.id === c.id}
-                               onOpen={() => onOpenChat?.({ id:c.id, title:c.title })}
+                               onOpen={() => onOpenChat?.({ id:c.id, title:c.title,
+                                 messages: extraChats.find(x => x.id === c.id)?.messages })}
                                onPin={() => pinChat(c.id)} />
                     ))}
                   </div>

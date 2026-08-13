@@ -12,7 +12,7 @@ function greeting() {
   return h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
 }
 
-export default function Chat({ user, sessionKey, openChat, mobile, drawer, onMenu, onNotify }) {
+export default function Chat({ user, sessionKey, openChat, mobile, drawer, onMenu, onNotify, onFork }) {
   const first = (user.name || 'there').split(' ')[0];
   const [thread, setThread] = useState([]);
   const scroller = useRef(null);
@@ -21,7 +21,7 @@ export default function Chat({ user, sessionKey, openChat, mobile, drawer, onMen
   useEffect(() => { setThread([]); }, [sessionKey]);
   useEffect(() => {
     /* no shared fallback — a chat without its own thread opens empty */
-    setThread(openChat ? (CONVERSATIONS[openChat.title] || []) : []);
+    setThread(openChat ? (openChat.messages || CONVERSATIONS[openChat.title] || []) : []);
   }, [openChat]);
 
   /* stay pinned to the newest message */
@@ -34,11 +34,12 @@ export default function Chat({ user, sessionKey, openChat, mobile, drawer, onMen
   const timer = useRef(null);
   useEffect(() => () => clearTimeout(timer.current), []);
 
-  /* forking keeps everything up to that reply and drops the rest, so the next
-     thing you send continues from there instead of the end of the thread */
+  /* the fork starts from that reply alone — nothing that came before it
+     carries over into the new chat */
   const fork = i => {
-    setThread(t => t.slice(0, i + 1));
-    onNotify?.('Forked into a new chat', 'fork');
+    const base = openChat?.title || 'New chat';
+    const title = base.startsWith('Fork:') ? base : `Fork: ${base}`;
+    onFork?.(title, thread.slice(i, i + 1));
   };
 
   const send = text => {

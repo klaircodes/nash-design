@@ -18,6 +18,17 @@ export default function App() {
   const [view, setView]           = useState('chat');
   const [useMemory, setUseMemory] = useState(true);
   const [note, setNote]           = useState(null);
+  const [forks, setForks]         = useState([]);
+
+  /* a fork becomes a chat of its own: it lands in the sidebar and opens */
+  const addFork = (title, messages) => {
+    const id = `fk${Date.now()}`;
+    const entry = { id, title, messages, group: 'Today', pinned: false };
+    setForks(f => [...f, entry]);
+    setOpenChat({ ...entry, at: Date.now() });
+    setView('chat');
+    notify('Forked into a new chat', 'fork');
+  };
 
   /* one place for app-wide confirmations, bottom right like every other toast */
   const notify = (msg, icon) => setNote({ msg, icon, at: Date.now() });
@@ -62,7 +73,7 @@ export default function App() {
                      setView('chat'); setDrawer(false);
                    }}
                    view={view} onNav={v => { setView(v); setDrawer(false); }}
-                   onNotify={notify}
+                   onNotify={notify} extraChats={forks}
                    openChat={openChat}
                    onOpenChat={c => {
                      setOpenChat(c ? { ...c, at: Date.now() } : null);
@@ -75,7 +86,8 @@ export default function App() {
             ? <Memories mobile={mobile} drawer={drawer} onMenu={() => setDrawer(true)}
                         use={useMemory} onUse={setUseMemory} />
             : <Chat user={user} sessionKey={session} openChat={openChat} mobile={mobile}
-                    drawer={drawer} onMenu={() => setDrawer(true)} onNotify={notify} />}
+                    drawer={drawer} onMenu={() => setDrawer(true)} onNotify={notify}
+                    onFork={addFork} />}
           <div className="toasts">
             <AnimatePresence initial={false}>
               {note && (
