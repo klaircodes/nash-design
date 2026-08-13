@@ -65,7 +65,7 @@
 .memmeta i{font-style:normal;color:var(--t4);}
 .memmeta .from{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .memmeta .scope{
-  padding:3px 9px;border-radius:7px;font-size:11px;font-weight:500;
+  padding:3px 9px;border-radius:7px;font-size:11px;font-weight:500;white-space:nowrap;
   background:rgba(99,91,255,.18);color:var(--accent);flex:0 0 auto;
 }
 .memmeta .scope.persona{background:var(--warn-bg);color:var(--warn);}
@@ -116,6 +116,30 @@
 }
 .memform textarea::placeholder{color:var(--t4);}
 .counter{margin:7px 0 16px;font-size:11.5px;color:var(--t4);}
+
+/* ---- which folder / persona / chat a memory is scoped to ---- */
+.ddwrap.target{position:relative;margin-top:12px;}
+.targetbtn{
+  width:100%;height:40px;display:flex;align-items:center;gap:10px;padding:0 12px;
+  border-radius:10px;background:var(--surface);color:var(--t1);font-size:13px;
+}
+.targetbtn > span{flex:1;min-width:0;text-align:left;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.targetbtn svg{color:var(--t3);flex:0 0 auto;}
+.targetbtn.empty > span{color:var(--t4);}
+.targetbtn.on,.targetbtn:hover{background:var(--hover);}
+.targetmenu{
+  position:absolute;left:0;right:0;top:46px;z-index:30;max-height:212px;overflow-y:auto;
+  padding:6px;border-radius:12px;background:var(--elevated);box-shadow:var(--shadow);
+  scrollbar-width:thin;scrollbar-color:var(--border) transparent;
+}
+[data-theme="light"] .targetmenu{background:var(--app);
+  box-shadow:0 10px 28px rgba(16,18,24,.14),inset 0 0 0 1px var(--border);}
+.targetmenu .sortrow{gap:9px;}
+.targetmenu .sortrow span{flex:1;min-width:0;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.targetmenu .sortrow:hover{background:var(--hover);color:var(--t1);}
+.scopenote{margin-top:12px;font-size:12.5px;color:var(--t3);}
 .memfoot{display:flex;justify-content:flex-end;gap:8px;padding:16px 18px 18px;}
 
 /* ---------- mobile ---------- */

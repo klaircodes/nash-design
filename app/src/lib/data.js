@@ -321,6 +321,14 @@ export const MEM_SCOPES = ['Global', 'Workspace', 'Persona', 'Chat'];
 
 /* the stored value stays stable; only what you read changes. Named by how far
    the memory reaches rather than by the object it hangs off. */
+/* what a scope can be pointed at, and where the options come from */
+export const MEM_SCOPE_TARGET = {
+  Global:    null,
+  Workspace: 'folder',
+  Persona:   'persona',
+  Chat:      'chat',
+};
+
 export const MEM_SCOPE_LABEL = {
   Global:    'Everywhere',
   Workspace: 'This workspace',
@@ -328,22 +336,31 @@ export const MEM_SCOPE_LABEL = {
   Chat:      'One chat',
 };
 
-const MEM_SEED = [
-  ['The user prefers Prometheus + Grafana for monitoring. They use alertmanager for routing and have a custom dashboard for SLO tracking.', 'Global', 'Open-source monitoring chat', 20, '2026-04-07'],
-  ['Writes in British English. Prefers “colour”, “behaviour”, and em dashes over parentheses.', 'Global', 'Onboarding copy pass', 14, '2026-04-05'],
-  ['The design system uses a 4px spacing scale. Anything off-scale is a bug, not a variant.', 'Workspace', 'Design system audit', 17, '2026-03-29'],
-  ['Ships to production on Thursdays. Never on a Friday, never the day before a holiday.', 'Workspace', 'Release checklist', 15, '2026-03-24'],
-  ['The Code Reviewer persona should lead with the failure scenario before the fix.', 'Persona', 'Persona tuning', 13, '2026-03-18'],
-  ['Prefers answers that state the assumption up front rather than asking a clarifying question.', 'Persona', 'Persona tuning', 15, '2026-03-11'],
-  ['In this thread, “the panel” always means the model picker, not the sidebar.', 'Chat', 'Comparing models', 13, '2026-03-04'],
-  ['Treat every price in this thread as USD unless stated otherwise.', 'Chat', 'Pricing research', 11, '2026-02-26'],
-  ['Do not suggest adding dependencies. This project stays on the standard library.', 'Workspace', 'Bug triage — render loop', 14, '2026-02-19'],
-  ['The user is on a 14-inch laptop; check layouts at 1440×900 before calling them done.', 'Global', 'Design system audit', 18, '2026-02-12'],
+const MEM_SEED = [   // text, scope, from, tokens, date, target
+  ['The user prefers Prometheus + Grafana for monitoring. They use alertmanager for routing and have a custom dashboard for SLO tracking.', 'Global', 'Open-source monitoring chat', 20, '2026-04-07', 'All chats'],
+  ['Writes in British English. Prefers “colour”, “behaviour”, and em dashes over parentheses.', 'Global', 'Onboarding copy pass', 14, '2026-04-05', 'All chats'],
+  ['The design system uses a 4px spacing scale. Anything off-scale is a bug, not a variant.', 'Workspace', 'Design system audit', 17, '2026-03-29', 'Work'],
+  ['Ships to production on Thursdays. Never on a Friday, never the day before a holiday.', 'Workspace', 'Release checklist', 15, '2026-03-24', 'Work'],
+  ['The Code Reviewer persona should lead with the failure scenario before the fix.', 'Persona', 'Persona tuning', 13, '2026-03-18', 'Code Reviewer'],
+  ['Prefers answers that state the assumption up front rather than asking a clarifying question.', 'Persona', 'Persona tuning', 15, '2026-03-11', 'Product Strategist'],
+  ['In this thread, “the panel” always means the model picker, not the sidebar.', 'Chat', 'Comparing models', 13, '2026-03-04', 'Comparing models'],
+  ['Treat every price in this thread as USD unless stated otherwise.', 'Chat', 'Pricing research', 11, '2026-02-26', 'Pricing research'],
+  ['Do not suggest adding dependencies. This project stays on the standard library.', 'Workspace', 'Bug triage — render loop', 14, '2026-02-19', 'Research'],
+  ['The user is on a 14-inch laptop; check layouts at 1440×900 before calling them done.', 'Global', 'Design system audit', 18, '2026-02-12', 'All chats'],
 ];
 
-export const MEMORIES = MEM_SEED.map(([text, scope, from, tokens, date], i) => ({
-  id: `m${i}`, text, scope, from, tokens, date,
+export const MEMORIES = MEM_SEED.map(([text, scope, from, tokens, date, target], i) => ({
+  id: `m${i}`, text, scope, from, tokens, date, target,
 }));
+
+/* the option lists a scope can point at */
+export const scopeOptions = kind => {
+  if (kind === 'folder')  return FOLDERS.map(f => f.label);
+  if (kind === 'persona') return PERSONAS.map(p => p.name);
+  if (kind === 'chat')    return [...CHATS.map(c => c.title),
+                                  ...FOLDERS.flatMap(f => f.chats)];
+  return [];
+};
 
 export const fmtMemDate = iso => {
   const [y, m, d] = iso.split('-').map(Number);

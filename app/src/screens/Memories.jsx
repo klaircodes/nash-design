@@ -2,7 +2,8 @@ import { useState, useMemo, useEffect, useLayoutEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import Icon from '../components/Icon.jsx';
 import { ease, dur, liquid, liquidWide } from '../lib/motion.js';
-import { MEMORIES, MEM_SCOPES, MEM_SCOPE_LABEL, fmtMemDate } from '../lib/data.js';
+import { MEMORIES, MEM_SCOPES, MEM_SCOPE_LABEL, MEM_SCOPE_TARGET,
+         scopeOptions, fmtMemDate } from '../lib/data.js';
 import copyText from '../lib/copy.js';
 import Toast from '../components/Toast.jsx';
 import '../styles/memories.css';
@@ -18,15 +19,54 @@ function Toggle({ on, onChange, label }) {
   );
 }
 
+/* which folder / persona / chat the memory is scoped to */
+function TargetPicker({ kind, value, onPick }) {
+  const [open, setOpen] = useState(false);
+  const options = scopeOptions(kind);
+  const noun = kind === 'folder' ? 'folder' : kind === 'persona' ? 'persona' : 'chat';
+
+  return (
+    <div className="ddwrap target">
+      <button className={`targetbtn ${open ? 'on' : ''} ${value ? '' : 'empty'}`}
+        onClick={() => setOpen(v => !v)}>
+        <Icon name={kind === 'folder' ? 'folder' : kind === 'persona' ? 'users' : 'temp'} size={15} />
+        <span>{value || `Choose a ${noun}…`}</span>
+        <motion.span style={{ display:'flex' }}
+          animate={{ rotate: open ? 180 : 0 }} transition={{ duration: dur.swap, ease }}>
+          <Icon name="chevD" size={14} />
+        </motion.span>
+      </button>
+
+      <AnimatePresence>
+        {open && (
+          <motion.div className="targetmenu"
+            initial={{ opacity:0, y:-6, scale:.98 }} animate={{ opacity:1, y:0, scale:1 }}
+            exit={{ opacity:0, y:-6, scale:.98 }} transition={{ duration:0.18, ease }}>
+            {options.map(o => (
+              <button key={o} className="sortrow"
+                onClick={() => { onPick(o); setOpen(false); }}>
+                <span>{o}</span>
+                {value === o && <span className="tick"><Icon name="check" size={14} /></span>}
+              </button>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
 /* Add and Edit are the same sheet — one is prefilled. */
 function MemoryDialog({ open, draft, onSave, onClose }) {
-  const [text, setText]   = useState('');
-  const [scope, setScope] = useState('Global');
+  const [text, setText]     = useState('');
+  const [scope, setScope]   = useState('Global');
+  const [target, setTarget] = useState(null);
 
   useEffect(() => {
     if (!open) return;
     setText(draft?.text || '');
     setScope(draft?.scope || 'Global');
+    setTarget(draft?.target || null);
   }, [open, draft]);
 
   useEffect(() => {
@@ -37,7 +77,9 @@ function MemoryDialog({ open, draft, onSave, onClose }) {
   }, [open, onClose]);
 
   if (!open) return null;
-  const ready = text.trim().length > 0;
+  const kind  = MEM_SCOPE_TARGET[scope];
+  /* a scoped memory is not finished until you say what it is scoped to */
+  const ready = text.trim().length > 0 && (!kind || Boolean(target));
 
   return (
     <motion.div className="scrim" onClick={onClose}
@@ -60,22 +102,27 @@ function MemoryDialog({ open, draft, onSave, onClose }) {
             onChange={e => setText(e.target.value)} />
           <div className="counter">{text.trim().length} characters</div>
 
-          <label className="fl">Scope</label>
+          <label className="fl">Applies to</label>
           <div className="filters">
             {MEM_SCOPES.map(s => (
               <motion.button key={s} className={`fpill ${scope === s ? 'on' : ''}`}
-                onClick={() => setScope(s)} whileTap={{ scale: 0.97 }}
+                onClick={() => { setScope(s); setTarget(null); }} whileTap={{ scale: 0.97 }}
                 transition={{ duration: dur.hover, ease }}>
                 {MEM_SCOPE_LABEL[s]}
               </motion.button>
             ))}
           </div>
+
+          {kind
+            ? <TargetPicker kind={kind} value={target} onPick={setTarget} />
+            : <p className="scopenote">Nash will recall this in every chat.</p>}
         </div>
 
         <div className="memfoot">
           <button className="ghost" onClick={onClose}>Cancel</button>
           <motion.button className="primary sm" disabled={!ready}
-            onClick={() => ready && onSave({ text: text.trim(), scope })}
+            onClick={() => ready && onSave({ text: text.trim(), scope,
+                                             target: target || 'All chats' })}
             whileTap={ready ? { scale: 0.98 } : {}}>
             {draft ? 'Save changes' : 'Add memory'}
           </motion.button>
@@ -99,7 +146,9 @@ function Row({ m, mobile, onEdit, onDelete, onCopy }) {
         <i>·</i>
         <span>{mobile ? fmtMemDate(m.date).replace(/,.*/, '') : fmtMemDate(m.date)}</span>
         <i>·</i>
-        <span className={`scope ${m.scope.toLowerCase()}`}>{MEM_SCOPE_LABEL[m.scope]}</span>
+        <span className={`scope ${m.scope.toLowerCase()}`}>
+          {MEM_SCOPE_LABEL[m.scope]}{m.target && m.scope !== 'Global' ? ` · ${m.target}` : ''}
+        </span>
         <i>·</i>
         <span className="from">From: {m.from}</span>
 
