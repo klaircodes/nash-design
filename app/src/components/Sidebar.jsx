@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import Icon from './Icon.jsx';
 import { ease, dur, liquid, liquidWide } from '../lib/motion.js';
+import copyText from '../lib/copy.js';
 import { GROUP_ORDER, ORGS, WORKSPACES, CONVERSATIONS } from '../lib/data.js';
 
 /* a chat matches on its title or on anything said inside it */
@@ -63,18 +64,21 @@ function ChatRow({ title, pinned, nested, mobile, onPin, onOpen, active,
   const [menu, setMenu]       = useState(null);   // null | {top,left}
   const [sub, setSub]         = useState(false);
   const [editing, setEditing] = useState(false);
+  const [onActs, setOnActs]   = useState(false);
   const [draft, setDraft]     = useState(title);
   const dotsRef = useRef(null);
 
-  /* the sidebar clips its own overflow, so the menu is measured and drawn fixed */
+  /* the sidebar clips its own overflow, so the menu is measured and drawn fixed,
+     clear of the panel's right edge rather than on top of the chat list */
   const openMenu = e => {
     e.stopPropagation();
     const r = dotsRef.current?.getBoundingClientRect();
     if (!r) return;
+    const panel = dotsRef.current.closest('.sidebar')?.getBoundingClientRect();
     const H = 300;
     setMenu({
-      left: r.left - 150,
-      top: r.bottom + H > window.innerHeight ? r.top - H - 6 : r.bottom + 6,
+      left: (panel?.right ?? r.right) + 10,
+      top: Math.min(r.top - 8, window.innerHeight - H - 16),
     });
     setSub(false);
   };
@@ -115,7 +119,9 @@ function ChatRow({ title, pinned, nested, mobile, onPin, onOpen, active,
   return (
     <motion.div className={`chatrow ${nested ? 'nested' : ''} ${active ? 'active' : ''} ${over ? 'over' : ''}`}
       onClick={editing ? undefined : onOpen}
-      draggable={Boolean(onDragStart) && !editing} onDragStart={onDragStart}
+      /* dragstart fires on the draggable row, not on the child under the cursor,
+         so the only way to exempt the controls is to disarm the row itself */
+      draggable={Boolean(onDragStart) && !editing && !onActs} onDragStart={onDragStart}
       onDragOver={onDropHere ? (e => { e.preventDefault(); onDropHere.mark(); }) : undefined}
       onDrop={onDropHere ? (e => { e.preventDefault(); onDropHere.drop(); }) : undefined}
       onHoverStart={() => setHover(true)} onHoverEnd={() => setHover(false)}
@@ -139,7 +145,9 @@ function ChatRow({ title, pinned, nested, mobile, onPin, onOpen, active,
       {/* Touch has no hover, so nothing can be revealed on demand — showing an
           overflow menu and an empty pin on every row just adds noise. On a phone
           only genuinely pinned rows carry a mark, and it only unpins. */}
-      <div className="rowacts">
+      <div className="rowacts"
+        onMouseEnter={() => setOnActs(true)}
+        onMouseLeave={() => setOnActs(false)}>
         {!mobile && (
           <motion.button ref={dotsRef} className="dots" onClick={openMenu}
             aria-label="Chat options"
@@ -344,7 +352,7 @@ const NAV = [
 ];
 
 export default function Sidebar({ user, onNewChat, collapsed, onToggle, mobile, drawer,
-                                 openChat, onOpenChat, view, onNav }) {
+                                 openChat, onOpenChat, view, onNav, onNotify }) {
   const [chatsOpen, setChatsOpen] = useState(true);
   const [foldersOpen, setFoldersOpen] = useState(true);
   const [open, setOpen] = useState({ work:true, research:false, personal:false });
@@ -507,7 +515,11 @@ export default function Sidebar({ user, onNewChat, collapsed, onToggle, mobile, 
       setOpen(o => ({ ...o, [arg]: true }));
       return;
     }
-    /* share is inert — there is nowhere to send to in a frontend-only build */
+    if (key === 'share') {
+      copyText(`https://nash.chat/c/${id}`).then(ok =>
+        onNotify?.(ok ? 'Link copied' : 'Could not copy', 'share'));
+      return;
+    }
   };
 
   const pinChat = id =>

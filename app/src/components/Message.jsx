@@ -2,13 +2,15 @@ import { useState, useRef, useLayoutEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import Icon from './Icon.jsx';
 import { ease, dur } from '../lib/motion.js';
+import copyText from '../lib/copy.js';
 
 const ACTIONS = [
-  { icon:'copy',     label:'Copy' },
-  { icon:'thumbUp',  label:'Good response' },
-  { icon:'thumbDown',label:'Bad response' },
-  { icon:'bookmark', label:'Bookmark' },
-  { icon:'share',    label:'Share' },
+  { icon:'copy',      label:'Copy' },
+  { icon:'thumbUp',   label:'Good response' },
+  { icon:'thumbDown', label:'Bad response' },
+  { icon:'fork',      label:'Fork conversation' },
+  { icon:'bookmark',  label:'Bookmark' },
+  { icon:'share',     label:'Share' },
 ];
 
 const MY_ACTIONS = [
@@ -31,13 +33,14 @@ function inline(str) {
   });
 }
 
-function CodeBlock({ lang, v }) {
+function CodeBlock({ lang, v, onNotify }) {
+  const copy = async () => onNotify?.(await copyText(v) ? 'Code copied' : 'Could not copy');
   return (
     <div className="codeblock">
       {lang && (
         <div className="cbhead">
           <span className="lang">{lang}</span>
-          <button title="Copy" aria-label="Copy code"><Icon name="copy" size={15} /></button>
+          <button title="Copy" aria-label="Copy code" onClick={copy}><Icon name="copy" size={15} /></button>
           <button title="Download" aria-label="Download code"><Icon name="download" size={15} /></button>
         </div>
       )}
@@ -56,14 +59,16 @@ function FileCard({ name, meta }) {
 }
 
 /* a titled document the reply produced — collapsible, with its own actions */
-function DocBlock({ title, v }) {
+function DocBlock({ title, v, onNotify }) {
   const [open, setOpen] = useState(true);
+  const copy = async () =>
+    onNotify?.(await copyText(v.join('\n\n')) ? 'Copied' : 'Could not copy');
   return (
     <div className="doc">
       <div className="dochead">
         <span className="t">{title}</span>
         <button title="Edit" aria-label="Edit"><Icon name="edit" size={15} /></button>
-        <button title="Copy" aria-label="Copy"><Icon name="copy" size={15} /></button>
+        <button title="Copy" aria-label="Copy" onClick={copy}><Icon name="copy" size={15} /></button>
         <button title="Download" aria-label="Download"><Icon name="download" size={15} /></button>
         <motion.button onClick={() => setOpen(o => !o)}
           aria-label={open ? 'Collapse' : 'Expand'}
@@ -132,15 +137,15 @@ function ErrorBlock({ v }) {
   );
 }
 
-function Blocks({ blocks }) {
+function Blocks({ blocks, onNotify }) {
   return blocks.map((b, i) => {
-    if (b.t === 'code')  return <CodeBlock key={i} lang={b.lang} v={b.v} />;
+    if (b.t === 'code')  return <CodeBlock key={i} lang={b.lang} v={b.v} onNotify={onNotify} />;
     if (b.t === 'file')  return <FileCard key={i} name={b.name} meta={b.meta} />;
     if (b.t === 'img')   return <ImageBlock key={i} ratio={b.ratio} />;
     if (b.t === 'table') return <Table key={i} head={b.head} rows={b.rows} />;
     if (b.t === 'dl')    return <ResultFile key={i} name={b.name} meta={b.meta} />;
     if (b.t === 'error') return <ErrorBlock key={i} v={b.v} />;
-    if (b.t === 'doc')   return <DocBlock key={i} title={b.title} v={b.v} />;
+    if (b.t === 'doc')   return <DocBlock key={i} title={b.title} v={b.v} onNotify={onNotify} />;
     if (b.t === 'h2')    return <h2 key={i} className="bh2">{b.v}</h2>;
     if (b.t === 'h3')    return <h3 key={i} className="bh3">{b.v}</h3>;
     if (b.t === 'quote') return <blockquote key={i} className="bq">{inline(b.v)}</blockquote>;
@@ -158,7 +163,17 @@ function Blocks({ blocks }) {
   });
 }
 
-export default function Message({ role, text, blocks, model, mobile, failed, pending }) {
+export default function Message({ role, text, blocks, model, mobile, failed, pending,
+                                  onNotify, onFork }) {
+  const [vote, setVote]   = useState(null);   // 'up' | 'down' | null
+  const [saved, setSaved] = useState(false);
+  /* what a reader would actually want on the clipboard */
+  const plain = () => text || (blocks || []).map(b =>
+    Array.isArray(b.v) ? b.v.flat(2).join('\n') : (b.v || b.title || b.name || '')).join('\n\n');
+  const copyMsg   = async () => onNotify?.(await copyText(plain()) ? 'Copied' : 'Could not copy');
+  const shareMsg  = async () =>
+    onNotify?.(await copyText(`https://nash.chat/s/${Math.abs(plain().length * 7919).toString(36)}`)
+      ? 'Link copied' : 'Could not copy', 'share');
   const clampable = role === 'user' && !blocks;
   const [open, setOpen]   = useState(false);
   const [long, setLong]   = useState(false);
@@ -204,7 +219,7 @@ export default function Message({ role, text, blocks, model, mobile, failed, pen
           className={`mtext ${clampable && long && !open ? 'clamped' : ''}`}
           animate={{ maxHeight: !clampable || open || !long ? 6000 : maxH }}
           transition={{ duration: dur.move, ease }}>
-          {blocks ? <Blocks blocks={blocks} /> : text}
+          {blocks ? <Blocks blocks={blocks} onNotify={onNotify} /> : text}
         </motion.div>
 
         <AnimatePresence initial={false}>
@@ -230,7 +245,30 @@ export default function Message({ role, text, blocks, model, mobile, failed, pen
             style={{ pointerEvents: hover || mobile ? 'auto' : 'none' }}
             transition={{ duration: dur.hover, ease }}>
             {ACTIONS.map(a => (
-              <motion.button key={a.icon} className="act" title={a.label} aria-label={a.label}
+              <motion.button key={a.icon} title={a.label} aria-label={a.label}
+                className={`act ${
+                  (a.icon === 'thumbUp'   && vote === 'up')   ||
+                  (a.icon === 'thumbDown' && vote === 'down') ||
+                  (a.icon === 'bookmark'  && saved) ? 'on' : ''}`}
+                onClick={() => {
+                  if (a.icon === 'copy')      return copyMsg();
+                  if (a.icon === 'share')     return shareMsg();
+                  if (a.icon === 'thumbUp')   {
+                    const next = vote === 'up' ? null : 'up';
+                    setVote(next);
+                    return onNotify?.(next ? 'Thanks — marked helpful' : 'Rating removed', 'thumbUp');
+                  }
+                  if (a.icon === 'thumbDown') {
+                    const next = vote === 'down' ? null : 'down';
+                    setVote(next);
+                    return onNotify?.(next ? 'Thanks — marked unhelpful' : 'Rating removed', 'thumbDown');
+                  }
+                  if (a.icon === 'bookmark')  {
+                    setSaved(v => !v);
+                    return onNotify?.(saved ? 'Bookmark removed' : 'Bookmarked', 'bookmark');
+                  }
+                  if (a.icon === 'fork')      return onFork?.();
+                }}
                 whileHover={{ color:'var(--t1)', backgroundColor:'var(--surface)' }}
                 whileTap={{ scale: 0.9 }} transition={{ duration: dur.hover, ease }}>
                 <Icon name={a.icon} size={15} />
@@ -248,6 +286,7 @@ export default function Message({ role, text, blocks, model, mobile, failed, pen
           transition={{ duration: dur.hover, ease }}>
           {MY_ACTIONS.map(a => (
             <motion.button key={a.icon} className="act" title={a.label} aria-label={a.label}
+              onClick={a.icon === 'copy' ? copyMsg : a.icon === 'share' ? shareMsg : undefined}
               whileHover={{ color:'var(--t1)', backgroundColor:'var(--surface)' }}
               whileTap={{ scale: 0.9 }} transition={{ duration: dur.hover, ease }}>
               <Icon name={a.icon} size={15} />

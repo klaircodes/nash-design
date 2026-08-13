@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import Auth from './screens/Auth.jsx';
 import Chat from './screens/Chat.jsx';
 import Memories from './screens/Memories.jsx';
 import Sidebar from './components/Sidebar.jsx';
-import Icon from './components/Icon.jsx';
+import Toast from './components/Toast.jsx';
 import { ease, liquidWide } from './lib/motion.js';
 import useIsMobile from './lib/useIsMobile.js';
 import './styles/shell.css';
@@ -17,6 +17,15 @@ export default function App() {
   const [openChat, setOpenChat]   = useState(null);
   const [view, setView]           = useState('chat');
   const [useMemory, setUseMemory] = useState(true);
+  const [note, setNote]           = useState(null);
+
+  /* one place for app-wide confirmations, bottom right like every other toast */
+  const notify = (msg, icon) => setNote({ msg, icon, at: Date.now() });
+  useEffect(() => {
+    if (!note) return;
+    const t = setTimeout(() => setNote(null), 2600);
+    return () => clearTimeout(t);
+  }, [note]);
   const mobile = useIsMobile();
 
   return (
@@ -53,6 +62,7 @@ export default function App() {
                      setView('chat'); setDrawer(false);
                    }}
                    view={view} onNav={v => { setView(v); setDrawer(false); }}
+                   onNotify={notify}
                    openChat={openChat}
                    onOpenChat={c => {
                      setOpenChat(c ? { ...c, at: Date.now() } : null);
@@ -65,7 +75,16 @@ export default function App() {
             ? <Memories mobile={mobile} drawer={drawer} onMenu={() => setDrawer(true)}
                         use={useMemory} onUse={setUseMemory} />
             : <Chat user={user} sessionKey={session} openChat={openChat} mobile={mobile}
-                    drawer={drawer} onMenu={() => setDrawer(true)} />}
+                    drawer={drawer} onMenu={() => setDrawer(true)} onNotify={notify} />}
+          <div className="toasts">
+            <AnimatePresence initial={false}>
+              {note && (
+                <Toast key="note" icon={note.icon} onClose={() => setNote(null)}>
+                  {note.msg}
+                </Toast>
+              )}
+            </AnimatePresence>
+          </div>
         </motion.div>
       )}
     </AnimatePresence>

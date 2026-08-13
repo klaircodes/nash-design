@@ -12,7 +12,7 @@ function greeting() {
   return h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
 }
 
-export default function Chat({ user, sessionKey, openChat, mobile, drawer, onMenu }) {
+export default function Chat({ user, sessionKey, openChat, mobile, drawer, onMenu, onNotify }) {
   const first = (user.name || 'there').split(' ')[0];
   const [thread, setThread] = useState([]);
   const scroller = useRef(null);
@@ -33,6 +33,13 @@ export default function Chat({ user, sessionKey, openChat, mobile, drawer, onMen
   /* the reply lands after a beat, so the wait has something to show for itself */
   const timer = useRef(null);
   useEffect(() => () => clearTimeout(timer.current), []);
+
+  /* forking keeps everything up to that reply and drops the rest, so the next
+     thing you send continues from there instead of the end of the thread */
+  const fork = i => {
+    setThread(t => t.slice(0, i + 1));
+    onNotify?.('Forked into a new chat', 'fork');
+  };
 
   const send = text => {
     const word = THINKING[Math.floor(Math.random() * THINKING.length)];
@@ -92,7 +99,8 @@ export default function Chat({ user, sessionKey, openChat, mobile, drawer, onMen
             {thread.map((m, i) => (
               <Message key={i} role={m.role} text={m.text} blocks={m.blocks}
                        pending={m.pending} failed={m.failed}
-                       model={m.model || model} mobile={mobile} />
+                       model={m.model || model} mobile={mobile} onNotify={onNotify}
+                       onFork={() => fork(i)} />
             ))}
           </div>
         </div>

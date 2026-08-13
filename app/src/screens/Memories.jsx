@@ -3,6 +3,8 @@ import { motion, AnimatePresence } from 'motion/react';
 import Icon from '../components/Icon.jsx';
 import { ease, dur, liquid, liquidWide } from '../lib/motion.js';
 import { MEMORIES, MEM_SCOPES, fmtMemDate } from '../lib/data.js';
+import copyText from '../lib/copy.js';
+import Toast from '../components/Toast.jsx';
 import '../styles/memories.css';
 
 const FILTERS = ['All', ...MEM_SCOPES];
@@ -131,6 +133,7 @@ export default function Memories({ mobile, drawer, onMenu, use, onUse }) {
   const [undo, setUndo]     = useState(null);
   const [loading, setLoading] = useState(true);
   const [hideOff, setHideOff] = useState(false);
+  const [note, setNote]       = useState(null);
 
   /* only opening the page fetches. Filtering and paging are local, so they
      switch instantly rather than pretending to load. */
@@ -158,9 +161,7 @@ export default function Memories({ mobile, drawer, onMenu, use, onUse }) {
       /* on a phone the reminder lies across the full width, so the list gives
          up a row for it and takes it back when the toast goes. Driven off the
          intended state, not the DOM — an exiting toast still has height. */
-      const toast = mobile && !use && !hideOff
-        ? (toastRef.current?.offsetHeight || 64)
-        : 0;
+      const toast = mobile && !use && !hideOff ? 68 : 0;
       const room = el.clientHeight - anchor.offsetTop - 76 - (toast ? toast + 12 : 0);
       const row = anchor.querySelector('.memrow')?.offsetHeight || 92;
       setPerPage(Math.max(1, Math.floor(room / (row + 12))));
@@ -210,12 +211,19 @@ export default function Memories({ mobile, drawer, onMenu, use, onUse }) {
     setUndo(m);
   };
   useEffect(() => {
+    if (!note) return;
+    const t = setTimeout(() => setNote(null), 2400);
+    return () => clearTimeout(t);
+  }, [note]);
+  useEffect(() => {
     if (!undo) return;
     const t = setTimeout(() => setUndo(null), 5000);
     return () => clearTimeout(t);
   }, [undo]);
 
   const clearAll = () => { setQuery(''); setFilter('All'); };
+  const copyMemory = async m =>
+    setNote(await copyText(m.text) ? 'Memory copied' : 'Could not copy');
 
   return (
     <div className="main">
@@ -301,7 +309,7 @@ export default function Memories({ mobile, drawer, onMenu, use, onUse }) {
               ))
             : slice.map(m => (
                 <Row key={m.id} m={m} mobile={mobile}
-                  onEdit={setDialog} onDelete={remove} onCopy={() => {}} />
+                  onEdit={setDialog} onDelete={remove} onCopy={copyMemory} />
               ))}
 
           {!loading && shown.length === 0 && (
@@ -347,24 +355,20 @@ export default function Memories({ mobile, drawer, onMenu, use, onUse }) {
       <div className="toasts">
         <AnimatePresence initial={false}>
           {!use && !hideOff && (
-            <motion.div className="toast warn" key="off" ref={toastRef}
-              initial={{ opacity:0, y:14 }} animate={{ opacity:1, y:0 }}
-              exit={{ opacity:0, y:10 }} transition={liquid}>
-              <Icon name="memoff" size={17} />
-              <span>Memory is off — these are kept, but Nash will not use them in replies.</span>
-              <button className="x" onClick={() => setHideOff(true)} aria-label="Dismiss">
-                <Icon name="x" size={14} />
-              </button>
-            </motion.div>
+            <Toast key="off" icon="memoff" tone="warn" onClose={() => setHideOff(true)}>
+              Memory is off — these are kept, but Nash will not use them in replies.
+            </Toast>
+          )}
+
+          {note && (
+            <Toast key="note" onClose={() => setNote(null)}>{note}</Toast>
           )}
 
           {undo && (
-            <motion.div className="toast" key="undo"
-              initial={{ opacity:0, y:14 }} animate={{ opacity:1, y:0 }}
-              exit={{ opacity:0, y:10 }} transition={liquid}>
-              <span>Memory deleted</span>
-              <button onClick={() => { setList(l => [undo, ...l]); setUndo(null); }}>Undo</button>
-            </motion.div>
+            <Toast key="undo" icon="trash" onClose={() => setUndo(null)}
+              action={{ label:'Undo', onClick:() => { setList(l => [undo, ...l]); setUndo(null); } }}>
+              Memory deleted
+            </Toast>
           )}
         </AnimatePresence>
       </div>
