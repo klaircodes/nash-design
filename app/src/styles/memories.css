@@ -59,7 +59,7 @@
 /* ---- rows ---- */
 .memlist{display:flex;flex-direction:column;gap:12px;}
 .memlist.muted{opacity:.55;}
-.memrow{background:var(--surface);border-radius:13px;padding:15px 17px;}
+.memrow{position:relative;background:var(--surface);border-radius:13px;padding:15px 17px;}
 .memmeta{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--t3);
   min-height:26px;}
 .memmeta i{font-style:normal;color:var(--t4);}
@@ -71,8 +71,7 @@
 .memmeta .scope.persona{background:var(--warn-bg);color:var(--warn);}
 .memmeta .scope.chat{background:var(--elevated);color:var(--t2);}
 
-.memacts{margin-left:auto;display:flex;align-items:center;gap:2px;flex:0 0 auto;
-  position:relative;}
+.memacts{margin-left:auto;display:flex;align-items:center;gap:2px;flex:0 0 auto;}
 .memacts button{width:28px;height:28px;border-radius:7px;display:grid;
   place-items:center;color:var(--t3);}
 .memacts .more{position:relative;display:flex;}
@@ -141,7 +140,6 @@
   .memmeta i:nth-of-type(3){display:none;}
   .memmeta .from{width:100%;}
   .memacts{position:absolute;top:11px;right:12px;}
-  .memrow{position:relative;}
   .memtext{font-size:13.5px;}
   /* centred, not stuck to the bottom edge, and never taller than the screen */
   .scrim:has(.memdialog){place-items:center;padding:24px 16px;}

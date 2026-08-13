@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect, useLayoutEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import Icon from '../components/Icon.jsx';
 import { ease, dur, liquid, liquidWide } from '../lib/motion.js';
-import { MEMORIES, MEM_SCOPES, fmtMemDate } from '../lib/data.js';
+import { MEMORIES, MEM_SCOPES, MEM_SCOPE_LABEL, fmtMemDate } from '../lib/data.js';
 import copyText from '../lib/copy.js';
 import Toast from '../components/Toast.jsx';
 import '../styles/memories.css';
@@ -66,7 +66,7 @@ function MemoryDialog({ open, draft, onSave, onClose }) {
               <motion.button key={s} className={`fpill ${scope === s ? 'on' : ''}`}
                 onClick={() => setScope(s)} whileTap={{ scale: 0.97 }}
                 transition={{ duration: dur.hover, ease }}>
-                {s}
+                {MEM_SCOPE_LABEL[s]}
               </motion.button>
             ))}
           </div>
@@ -92,12 +92,14 @@ function Row({ m, mobile, onEdit, onDelete, onCopy }) {
   return (
     <motion.div className="memrow" key={m.id}
       onHoverStart={() => setHover(true)} onHoverEnd={() => setHover(false)}>
+      <p className="memtext">{m.text}</p>
+
       <div className="memmeta">
         <span>{m.tokens} tokens</span>
         <i>·</i>
         <span>{mobile ? fmtMemDate(m.date).replace(/,.*/, '') : fmtMemDate(m.date)}</span>
         <i>·</i>
-        <span className={`scope ${m.scope.toLowerCase()}`}>{m.scope}</span>
+        <span className={`scope ${m.scope.toLowerCase()}`}>{MEM_SCOPE_LABEL[m.scope]}</span>
         <i>·</i>
         <span className="from">From: {m.from}</span>
 
@@ -111,15 +113,13 @@ function Row({ m, mobile, onEdit, onDelete, onCopy }) {
               animate={{ opacity: show ? 1 : 0 }}
               style={{ pointerEvents: show ? 'auto' : 'none' }}
               whileHover={{ color: a.danger ? 'var(--err)' : 'var(--t1)',
-                            backgroundColor:'var(--surface)' }}
+                            backgroundColor:'var(--elevated)' }}
               whileTap={{ scale: 0.9 }} transition={{ duration: dur.hover, ease }}>
               <Icon name={a.icon} size={15} />
             </motion.button>
           ))}
         </div>
       </div>
-
-      <p className="memtext">{m.text}</p>
     </motion.div>
   );
 }
@@ -245,6 +245,7 @@ export default function Memories({ mobile, drawer, onMenu, use, onUse }) {
       )}
 
       <div className={`page ${mobile && !use && !hideOff ? 'toastroom' : ''}`} ref={host}>
+       <div className="pagein">
         <div className="pagehead deskonly">
           <div className="pt">
             <h1>Memories</h1>
@@ -290,7 +291,7 @@ export default function Memories({ mobile, drawer, onMenu, use, onUse }) {
               <motion.button key={f} className={`fpill ${filter === f ? 'on' : ''}`}
                 onClick={() => setFilter(f)} whileTap={{ scale: 0.97 }}
                 transition={{ duration: dur.hover, ease }}>
-                {f}<span className="n">{n}</span>
+                {f === 'All' ? 'All' : MEM_SCOPE_LABEL[f]}<span className="n">{n}</span>
               </motion.button>
             );
           })}
@@ -350,6 +351,7 @@ export default function Memories({ mobile, drawer, onMenu, use, onUse }) {
             </button>
           </div>
         )}
+       </div>
       </div>
 
       <div className="toasts">

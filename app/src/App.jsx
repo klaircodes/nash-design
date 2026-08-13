@@ -5,6 +5,7 @@ import Chat from './screens/Chat.jsx';
 import Memories from './screens/Memories.jsx';
 import Sidebar from './components/Sidebar.jsx';
 import Toast from './components/Toast.jsx';
+import Icon from './components/Icon.jsx';
 import { ease, liquidWide } from './lib/motion.js';
 import useIsMobile from './lib/useIsMobile.js';
 import './styles/shell.css';
