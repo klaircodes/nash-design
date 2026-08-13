@@ -93,6 +93,29 @@
 .chatrow .pin.on:hover svg path{fill:none;}
 .rule{height:1px;background:var(--border);margin:8px 0;}
 
+/* ---- chat row menu ---- */
+.rowmenu{
+  position:fixed;z-index:61;width:206px;padding:6px;
+  border-radius:12px;background:var(--elevated);box-shadow:var(--shadow);
+}
+[data-theme="light"] .rowmenu{background:var(--app);
+  box-shadow:0 10px 28px rgba(16,18,24,.14),inset 0 0 0 1px var(--border);}
+.rmwrap{position:relative;}
+.rmrow{
+  width:100%;display:flex;align-items:center;gap:11px;padding:9px 10px;
+  border-radius:8px;font-size:12.5px;color:var(--t2);text-align:left;
+}
+.rmrow span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.rmrow:hover{background:var(--hover);color:var(--t1);}
+.rmrow.danger{color:var(--err);}
+.rmrow.danger:hover{background:var(--err-bg);color:var(--err);}
+.rowmenu.submenu{position:absolute;left:198px;top:-6px;width:184px;}
+.rmempty{padding:10px;font-size:12.5px;color:var(--t3);}
+.chatrow .rename{
+  flex:1;min-width:0;font-size:12.5px;color:var(--t1);
+  background:var(--surface);border-radius:6px;padding:2px 7px;outline:none;border:0;
+}
+
 /* ---- folders: drop target + new folder ---- */
 .sechead.row{display:flex;align-items:center;gap:6px;}
 .sechead.row .lbl{flex:1;text-align:left;height:100%;

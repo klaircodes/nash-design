@@ -47,9 +47,57 @@ function Chevron({ open }) {
   );
 }
 
+const ROWMENU = [
+  { key:'share',     icon:'share',     label:'Share' },
+  { key:'rename',    icon:'edit',      label:'Rename' },
+  { key:'duplicate', icon:'duplicate', label:'Duplicate' },
+  { key:'move',      icon:'moveto',    label:'Move to Folder', more:true },
+  { key:'pin',       icon:'pin',       label:'Pin' },
+  { key:'archive',   icon:'archive',   label:'Archive' },
+  { key:'delete',    icon:'trash',     label:'Delete', danger:true },
+];
+
 function ChatRow({ title, pinned, nested, mobile, onPin, onOpen, active,
-                  onDragStart, onDropHere, over }) {
-  const [hover, setHover] = useState(false);
+                  onDragStart, onDropHere, over, folders = [], onAction }) {
+  const [hover, setHover]     = useState(false);
+  const [menu, setMenu]       = useState(null);   // null | {top,left}
+  const [sub, setSub]         = useState(false);
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft]     = useState(title);
+  const dotsRef = useRef(null);
+
+  /* the sidebar clips its own overflow, so the menu is measured and drawn fixed */
+  const openMenu = e => {
+    e.stopPropagation();
+    const r = dotsRef.current?.getBoundingClientRect();
+    if (!r) return;
+    const H = 300;
+    setMenu({
+      left: r.left - 150,
+      top: r.bottom + H > window.innerHeight ? r.top - H - 6 : r.bottom + 6,
+    });
+    setSub(false);
+  };
+
+  useEffect(() => {
+    if (!menu) return;
+    const key = e => e.key === 'Escape' && setMenu(null);
+    window.addEventListener('keydown', key);
+    return () => window.removeEventListener('keydown', key);
+  }, [menu]);
+
+  const run = (key, arg) => {
+    setMenu(null);
+    if (key === 'rename') { setDraft(title); setEditing(true); return; }
+    if (key === 'pin') { onPin?.(); return; }
+    onAction?.(key, arg);
+  };
+
+  const commit = () => {
+    setEditing(false);
+    const next = draft.trim();
+    if (next && next !== title) onAction?.('rename', next);
+  };
 
   /* generous 26px target — the glyph alone was fiddly to hit */
   const PinBtn = () => (
@@ -66,30 +114,81 @@ function ChatRow({ title, pinned, nested, mobile, onPin, onOpen, active,
 
   return (
     <motion.div className={`chatrow ${nested ? 'nested' : ''} ${active ? 'active' : ''} ${over ? 'over' : ''}`}
-      onClick={onOpen}
-      draggable={Boolean(onDragStart)} onDragStart={onDragStart}
+      onClick={editing ? undefined : onOpen}
+      draggable={Boolean(onDragStart) && !editing} onDragStart={onDragStart}
       onDragOver={onDropHere ? (e => { e.preventDefault(); onDropHere.mark(); }) : undefined}
       onDrop={onDropHere ? (e => { e.preventDefault(); onDropHere.drop(); }) : undefined}
       onHoverStart={() => setHover(true)} onHoverEnd={() => setHover(false)}
-      animate={{ backgroundColor: active || hover || over ? 'var(--hover)' : 'rgba(0,0,0,0)',
-                 color: active || hover || over ? 'var(--t1)' : 'var(--t2)' }}
+      animate={{ backgroundColor: active || hover || over || menu ? 'var(--hover)' : 'rgba(0,0,0,0)',
+                 color: active || hover || over || menu ? 'var(--t1)' : 'var(--t2)' }}
       transition={{ duration: dur.hover, ease }}
     >
-      <span className="title">{title}</span>
+      {editing ? (
+        <input className="rename" autoFocus value={draft}
+          onClick={e => e.stopPropagation()}
+          onChange={e => setDraft(e.target.value)}
+          onBlur={commit}
+          onKeyDown={e => {
+            if (e.key === 'Enter') commit();
+            if (e.key === 'Escape') setEditing(false);
+          }} />
+      ) : (
+        <span className="title">{title}</span>
+      )}
+
       {/* Touch has no hover, so nothing can be revealed on demand — showing an
           overflow menu and an empty pin on every row just adds noise. On a phone
           only genuinely pinned rows carry a mark, and it only unpins. */}
       <div className="rowacts">
         {!mobile && (
-          <motion.span className="dots"
-            animate={{ opacity: hover ? 1 : 0 }}
-            style={{ pointerEvents: hover ? 'auto' : 'none' }}
+          <motion.button ref={dotsRef} className="dots" onClick={openMenu}
+            aria-label="Chat options"
+            animate={{ opacity: hover || menu ? 1 : 0 }}
+            style={{ pointerEvents: hover || menu ? 'auto' : 'none' }}
             transition={{ duration: dur.hover, ease }}>
             <Icon name="dotsH" size={15} />
-          </motion.span>
+          </motion.button>
         )}
         {(!mobile || pinned) && <PinBtn />}
       </div>
+
+      <AnimatePresence>
+        {menu && (<>
+          <div className="orgveil" onClick={e => { e.stopPropagation(); setMenu(null); }} />
+          <motion.div className="rowmenu" style={{ top: menu.top, left: menu.left }}
+            onClick={e => e.stopPropagation()}
+            initial={{ opacity:0, y:-6, scale:.98 }} animate={{ opacity:1, y:0, scale:1 }}
+            exit={{ opacity:0, y:-6, scale:.98 }} transition={{ duration:0.18, ease }}>
+            {ROWMENU.map(m => (
+              <div key={m.key} className="rmwrap"
+                onMouseEnter={() => setSub(m.key === 'move')}>
+                <button className={`rmrow ${m.danger ? 'danger' : ''}`}
+                  onClick={() => (m.more ? setSub(v => !v) : run(m.key))}>
+                  <Icon name={m.icon} size={15} />
+                  <span>{m.key === 'pin' && pinned ? 'Unpin' : m.label}</span>
+                  {m.more && <Icon name="chevR" size={14} />}
+                </button>
+
+                <AnimatePresence>
+                  {m.more && sub && (
+                    <motion.div className="rowmenu submenu"
+                      initial={{ opacity:0, x:-6 }} animate={{ opacity:1, x:0 }}
+                      exit={{ opacity:0, x:-6 }} transition={{ duration:0.16, ease }}>
+                      {folders.length === 0 && <div className="rmempty">No folders yet</div>}
+                      {folders.map(f => (
+                        <button key={f.key} className="rmrow"
+                          onClick={() => run('move', f.key)}>
+                          <Icon name="folder" size={15} /><span>{f.label}</span>
+                        </button>
+                      ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            ))}
+          </motion.div>
+        </>)}
+      </AnimatePresence>
     </motion.div>
   );
 }
@@ -370,6 +469,47 @@ export default function Sidebar({ user, onNewChat, collapsed, onToggle, mobile, 
     setAdding(false);
   };
 
+  /* one handler for every row action, whether the chat is loose or in a folder */
+  const rowAction = (id, from) => (key, arg) => {
+    const patch = (list, fn) => list.map(c => (c.id === id ? fn(c) : c));
+    const drop  = list => list.filter(c => c.id !== id);
+    const inFolder = fn =>
+      setFolders(l => l.map(f => (f.key !== from ? f : { ...f, chats: fn(f.chats) })));
+
+    if (key === 'rename') {
+      if (from === 'loose') setChats(l => patch(l, c => ({ ...c, title: arg })));
+      else inFolder(rows => patch(rows, c => ({ ...c, title: arg })));
+      return;
+    }
+    if (key === 'duplicate') {
+      const copy = src => ({ ...src, id: `${src.id}-d${Date.now()}`,
+                             title: `${src.title} copy`, pinned: false });
+      if (from === 'loose') setChats(l => l.flatMap(c => (c.id === id ? [c, copy(c)] : [c])));
+      else inFolder(rows => rows.flatMap(c => (c.id === id ? [c, copy(c)] : [c])));
+      return;
+    }
+    if (key === 'delete' || key === 'archive') {
+      if (from === 'loose') setChats(drop); else inFolder(drop);
+      if (openChat?.id === id) onOpenChat?.(null);
+      return;
+    }
+    if (key === 'move') {
+      let moving;
+      if (from === 'loose') setChats(l => { moving = l.find(c => c.id === id); return drop(l); });
+      else setFolders(l => l.map(f => {
+        if (f.key !== from) return f;
+        moving = f.chats.find(c => c.id === id);
+        return { ...f, chats: f.chats.filter(c => c.id !== id) };
+      }));
+      setFolders(l => l.map(f => (f.key !== arg ? f : {
+        ...f, chats: [...f.chats, { id, title: moving?.title || '', pinned: false }],
+      })));
+      setOpen(o => ({ ...o, [arg]: true }));
+      return;
+    }
+    /* share is inert — there is nowhere to send to in a frontend-only build */
+  };
+
   const pinChat = id =>
     setChats(list => list.map(c => (c.id === id ? { ...c, pinned: !c.pinned } : c)));
   const pinInFolder = (key, id) =>
@@ -518,6 +658,7 @@ export default function Sidebar({ user, onNewChat, collapsed, onToggle, mobile, 
                                    over={over === c.id}
                                    onDropHere={{ mark:() => setOver(c.id),
                                                  drop:() => dropOnChat(c, f.key) }}
+                                   folders={folders} onAction={rowAction(c.id, f.key)}
                                    active={openChat?.id === c.id}
                                    onOpen={() => onOpenChat?.({ id:c.id, title:c.title })}
                                    onPin={() => pinInFolder(f.key, c.id)} />
@@ -528,6 +669,7 @@ export default function Sidebar({ user, onNewChat, collapsed, onToggle, mobile, 
                                    over={over === c.id}
                                    onDropHere={{ mark:() => setOver(c.id),
                                                  drop:() => dropOnChat(c, f.key) }}
+                                   folders={folders} onAction={rowAction(c.id, f.key)}
                                    active={openChat?.id === c.id}
                                    onOpen={() => onOpenChat?.({ id:c.id, title:c.title })}
                                    onPin={() => pinInFolder(f.key, c.id)} />
@@ -546,6 +688,7 @@ export default function Sidebar({ user, onNewChat, collapsed, onToggle, mobile, 
                                over={over === c.id}
                                onDropHere={{ mark:() => setOver(c.id),
                                              drop:() => dropOnChat(c, 'loose') }}
+                               folders={folders} onAction={rowAction(c.id, 'loose')}
                                active={openChat?.id === c.id}
                                onOpen={() => onOpenChat?.({ id:c.id, title:c.title })}
                                onPin={() => pinChat(c.id)} />
@@ -563,6 +706,7 @@ export default function Sidebar({ user, onNewChat, collapsed, onToggle, mobile, 
                                over={over === c.id}
                                onDropHere={{ mark:() => setOver(c.id),
                                              drop:() => dropOnChat(c, 'loose') }}
+                               folders={folders} onAction={rowAction(c.id, 'loose')}
                                active={openChat?.id === c.id}
                                onOpen={() => onOpenChat?.({ id:c.id, title:c.title })}
                                onPin={() => pinChat(c.id)} />
