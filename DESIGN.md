@@ -537,6 +537,31 @@ to the same box.
 | Filters | directly under search | scrolling strip |
 | Pagination | bottom left of the list | none — the list scrolls |
 
+### Containers and loose items
+
+A page that has both — Bookmarks first, but the same holds anywhere — lists them
+in one order:
+
+```
+Folders · 3          ← containers, as cards
+  [ … ]  [ … ]  [ … ]
+
+Unsorted · 4         ← only what is not in a folder
+  [ … ]
+  [ … ]
+```
+
+**Folders first, unsorted beneath.** The unsorted section holds **only items that
+are not in a folder** — a bookmark already filed appears inside its folder and
+nowhere else. An item listed in both places makes the count meaningless and makes
+filing feel like it did nothing.
+
+Its heading is **"Unsorted"**, not "Responses" or "All" — the word has to say why
+those items are there rather than describing what they are.
+
+When nothing is unfiled, the section disappears rather than showing an empty
+state; the folders above are already the answer.
+
 ---
 
 ## 14. Drift — fix before extending
