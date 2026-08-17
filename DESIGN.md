@@ -559,8 +559,14 @@ filing feel like it did nothing.
 Its heading is **"Unsorted"**, not "Responses" or "All" — the word has to say why
 those items are there rather than describing what they are.
 
-When nothing is unfiled, the section disappears rather than showing an empty
-state; the folders above are already the answer.
+**Either section disappears when it is empty** — neither gets a placeholder.
+
+- No folders yet → **no Folders heading at all**, just the bookmarks, unlabelled.
+  A lone "Unsorted" heading over the only list on the page is a distinction with
+  nothing to distinguish from. The heading returns the moment a first folder
+  exists.
+- Nothing unfiled → no Unsorted section; the folders above are already the answer.
+- Neither → the page-level empty state, not two empty sections.
 
 ---
 
