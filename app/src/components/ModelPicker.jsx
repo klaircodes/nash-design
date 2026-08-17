@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import Icon from './Icon.jsx';
-import { ease, dur, liquid } from '../lib/motion.js';
+import { ease, dur, liquid, popMenu, popDialog, popScrim } from '../lib/motion.js';
 import { MODELS, PROVIDERS, FILTERS, SORTS, PERSONAS, fmtDate } from '../lib/data.js';
 
 const meta = m => `${fmtDate(m.date)} · ${m.tags.includes('vision') ? 'Vision'
@@ -169,8 +169,7 @@ export default function ModelPicker({ open, model, pinned, onPick, onPin, onClos
         <AnimatePresence>
           {filterOpen && (
             <motion.div className="sortmenu under"
-              initial={{ opacity:0, y:-6, scale:.98 }} animate={{ opacity:1, y:0, scale:1 }}
-              exit={{ opacity:0, y:-6, scale:.98 }} transition={{ duration:0.18, ease }}>
+              {...popMenu}>
               {FILTERS.map(f => (
                 <motion.button key={f.key} className="sortrow"
                   onClick={() => { setFilter(f.key); setFilterOpen(false); }}
@@ -194,8 +193,7 @@ export default function ModelPicker({ open, model, pinned, onPick, onPin, onClos
         <AnimatePresence>
           {sortOpen && (
             <motion.div className="sortmenu under"
-              initial={{ opacity:0, y:-6, scale:.98 }} animate={{ opacity:1, y:0, scale:1 }}
-              exit={{ opacity:0, y:-6, scale:.98 }} transition={{ duration:0.18, ease }}>
+              {...popMenu}>
               {SORTS.map(so => (
                 <motion.button key={so.key} className="sortrow"
                   onClick={() => { setSort(so.key); setSortOpen(false); }}
@@ -242,8 +240,7 @@ export default function ModelPicker({ open, model, pinned, onPick, onPin, onClos
       <AnimatePresence>
         {sortOpen && (
           <motion.div className="sortmenu"
-            initial={{ opacity:0, y:-6, scale:.98 }} animate={{ opacity:1, y:0, scale:1 }}
-            exit={{ opacity:0, y:-6, scale:.98 }} transition={{ duration:0.18, ease }}>
+            {...popMenu}>
             {SORTS.map(so => (
               <motion.button key={so.key} className="sortrow"
                 onClick={() => { setSort(so.key); setSortOpen(false); }}
@@ -288,10 +285,10 @@ export default function ModelPicker({ open, model, pinned, onPick, onPin, onClos
         if (filterOpen && !e.target.closest('.ddbtn') && !e.target.closest('.sortmenu'))
           setFilterOpen(false);
       }}
-      initial={inline ? { opacity:0, y:14 } : { opacity:0, y:10, scale:.99 }}
-      animate={inline ? { opacity:1, y:0 }  : { opacity:1, y:0, scale:1 }}
-      exit={inline    ? { opacity:0, y:10 } : { opacity:0, y:8, scale:.99 }}
-      transition={liquid}>
+      {...(inline
+        ? { initial:{ opacity:0, y:14 }, animate:{ opacity:1, y:0 },
+            exit:{ opacity:0, y:10 }, transition: liquid }
+        : popDialog)}>
 
         <AnimatePresence mode="wait" initial={false}>
           <motion.div key={view.kind + (view.name || '')}
@@ -403,8 +400,7 @@ export default function ModelPicker({ open, model, pinned, onPick, onPin, onClos
 
   return (
     <motion.div className="scrim" onClick={onClose}
-      initial={{ opacity:0 }} animate={{ opacity:1 }} exit={{ opacity:0 }}
-      transition={{ duration:0.18, ease }}>
+      {...popScrim}>
       {body}
     </motion.div>
   );

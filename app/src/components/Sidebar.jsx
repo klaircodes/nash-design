@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import Icon from './Icon.jsx';
-import { ease, dur, liquid, liquidWide } from '../lib/motion.js';
+import { ease, dur, liquid, liquidWide, popMenu, popSide } from '../lib/motion.js';
 import copyText from '../lib/copy.js';
 import { GROUP_ORDER, ORGS, WORKSPACES, CONVERSATIONS } from '../lib/data.js';
 
@@ -165,8 +165,7 @@ function ChatRow({ title, pinned, nested, mobile, onPin, onOpen, active,
           <div className="orgveil" onClick={e => { e.stopPropagation(); setMenu(null); }} />
           <motion.div className="rowmenu" style={{ top: menu.top, left: menu.left }}
             onClick={e => e.stopPropagation()}
-            initial={{ opacity:0, y:-6, scale:.98 }} animate={{ opacity:1, y:0, scale:1 }}
-            exit={{ opacity:0, y:-6, scale:.98 }} transition={{ duration:0.18, ease }}>
+            {...popMenu}>
             {ROWMENU.map(m => (
               <div key={m.key} className="rmwrap"
                 onMouseEnter={() => setSub(m.key === 'move')}>
@@ -180,8 +179,7 @@ function ChatRow({ title, pinned, nested, mobile, onPin, onOpen, active,
                 <AnimatePresence>
                   {m.more && sub && (
                     <motion.div className="rowmenu submenu"
-                      initial={{ opacity:0, x:-6 }} animate={{ opacity:1, x:0 }}
-                      exit={{ opacity:0, x:-6 }} transition={{ duration:0.16, ease }}>
+                      {...popSide}>
                       {folders.length === 0 && <div className="rmempty">No folders yet</div>}
                       {folders.map(f => (
                         <button key={f.key} className="rmrow"
@@ -275,10 +273,7 @@ function MoreMenu({ collapsed, mobile, view, onNav }) {
         {open && (<>
           <div className="orgveil" onClick={() => setOpen(false)} />
           <motion.div className="orgmenu compact" style={{ top: at.top, left: at.left }}
-            initial={{ opacity:0, x: at.drop ? 0 : -10, y: at.drop ? -8 : 0, scale:.98 }}
-            animate={{ opacity:1, x:0, y:0, scale:1 }}
-            exit={{ opacity:0, x: at.drop ? 0 : -8, y: at.drop ? -6 : 0, scale:.98 }}
-            transition={liquid}>
+            {...(at.drop ? popMenu : popSide)}>
             {MORE.map(m => (
               <motion.button key={m.label} className="orgrow"
                 onClick={() => { setOpen(false); onNav?.(m.view); }}
@@ -315,10 +310,7 @@ function OrgSwitcher({ collapsed, org, onPick }) {
         {open && (<>
           <div className="orgveil" onClick={() => setOpen(false)} />
           <motion.div className="orgmenu" style={{ top: at.top, left: at.left }}
-            initial={{ opacity:0, x: at.drop ? 0 : -10, y: at.drop ? -8 : 0, scale:.98 }}
-            animate={{ opacity:1, x:0, y:0, scale:1 }}
-            exit={{ opacity:0, x: at.drop ? 0 : -8, y: at.drop ? -6 : 0, scale:.98 }}
-            transition={liquid}>
+            {...(at.drop ? popMenu : popSide)}>
             <motion.button className="orgrow"
               onClick={() => { onPick('Personal'); setOpen(false); }}
               whileHover={{ backgroundColor:'var(--hover)' }} transition={{ duration: dur.hover, ease }}>

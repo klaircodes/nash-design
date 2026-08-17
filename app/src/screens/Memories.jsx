@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect, useLayoutEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import Icon from '../components/Icon.jsx';
-import { ease, dur, liquid, liquidWide } from '../lib/motion.js';
+import { ease, dur, liquid, liquidWide, popMenu, popDialog, popScrim } from '../lib/motion.js';
 import { MEMORIES, MEM_SCOPES, MEM_SCOPE_LABEL, MEM_SCOPE_TARGET,
          scopeOptions, fmtMemDate } from '../lib/data.js';
 import copyText from '../lib/copy.js';
@@ -40,8 +40,7 @@ function TargetPicker({ kind, value, onPick }) {
       <AnimatePresence>
         {open && (
           <motion.div className="targetmenu"
-            initial={{ opacity:0, y:-6, scale:.98 }} animate={{ opacity:1, y:0, scale:1 }}
-            exit={{ opacity:0, y:-6, scale:.98 }} transition={{ duration:0.18, ease }}>
+            {...popMenu}>
             {options.map(o => (
               <button key={o} className="sortrow"
                 onClick={() => { onPick(o); setOpen(false); }}>
@@ -83,11 +82,9 @@ function MemoryDialog({ open, draft, onSave, onClose }) {
 
   return (
     <motion.div className="scrim" onClick={onClose}
-      initial={{ opacity:0 }} animate={{ opacity:1 }} exit={{ opacity:0 }}
-      transition={{ duration:0.18, ease }}>
+      {...popScrim}>
       <motion.div className="memdialog" onClick={e => e.stopPropagation()}
-        initial={{ opacity:0, y:10, scale:.99 }} animate={{ opacity:1, y:0, scale:1 }}
-        exit={{ opacity:0, y:8, scale:.99 }} transition={liquid}>
+        {...popDialog}>
         <div className="mhead">
           <div className="tt"><h3>{draft ? 'Edit memory' : 'Add memory'}</h3></div>
           <motion.button className="iconbtn" onClick={onClose} aria-label="Close"
