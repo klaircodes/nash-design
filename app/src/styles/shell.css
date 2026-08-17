@@ -69,9 +69,13 @@
 .folderrow .chev{margin-left:auto;display:flex;}
 /* nested chats are the same row, only indented */
 .chatrow.nested{padding-left:31px;}
+/* A group of one is common, so the heading has to carry it: sit close to the
+   chats it names, far from the ones it doesn't, and stay put while they scroll. */
 .datemark{
+  position:sticky;top:0;z-index:1;
   height:30px;display:flex;align-items:center;padding:0 9px;
-  font-size:11px;font-weight:500;color:var(--t3);margin-top:14px;
+  font-size:11px;font-weight:500;color:var(--t3);
+  margin:24px 0 4px;background:var(--sunken);
 }
 .datemark.first{margin-top:0;}
 .chatrow{
