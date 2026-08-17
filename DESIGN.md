@@ -559,6 +559,18 @@ filing feel like it did nothing.
 Its heading is **"Unsorted"**, not "Responses" or "All" — the word has to say why
 those items are there rather than describing what they are.
 
+**The two sections are laid out differently, on purpose.** Folders are cards in
+a grid, each sized to its content (~400 wide). Unsorted bookmarks are
+**full-width rows spanning the whole content column** — they sit outside the
+folder grid entirely, never indented under it, never constrained to a card's
+width. The change in shape is what tells you one group is containers and the
+other is items; two identical stacks would read as one list with a label in the
+middle.
+
+A row carries a **folder chip only when it is filed** — which means a row in the
+Unsorted section never has one. A chip on an unsorted item is a contradiction:
+it says the thing is in a folder while sitting in the list of things that are not.
+
 **Either section disappears when it is empty** — neither gets a placeholder.
 
 - No folders yet → **no Folders heading at all**, just the bookmarks, unlabelled.
