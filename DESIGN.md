@@ -293,13 +293,52 @@ liquidWide = spring 210 / 30 / 0.95     // sidebar width, travelling controls
 | Hover | colour only, `dur.hover` |
 | Press | `scale .86–.99`, `dur.press` |
 | Row reveal | **opacity only — the slot is always reserved** |
-| Accordion | `height: auto` on `liquid` |
+| Collapse / expand | `height: auto` on `liquid` — **see below** |
 | Panel open | opacity + 10px rise, `liquid` |
 | View swap | opacity + 14px slide, direction follows the drill |
 | Sidebar collapse | width + content translate, `liquidWide` |
 | Travelling control | shared `layoutId` — one element moves |
 | Thinking | 1.6s linear gradient sweep through the text |
 | Skeleton | 1.3s sweep across `--elevated` bars |
+
+### Collapse and expand
+
+**Nothing opens or closes instantly.** Every disclosure in the app animates its
+height, on `liquid`, with the chevron or mark rotating over `dur.swap`. This
+covers, without exception:
+
+| What | Opens |
+|---|---|
+| Sidebar sections — Chats, Folders | `height: auto`, chevron rotates |
+| A folder's chats | `height: auto`, chevron rotates |
+| Composer tools / Add to Chat | `height: auto`, `+` morphs to `−` |
+| Model picker panel | `height: auto` into a fixed 52vh frame |
+| Document block in a reply | `height: auto`, chevron rotates −90° |
+| New-folder draft row | `height: 0 → 34` |
+| Show more on a long message | `maxHeight` to the measured 7-line cap |
+| Sidebar collapse | width + content translate on `liquidWide` |
+| Menus and flyouts | opacity + 6px rise, `dur.swap` |
+
+**Rules for all of them:**
+
+1. **Animate to `auto`, not to a guessed pixel height.** Motion measures the
+   content; a hardcoded height is wrong the moment the content changes.
+2. **The parent that animates height needs `overflow: hidden`.** Without it the
+   content spills during the transition.
+3. **Height and opacity get different timings** — `{ height: liquid, opacity:
+   { duration: 0.2, ease } }`. Opacity finishing first stops the content
+   ghosting through the closing edge.
+4. **The affordance moves with it.** A chevron rotates 180°, a `+` morphs to a
+   `−`, a document's chevron turns −90°. The control never swaps for a second
+   icon.
+5. **Closing is animated too.** Both directions run through `AnimatePresence`
+   with a real `exit` — an element that fades in and then vanishes on close is
+   half-built.
+6. **Fixed frames animate their content, not themselves.** A panel with a set
+   height expands into that frame; the frame itself never resizes around what's
+   inside it.
+7. **No overshoot.** `liquid` is damped to settle, not to bounce. Nothing about
+   opening a folder should spring past its resting height.
 
 **No bouncy easing.** Everything decelerates into place.
 
