@@ -468,14 +468,28 @@ panel opens *between* the content and the composer and pushes nothing off screen
 All measured from the **panel's** right edge, never the trigger's — the trigger
 is inset, so `trigger.right` lands back on top of the sidebar.
 
-| Menu | Placement |
-|---|---|
-| **Org switcher** | `left: panel.right + 12`, `top: trigger.top - 4` |
-| **Chat row menu** | `left: panel.right + 10`, `top: trigger.top - 8`, clamped to `viewport - height - 16` so it never runs off the bottom |
-| **Fallback** | when `left + width` exceeds the viewport, drop below the trigger instead: `top: trigger.bottom + 8`, `left: trigger.left` |
+| Menu | Width | Placement |
+|---|---|---|
+| **Org switcher** | 272 | `left: panel.right + 12`, `top: trigger.top - 4` |
+| **More** | 206 | `left: panel.right + 12`, `top: trigger.top - 4` |
+| **Chat row menu** | 206 | `left: panel.right + 10`, `top: trigger.top - 8` |
+| **Move to Folder submenu** | 184 | `left: 198` off its parent, `top: -6` |
 
-All are `position: fixed`, because the sidebar clips its own overflow for the
-collapse animation.
+**Vertical rule.** A flyout opens **level with its trigger**, not centred on the
+panel and not anchored to the top — the row you clicked stays where your eye
+already is. It is then clamped to `viewport - height - 16` so it can never run
+off the bottom, and only if it still does not fit does it flip above the trigger.
+
+**Horizontal fallback.** When `panel.right + width` would exceed the viewport —
+a phone, where the drawer owns most of the screen — the menu drops below the
+trigger instead: `top: trigger.bottom + 8`, `left: trigger.left`. It animates
+down rather than sideways in that case, so the direction matches the placement.
+
+**All are `position: fixed`**, because the sidebar clips its own overflow for the
+collapse animation. An absolutely-positioned menu is cut off at the panel edge.
+
+**Dismissal is the same for all of them:** outside click, Escape, or the sidebar
+scrolling — a fixed menu cannot track a trigger that has scrolled away.
 
 ### Menus inside a panel
 
