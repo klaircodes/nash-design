@@ -382,7 +382,13 @@ opens. Filtering, searching and paging are local — they switch instantly.
     narrowing it and offers to clear search *and* filters in one action.
 12. **Copy actually copies.** `navigator.clipboard` with a `textarea` fallback —
     a plain `http://localhost` preview is not always a secure context.
-12. **Pagination only when it's needed.** Page size is measured from the
+13. **Descriptions are written for you.** Anywhere a description is optional —
+    bookmark folders first — it is generated on creation rather than left blank,
+    because a field nobody fills is worse than a line nobody asked for. From that
+    moment it is a normal editable value: no confirmation, no regeneration, no
+    special treatment. Counts and dates stay out of it and live on their own
+    derived row, where they cannot go stale.
+14. **Pagination only when it's needed.** Page size is measured from the
     viewport; if everything fits there is no pager at all. Mobile scrolls instead.
 
 ---
