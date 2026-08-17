@@ -362,21 +362,25 @@ opens. Filtering, searching and paging are local — they switch instantly.
    text never reflows and truncation never shifts mid-hover.
 3. **One panel at a time.** Opening the model picker closes Add to Chat, and the
    reverse.
-4. **Touch shows everything.** No hover means no hidden affordances — actions are
+4. **The composer is closed unless you opened it.** It rests as the single input
+   row. Sending, starting a new chat, opening a chat from the sidebar, and
+   opening the model picker all return it to that row. Nothing else may open it —
+   a composer found open on arrival is a bug.
+5. **Touch shows everything.** No hover means no hidden affordances — actions are
    permanently visible on mobile, and rows drop what they can't afford to show.
-5. **Spacing is constant across states.** Collapsing the sidebar must not shrink
+6. **Spacing is constant across states.** Collapsing the sidebar must not shrink
    or reflow its contents.
-6. **Drag highlights on enter**, holds until the drag ends, and uses the hover
+7. **Drag highlights on enter**, holds until the drag ends, and uses the hover
    treatment — never an accent outline. Clear it with one global `dragend`.
-7. **Controls are not drag handles.** A row's buttons disarm the row's own
+8. **Controls are not drag handles.** A row's buttons disarm the row's own
    `draggable` while the pointer is over them.
 8. **Facts aren't draggable.** A chat can be dragged into a folder, but not into
    a different date group — the date records when it happened.
-9. **Destructive is recoverable.** Delete removes immediately and offers Undo,
+10. **Destructive is recoverable.** Delete removes immediately and offers Undo,
    rather than asking first.
-10. **Empty states name the cause.** "Nothing matches X" says which filter is
+11. **Empty states name the cause.** "Nothing matches X" says which filter is
     narrowing it and offers to clear search *and* filters in one action.
-11. **Copy actually copies.** `navigator.clipboard` with a `textarea` fallback —
+12. **Copy actually copies.** `navigator.clipboard` with a `textarea` fallback —
     a plain `http://localhost` preview is not always a secure context.
 12. **Pagination only when it's needed.** Page size is measured from the
     viewport; if everything fits there is no pager at all. Mobile scrolls instead.
@@ -454,7 +458,7 @@ between screens reads as a different element.
 | **Thread** | same 768px centred column, `8px 24px 20px`. Scrolls; the composer does not move with it. |
 | **Top bar** | 56px, first in the column. Mobile keeps 56 with a **14px inset above it**. |
 | **Greeting** | centred in the space between top bar and composer |
-| **Disclaimer** | directly under the composer, centred, 10.5px |
+| **Disclaimer** | **always** directly under the composer — 9px gap, centred, 10.5px `--t4`. Present on every breakpoint and every state; it is chrome, not a mobile extra. The wording is fixed: *"Nash can make mistakes. Please double-check responses."* |
 
 The order is invariant: **top bar → content → panel (if open) → composer**. A
 panel opens *between* the content and the composer and pushes nothing off screen.

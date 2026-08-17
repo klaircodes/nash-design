@@ -19,6 +19,10 @@ export default function Chat({ user, sessionKey, openChat, mobile, drawer, onMen
 
   /* New Chat empties the thread; opening one from the sidebar loads its own. */
   useEffect(() => { setThread([]); }, [sessionKey]);
+
+  /* The composer is closed unless you opened it: starting a chat, opening one,
+     or sending all return it to the collapsed row. */
+  useEffect(() => { setTools(false); }, [sessionKey, openChat]);
   useEffect(() => {
     /* no shared fallback — a chat without its own thread opens empty */
     setThread(openChat ? (openChat.messages || CONVERSATIONS[openChat.title] || []) : []);
@@ -43,6 +47,7 @@ export default function Chat({ user, sessionKey, openChat, mobile, drawer, onMen
   };
 
   const send = text => {
+    setTools(false);
     const word = THINKING[Math.floor(Math.random() * THINKING.length)];
     setThread(t => [...t, { role:'user', text }, { role:'bot', pending: word }]);
     clearTimeout(timer.current);
