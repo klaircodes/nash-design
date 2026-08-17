@@ -121,6 +121,49 @@ Where each lands in practice:
 **Pills are always fully round** — radius equals half the height. A 34px pill is
 17px; anything else is not a pill.
 
+### Spacing
+
+**Everything sits on a 4px scale.** `4 · 8 · 12 · 16 · 20 · 24 · 32 · 40`. A gap
+of 9, 15 or 30 is a bug, not a variant.
+
+| Gap | Between |
+|---|---|
+| **4** | a label and the value directly under it |
+| **8** | icon and its text; items in a row |
+| **12** | rows in a list; blocks in a message |
+| **16** | a card's padding; groups within a card |
+| **20–24** | sections of a page |
+| **32–40** | major regions |
+
+**Inside a card**, the rhythm is fixed and the same in every card:
+
+```
+┌─ padding 16 ─────────────────────────┐
+│  icon 8 title                    ⋯   │
+│            ↕ 12                      │
+│  description                         │
+│            ↕ 12                      │
+│  derived row — 8 saved · Updated 2d  │
+└──────────────────────────────────────┘
+```
+
+Three rules make it hold:
+
+1. **The gap belongs to the container, not the content.** Set one `gap` on the
+   card's auto-layout; never add margins to individual children. Uneven gaps in
+   a card are almost always a child carrying its own margin on top of the gap.
+2. **Empty content collapses.** A card with no description is *shorter* — it does
+   not hold an empty slot open. A gap that stays when the thing it separates is
+   gone reads as broken alignment. (And per §10.13 a description is generated on
+   creation, so "No description yet" should not be reachable at all.)
+3. **A derived row is never padded away from the card's edge differently to the
+   rest.** It is one more child at the same 12px gap, not a footer pinned to the
+   bottom — otherwise short cards stretch to give it somewhere to sit.
+
+**Cards in a grid are sized by content, not stretched to match.** If two cards
+in a row must be the same height, the shorter one is padded by the grid, never
+by inventing space inside it.
+
 ---
 
 ## 4. Buttons
