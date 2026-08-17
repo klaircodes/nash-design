@@ -457,8 +457,11 @@ and outline when not; hovering a filled one hollows it to preview the unpin. The
 same goes for 👍 / 👎 / bookmark. A slashed or rotated variant was tried and
 rejected — one shape, two fills.
 
-**Overflow menus are horizontal (`dotsH`)** everywhere except the sidebar's
-"More" nav item, which keeps the vertical `dots`.
+**Overflow menus follow the shape they sit in.** A **row** takes the horizontal
+`dotsH` — the glyph runs along the row, where the eye is already travelling. A
+**card** takes the vertical `dots`, as does the sidebar's "More" nav item. In a
+card the trigger sits in a corner with height around it, and a horizontal mark
+there reads as a drag handle or a truncation, not a menu.
 
 ---
 
