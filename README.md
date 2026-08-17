@@ -42,3 +42,9 @@ src/
 - [ ] App shell and sidebar
 - [ ] Chat — empty, filled, streaming
 - [ ] Connectors, Bookmarks, Memories, Library
+
+## Design rules
+
+`DESIGN.md` lives at `~/Documents/Nash/DESIGN.md` — that copy is the single
+source of truth. Read it before changing anything visual, and write new
+decisions into it there. Do not create a copy in this repo.
