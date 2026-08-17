@@ -32,7 +32,7 @@ function Collapse({ open, children }) {
           transition={{ height: liquid, opacity: { duration: 0.18, ease } }}
           style={{ overflow: 'hidden' }}
         >
-          <div style={{ display:'flex', flexDirection:'column', gap:2 }}>{children}</div>
+          <div className="collapsein">{children}</div>
         </motion.div>
       )}
     </AnimatePresence>
