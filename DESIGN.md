@@ -7,7 +7,7 @@ from this document rather than inventing its own answer.
 Two things to know before reading:
 
 - **Dark is the default.** Light is a complete theme, switched in Settings.
-- **§13 is the drift list** — where the app currently breaks its own rules. Fix
+- **§14 is the drift list** — where the app currently breaks its own rules. Fix
   those before adding to them.
 
 ---
@@ -431,7 +431,91 @@ the width can track the viewport.
 
 ---
 
-## 13. Drift — fix before extending
+## 13. Placement
+
+Where things sit is fixed. These are not suggestions — an element that moves
+between screens reads as a different element.
+
+### Anchored to the viewport
+
+| Element | Placement |
+|---|---|
+| **Toasts** | **bottom right, 24px from both edges**, stacking upward, 10px gap, `z-index 90`. Mobile: full width at a 16px inset, 16px from the bottom. Never centred, never top, never inline. |
+| **Scrim** | `inset: 0`, `z-index 60` |
+| **Drawer scrim** | `inset: 0`, `z-index 79`, opaque `--app` |
+| **Drawer** | `top:0 bottom:0 left:0`, `z-index 80` |
+| **Drawer collapse mark** | `left: var(--drawerw) + 16px`, `top: 14px` — a constant 16px off the panel's edge at any width |
+
+### The chat column
+
+| Element | Placement |
+|---|---|
+| **Composer** | **always the last thing in the column**, full width of a 768px centred column, `0 24px 28px`. Never floating, never overlapping the thread. Mobile: full width, `12px 12px 14px`. |
+| **Thread** | same 768px centred column, `8px 24px 20px`. Scrolls; the composer does not move with it. |
+| **Top bar** | 56px, first in the column. Mobile keeps 56 with a **14px inset above it**. |
+| **Greeting** | centred in the space between top bar and composer |
+| **Disclaimer** | directly under the composer, centred, 10.5px |
+
+The order is invariant: **top bar → content → panel (if open) → composer**. A
+panel opens *between* the content and the composer and pushes nothing off screen.
+
+### Flyouts from the sidebar
+
+All measured from the **panel's** right edge, never the trigger's — the trigger
+is inset, so `trigger.right` lands back on top of the sidebar.
+
+| Menu | Placement |
+|---|---|
+| **Org switcher** | `left: panel.right + 12`, `top: trigger.top - 4` |
+| **Chat row menu** | `left: panel.right + 10`, `top: trigger.top - 8`, clamped to `viewport - height - 16` so it never runs off the bottom |
+| **Fallback** | when `left + width` exceeds the viewport, drop below the trigger instead: `top: trigger.bottom + 8`, `left: trigger.left` |
+
+All are `position: fixed`, because the sidebar clips its own overflow for the
+collapse animation.
+
+### Menus inside a panel
+
+| Menu | Placement |
+|---|---|
+| **Sort** | `top: 38` under the filter bar, `right: 18` (0 in a search row, 12 on mobile) |
+| **Target picker** | `left: 0; right: 0` — fills its field — `top: 46`, `max-height: 212` then scrolls |
+| **Submenu** | `left: 198` off its parent menu, `top: -6` |
+
+### Panels and dialogs
+
+| Element | Size and placement |
+|---|---|
+| **Model picker (desktop)** | 472 wide, `min(620px, 82vh)` tall, centred over the scrim |
+| **Model picker (mobile)** | full width, **52vh, fixed**, sitting directly above the composer |
+| **Memory dialog** | 520 wide, centred. Mobile: centred with a 16px side inset, `max-height: calc(100vh - 48px)` |
+| **Add to Chat** | above the composer, inside the composer's gutter |
+
+**A panel height never derives from its content.** Three results and thirty open
+to the same box.
+
+### The sidebar
+
+| | |
+|---|---|
+| Width | **280** expanded · **126** collapsed |
+| Mobile drawer | `calc(100vw - 76px)` — a constant 76px strip stays visible |
+| Brand row | fixed at the top, never scrolls |
+| Footer — user row and version | **pinned to the bottom at all times** |
+| Everything between | one scrolling region |
+
+### Page chrome
+
+| | Desktop | Mobile |
+|---|---|---|
+| Page padding | `34px 40px 60px` | `6px 16px 44px` |
+| Page header | top left; primary action top right | stacked, action full width |
+| Search row | directly under the header | same |
+| Filters | directly under search | scrolling strip |
+| Pagination | bottom left of the list | none — the list scrolls |
+
+---
+
+## 14. Drift — fix before extending
 
 Measured against the shipped CSS. These are places the app contradicts this
 document.
@@ -459,7 +543,7 @@ carry the app; several others appear once.
 
 ---
 
-## 14. Adding a screen
+## 15. Adding a screen
 
 The order that has worked, and the checks that catch what eyes miss:
 
